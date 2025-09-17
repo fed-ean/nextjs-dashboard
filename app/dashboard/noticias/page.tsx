@@ -1,4 +1,4 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "../../global.css"
 import NoticiaEncabezado from '../../ui/dashboard/noticia-encabezado';
 
 export default function PageNoticias() {

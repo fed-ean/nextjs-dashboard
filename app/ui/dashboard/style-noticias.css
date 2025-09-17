@@ -1,0 +1,377 @@
+@charset "UTF-8";
+/* Aquí definimos las Custom properties */
+
+ol a{
+    text-decoration: none;    
+}
+
+::-webkit-scrollbar { width: 0px; height: 9px;}
+::-webkit-scrollbar-button { width: 0px; height: 0px;}
+::-webkit-scrollbar-thumb { background: transparent; border: 0px none #fff; border-radius: 10px;}
+::-webkit-scrollbar-thumb:hover { background: #3a77a1;}
+::-webkit-scrollbar-thumb:active { background: #8dd0d8;}
+::-webkit-scrollbar-track {background: transparent;border: 0px solid #aaa; border-radius: 5px;}
+::-webkit-scrollbar-track:hover { background: #e4e4e4;}
+::-webkit-scrollbar-track:active { background: #d2d2d2;}
+::-webkit-scrollbar-corner { background: transparent;}
+
+:root {
+    --negro: #393939;
+    --blanco: #ececec;
+    --sombra-ppal: #c9c9c9;
+    --sombra-sec: #ffffff;
+    --borde-negro: #00000050;
+    --marcado: rgb(127, 195, 255);
+  /* Tipografía */
+    --tipo-principal: Helvetica, Arial, sans-serif;
+}
+:root {
+    /* Colores para el tema CLARO */
+    --color-fondo-claro: #fffbf0; /* Color de fondo principal de la sección */
+    --color-texto-claro: #000000; /* Color de texto general */
+    --color-barra-navegacion-claro: #241F55; /* Color de la barra de navegación */
+    --color-footer-claro: #222; /* Color del pie de página */
+    --color-box-claro: #1e3e62; /* Color de las cajas de noticias */
+    --color-sombra-ppal-claro: #c9c9c9; /* Sombra principal */
+    --color-sombra-sec-claro: #ffffff; /* Sombra secundaria */
+    --color-borde-negro-claro: #00000050; /* Borde oscuro */
+    --color-marcado-claro: rgb(127, 195, 255); /* Color de marcado/activo */
+    --color-footer-titulo: #FFD700;
+    --color-noticia-varias-hover-claro: #ffffff; /* Color del texto al hacer hover en noticias varias */
+}
+@media (prefers-color-scheme: dark) {
+    :root{
+    /* Colores para el tema OSCURO */
+    --color-fondo-claro: #202020; /* Fondo más oscuro */
+    --color-texto-claro: #ffffff; /* Texto claro */
+    --color-barra-navegacion-claro: #1a1a1a; /* Barra de navegación más oscura */
+    --color-footer-claro: #111; /* Pie de página muy oscuro */
+    --color-box-claro: #333333; /* Cajas de noticias más oscuras */
+    --color-sombra-ppal-claro: #1a1a1a; /* Sombras adaptadas al oscuro */
+    --color-sombra-sec-claro: #4a4a4a; /* Sombras adaptadas al oscuro */
+    --color-borde-negro-claro: #FFFFFF50; /* Borde claro */
+    --color-marcado-claro: rgb(70, 130, 180); /* Color de marcado/activo para oscuro */
+    --color-noticia-varias-hover-claro: #e0e0e0; /* Color del texto al hacer hover en noticias varias para oscuro */
+}}
+/* Las adaptamos al modo oscuro */
+@media (prefers-color-scheme: dark) {
+    :root {
+    --negro: #ececec;
+    --blanco: #303030;
+    --sombra-ppal: #242424;
+    --sombra-sec: #3c3c3c;
+    --borde-negro: #FFFFFF50;
+    }
+}
+
+div.principal{
+    width: 100%;
+    height: 80dvh;
+    background: url("../fotos/mirtha-gala.jpeg") no-repeat center;
+    background-size: cover;
+    border-bottom-left-radius: 40px;
+    border-bottom-right-radius: 40px;
+    align-content: end;
+    overflow-y: scroll;
+}
+
+div p{
+    font-size: 2rem;
+    margin: 40px;
+    overflow-y: scroll;
+    /*
+    margin-top: 20px;
+    margin-bottom: 20px;*/
+}
+
+body{
+    background-color: var(--color-fondo-claro);
+    color: var(--color-texto-claro);
+    scroll-behavior:smooth;
+}
+
+
+.navbar-toggler{
+    background-color: white;
+}    
+
+/*para decorar los botones que estan en la barra de navegacion*/
+.btn-nav-bar{
+    height: 45px;
+    width: 45px;
+    border-radius: 5px;
+}
+
+.btn-nav-bar img {
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+
+.img-btn-nav{
+    position: absolute;
+    transform: translate(-50%, -50%);
+}    
+
+.img-a-nav{
+    transform: translate(6%, 6%);
+}    
+
+.btn-nav-bar:hover{
+    background-color: rgba(255, 255, 255, 0.274);
+    border: none;
+}    
+
+/*Clase usada para el boton con que se extiende en la barra de navegacion*/
+.btn-nav-completo{
+    background-color: #241F55;
+}
+
+.categorias-nav a{
+    display: block;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 1.3rem 3rem;
+    color: white;
+}    
+
+.categorias-nav a:hover{
+    background-color: rgba(255, 255, 255, 0.356);
+    transition: .2s;
+}
+
+.categorias-nav:first-of-type h4{
+    padding: 1rem 3rem;
+    border-bottom: 1px solid white;
+    font-size: 20px;
+}
+
+.categorias-nav h4{
+    border-bottom: 1px solid rgba(255, 255, 255, 0.589);
+    padding: 0 1rem 1rem 1rem;
+    margin: 0 0.9rem;
+    font-size: 20px;
+    color: white;
+    text-align: center;
+    border-bottom-color: rgba(var(--color-texto-claro), 0.562);
+}
+.categorias-nav{
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-barra-navegacion-claro);
+}    
+
+
+.categorias-nav-header{
+    padding: 10px 10px 0 0;
+    margin: 0;
+}
+
+.contactos-nav{
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    background-color: var(--color-barra-navegacion-claro);
+}
+
+.contactos-nav i{
+    font-size: 2.5rem;
+    position: absolute;
+    align-self: center;
+}
+
+.contactos-nav a{
+    height: 3.5rem;
+    width: 3.5rem;
+    
+    border-radius: 7px;
+    display: flex;
+    justify-content: center;
+}
+
+.contactos-nav a:hover{
+    background-color: rgba(255, 255, 255, 0.356);
+    transition: .2s;
+}
+
+section{
+    margin-top: 5dvh;
+    background-color: #fffbf0;
+    height: 100%;
+    width: 95%;
+    justify-self: center;
+}
+
+.container-left
+{
+    width: 15%;
+    float: left;
+    position: relative;
+    display: block;
+    border-right: 1px solid black;
+}
+
+.container-right{
+    width: 85%;
+    float: right;
+    position: relative;
+    display: block;
+
+}
+
+.foto-principal{
+    text-align: center;
+}
+
+.foto-principal img{
+    width: 80dvh;
+    border-radius: 0.4rem;
+}
+
+.text-container{
+    background: #1414147a;
+    backdrop-filter: blur(0.2rem);
+    -webkit-backdrop-filter: blur(0.6rem);
+    border-radius: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    margin: 0 2dvh 2dvh 2dvh;
+}
+
+.principal button{
+    margin: 15px 5px 0 35px;
+    background: #2a2558;
+    border-radius: 25px;
+    border: 1px;
+}
+
+.principal p{
+    margin-top: -1.5dvh;
+}
+
+.principal h3{
+    font-size: 3.5dvh;
+    margin: 2dvh 8dvh 2dvh 8dvh;
+    padding: 1px;
+    color: rgb(208, 206, 241);
+}
+
+.container-left h3{
+    font-size: 3.4dvh;
+}
+
+.container-left a{
+    color: var(--color-texto-claro);
+}
+.text-descriptivo{
+    margin-top: -0.5dvh;
+    text-align: center;
+    font-size: 2.2dvh;
+}
+
+.text{
+    margin: 10px 100px 10px 100px;
+    font-size: 3dvh;
+}
+
+h1{
+    border-bottom: 1px solid rgb(165, 165, 165);
+    font-size: 7dvh;
+    margin: 0 35px;
+    padding: 14px;      
+    text-align: left;
+    color: rgb(255, 255, 255);
+    text-shadow: 1.5px 1px 5px rgba(0, 0, 20, 0.514);
+}
+
+h2{
+    font-size: 3.7dvh;
+    padding: 20px 0 20px;
+    text-align: center;
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+}
+
+h4{
+    font-size: 2dvh;
+    letter-spacing: 0.15rem;
+    margin: 1dvh 4dvh 1dvh 4dvh;
+    color: white;
+}
+
+li{
+    list-style-type: none;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 2.4dvh;
+}
+
+
+p{
+    text-align: justify;
+}
+
+.links-navbar{
+    text-decoration: none;
+    color: white;
+    display: flex;
+    align-items: center;
+}
+
+.barra-navegacion{
+    background-color: var(--color-barra-navegacion-claro);
+    padding: 0 10px;
+    display: flex;
+    justify-content: space-between;
+    color: white;
+    border: none;
+    height: 9dvh;
+}
+
+.logo{
+    height:5dvh;
+    width: 25dvh;
+    justify-content: center;
+}
+
+.img-a-nav{
+    color: #ffffff;
+    position: absolute;
+    transform: translate(20%, 20%);
+}
+
+/*boton para subir*/
+.back-to-top {
+    display: none; 
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 9999;
+}
+
+.youtube-menu{
+    color: #FF0000;
+}
+.fa-youtube{
+    color: #FF0000;
+}
+.fa-facebook{
+    color: #1877F2;
+}
+.instagram-gradient {
+    font-size: 40px;
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 50px;
+}
+.fa-x-twitter{
+    color: #dddddd;
+}
+.fa-telegram{
+    color: #0088CC;
+}
