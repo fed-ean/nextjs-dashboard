@@ -2,31 +2,40 @@ import AcmeLogo from '@/app/ui/acme-logo';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import NavBar from './ui/dashboard/navbar';
-import NoticiaPrincipal from './ui/dashboard/not-principales';
+import NoticiaPrincipalIzquierda from './ui/dashboard/not-principal-izquierda';
+import NoticiaPrincipalDerecha from './ui/dashboard/not-principal-derecha';
 import EnVivo from './ui/dashboard/envivo';
+import RadioPlayer from './ui/Reproductor';
 import NoticiasVarias from './ui/dashboard/noticias-varias';
 import Footer from './ui/dashboard/footer';
 import "./global.css";
+import React from 'react';
 
 export default function Page() {
   return(
     <>
-      <article className="mx-3">
-      <h1>Difusion y analisis de las empresas PYMES</h1>
-
-      <EnVivo/>
-
+      <article className="mx-3 mt-14">
+      <h1>DIFUSIÓN y ANÁLISIS de las EMPRESAS PYMES</h1>
+      <RadioPlayer/>
       <h2>Noticias Principales</h2>
-
-      <NoticiaPrincipal />
+      <div className="flex flex-wrap">
+      <NoticiaPrincipalIzquierda />
+      <NoticiaPrincipalDerecha /> 
+      </div>
     
       </article>
-      <article className="noticias-varias">
-        <h2>Noticias Varias</h2>
-        <div className="flex flex-wrap justify-center text-center mx-3 space-x-4">
-      <NoticiasVarias/>
-    </div>
-      </article>
+      <article className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 noticias-varias">
+  <h2 className="col-span-full">Noticias Varias</h2>
+  <NoticiasVarias />
+  <NoticiasVarias />
+  <NoticiasVarias />
+  <NoticiasVarias />
+  <NoticiasVarias />
+  <NoticiasVarias />
+  <NoticiasVarias />
+  <NoticiasVarias />
+  <NoticiasVarias />
+</article>
       <Footer/>
     </>
   );

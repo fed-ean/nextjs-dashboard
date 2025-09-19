@@ -90,109 +90,6 @@ body{
     scroll-behavior:smooth;
 }
 
-
-.navbar-toggler{
-    background-color: white;
-}    
-
-/*para decorar los botones que estan en la barra de navegacion*/
-.btn-nav-bar{
-    height: 45px;
-    width: 45px;
-    border-radius: 5px;
-}
-
-.btn-nav-bar img {
-    position: absolute;
-    transform: translate(-50%, -50%);
-}
-
-.img-btn-nav{
-    position: absolute;
-    transform: translate(-50%, -50%);
-}    
-
-.img-a-nav{
-    transform: translate(6%, 6%);
-}    
-
-.btn-nav-bar:hover{
-    background-color: rgba(255, 255, 255, 0.274);
-    border: none;
-}    
-
-/*Clase usada para el boton con que se extiende en la barra de navegacion*/
-.btn-nav-completo{
-    background-color: #241F55;
-}
-
-.categorias-nav a{
-    display: block;
-    text-decoration: none;
-    font-size: 18px;
-    padding: 1.3rem 3rem;
-    color: white;
-}    
-
-.categorias-nav a:hover{
-    background-color: rgba(255, 255, 255, 0.356);
-    transition: .2s;
-}
-
-.categorias-nav:first-of-type h4{
-    padding: 1rem 3rem;
-    border-bottom: 1px solid white;
-    font-size: 20px;
-}
-
-.categorias-nav h4{
-    border-bottom: 1px solid rgba(255, 255, 255, 0.589);
-    padding: 0 1rem 1rem 1rem;
-    margin: 0 0.9rem;
-    font-size: 20px;
-    color: white;
-    text-align: center;
-    border-bottom-color: rgba(var(--color-texto-claro), 0.562);
-}
-.categorias-nav{
-    margin: 0;
-    padding: 0;
-    background-color: var(--color-barra-navegacion-claro);
-}    
-
-
-.categorias-nav-header{
-    padding: 10px 10px 0 0;
-    margin: 0;
-}
-
-.contactos-nav{
-    display: flex;
-    justify-content: space-around;
-    align-items: flex-end;
-    background-color: var(--color-barra-navegacion-claro);
-}
-
-.contactos-nav i{
-    font-size: 2.5rem;
-    position: absolute;
-    align-self: center;
-}
-
-.contactos-nav a{
-    height: 3.5rem;
-    width: 3.5rem;
-    
-    border-radius: 7px;
-    display: flex;
-    justify-content: center;
-}
-
-.contactos-nav a:hover{
-    background-color: rgba(255, 255, 255, 0.356);
-    transition: .2s;
-}
-
 section{
     margin-top: 5dvh;
     background-color: #fffbf0;
@@ -290,6 +187,7 @@ h2{
     text-decoration-line: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 4px;
+    margin: 0;
 }
 
 h4{
@@ -311,67 +209,14 @@ p{
     text-align: justify;
 }
 
-.links-navbar{
-    text-decoration: none;
-    color: white;
-    display: flex;
-    align-items: center;
-}
-
-.barra-navegacion{
-    background-color: var(--color-barra-navegacion-claro);
-    padding: 0 10px;
-    display: flex;
-    justify-content: space-between;
-    color: white;
-    border: none;
-    height: 9dvh;
-}
-
 .logo{
     height:5dvh;
     width: 25dvh;
     justify-content: center;
 }
 
-.img-a-nav{
-    color: #ffffff;
-    position: absolute;
-    transform: translate(20%, 20%);
-}
-
-/*boton para subir*/
-.back-to-top {
-    display: none; 
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    z-index: 9999;
-}
-
-.youtube-menu{
-    color: #FF0000;
-}
-.fa-youtube{
-    color: #FF0000;
-}
-.fa-facebook{
-    color: #1877F2;
-}
-.instagram-gradient {
-    font-size: 40px;
-    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-size: 50px;
-}
-.fa-x-twitter{
-    color: #dddddd;
-}
-.fa-telegram{
-    color: #0088CC;
+.logo{
+    height:5dvh;
+    width: 25dvh;
+    justify-content: center;
 }

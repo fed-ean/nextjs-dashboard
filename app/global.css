@@ -116,7 +116,7 @@ li{
 
 p{
     text-align: justify;
-    color: white;
+    color: rgb(0, 0, 0);
 }
 h4{
     color: var(--color-footer-titulo);
@@ -259,21 +259,29 @@ div.envivo p{
     object-fit: cover;
 }
 
-.noticias-varias .card .card-title {
+.noticias-varias .card .card-title{
+    background-color: rgb(0,0,0,0.5);
+    border-radius: 5px;
+}
+
+
+.noticias-varias .card:hover .card-title{
+    background-color: rgb(0,0,0,0.0);
+}
+ 
+.noticias-varias .card .card-title{
     color: #e0e0e0;
 
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-}
+} 
 
 .noticias-varias .card:hover img{
     filter: brightness(0.4);
 }
 
-.noticias-varias .row {
+.noticias-varias{
     row-gap: 1.5rem; /*espaciado entre filas*/
     column-gap: 1rem;
 }

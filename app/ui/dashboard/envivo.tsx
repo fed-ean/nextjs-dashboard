@@ -1,13 +1,11 @@
 import "./style-index.css";
-
+import RadioPlayer from "../Reproductor";
 
 export default function EnVivo(){
     return(
         <div className="envivo">
-  <button className="btn-envivo">
-    <img src="fotos/flecha.svg" />
-  </button>
-  <p>En vivo</p>
+        <RadioPlayer/>  
+        <p>En vivo</p>
 </div>
 
     )

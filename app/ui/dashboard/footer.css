@@ -1,0 +1,151 @@
+.footer {
+    margin-top: 5rem;
+    color: #ececec;
+    padding: 1rem 0;
+}
+
+.div-conteiner {
+    width: 95%;
+    display: flex;
+    justify-content: space-between;
+    padding: 1.5rem ;
+    margin: 0 auto;
+    gap: 30px;
+}
+.footer-section .footer-brand {
+    flex: 1;
+    min-width: 200px;
+}
+
+.izquierda {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
+.izquierda p{
+    margin: 0;
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bolder;
+}
+.redes ul {
+    display: flex;
+    gap: 15px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-wrap: wrap;
+}
+.redes h4 {
+    margin: 0 0 8px 0;
+}
+
+.centro {
+    text-align: center;
+}
+
+.derecha {
+    text-align: center;
+}
+
+.footer-logo{
+    width: 300px;
+}
+.footer-span{
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;;
+    font-size: 2em;
+    font-weight: bold;
+}
+.footer-bottom {
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+    padding-top: 2rem;
+    border-top: 1px solid; /* Ajusta el color del borde si es necesario */
+
+}
+.footer-bottom .footer-bottom-p{
+    text-align: center;
+}
+.footer-bottom-p a{
+    text-decoration: none;
+}
+.footer-bottom-ul{
+    display: contents;
+}
+.footer-bottom-ul li{
+    align-items:start;
+    display:contents;
+}
+.footer-bottom-ul a{
+    font-size: 1.3rem;
+    text-decoration: none;
+    color: #FFF; /* Un gris más suave para los enlaces */
+    text-align: start;
+    display: contents;
+}
+
+.footer p{
+    color: #FFFFFF;
+}
+/*footer secciones*/
+.footer-ul-li a{
+    text-decoration: none;
+    color: #FFF; /* Usa la variable */
+    text-align: start;
+    display: block;
+    font-size: 20px;
+}
+/*footer redes*/
+.youtube-menu{
+    color: #FF0000;
+}
+.fa-youtube{
+    color: #FF0000;
+}
+.fa-facebook{
+    color: #1877F2;
+}
+.instagram-gradient {
+    font-size: 40px;
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 50px;
+}
+.fa-x-twitter{
+    color: #dddddd;
+}
+.fa-telegram{
+    color: #0088CC;
+}
+/*footer contacto*/
+.footer-a-contacto{
+    display: block;
+    text-align: start;
+    text-decoration: none;
+}
+.fa-envelope{
+    color: #ffffff;
+}
+.fa-circle-info{
+    color: #ffffff;
+}
+.fa-square-phone{
+    color:#1877F2;
+}
+.fa-linkedin{
+    font-size: 25px;
+    color: #1877F2;
+}
+.fa-location-dot{
+    color:#c70b0b;
+}
+.fa-whatsapp{
+    color: #4FCE5D;
+    color: #075E54;
+}
+/*footer contacto*/
+.footer-bottom-contacto{
+    display: flex;
+}
