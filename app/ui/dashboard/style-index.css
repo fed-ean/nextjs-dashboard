@@ -240,24 +240,63 @@ div.envivo p{
     height: 100%;
     object-fit: cover;
 }
-
 .noticias-varias .card .card-title {
-    color: #e0e0e0;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  color: #e0e0e0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: background-color 0.3s ease;
+  /* Impide que se pueda seleccionar el texto sobrante */
+  max-height: calc(1.5rem * 3); /* 3 líneas de altura (aproximadamente) */
+  line-height: 1.25rem;
+  user-select: none;
 }
 
 .noticias-varias .card:hover img{
     filter: brightness(0.4);
 }
 
-.noticias-varias .row {
-    row-gap: 1.5rem; /*espaciado entre filas*/
-    column-gap: 1rem;
+
+.noticias-varias .card:hover .card-title{
+    background-color: rgb(0,0,0,0);
 }
+
+.noticias-varias{
+    column-gap: 1.5rem;
+    row-gap: 2rem; /*espaciado entre filas*/
+}
+
+
+
+/*       TARJETAS      */
+
+.tarjeta img{
+    position: relative;
+    border-radius: 5px;
+}
+
+.tarjeta p{
+    padding: 3px;
+    background-color: rgb(2,2,2);
+    margin-bottom:10px;
+    margin-left:10px;
+    margin-top: auto;
+    margin-right:auto;
+}
+
+.tarjeta h5{
+    text-decoration: solid;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  
+}
+
 
 /*para decorar los botones que estan en la barra de navegacion*/
 

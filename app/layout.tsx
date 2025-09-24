@@ -1,6 +1,7 @@
 import './global.css';
 import ScrollToTopButton from './ui/scrollBoton';
 import NavBar from './ui/dashboard/navbar';
+import Footer from './ui/dashboard/footer';
 export default function RootLayout({
   children,
 }: {
@@ -14,6 +15,8 @@ export default function RootLayout({
           {children}
         </div>
         <ScrollToTopButton/>
+        <div></div>
+        <Footer />
         </body>
     </html>
   );

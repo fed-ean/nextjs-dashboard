@@ -122,6 +122,7 @@ section{
 .foto-principal img{
     width: 80dvh;
     border-radius: 0.4rem;
+    display: inline;
 }
 
 .text-container{
@@ -195,6 +196,7 @@ h4{
     letter-spacing: 0.15rem;
     margin: 1dvh 4dvh 1dvh 4dvh;
     color: white;
+    font-weight: bold;
 }
 
 li{
@@ -207,12 +209,6 @@ li{
 
 p{
     text-align: justify;
-}
-
-.logo{
-    height:5dvh;
-    width: 25dvh;
-    justify-content: center;
 }
 
 .logo{

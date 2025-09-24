@@ -1,29 +1,63 @@
-import Link from 'next/link';
-import NavLinks from '@/app/ui/dashboard/nav-links';
-import AcmeLogo from '@/app/ui/acme-logo';
-import { PowerIcon } from '@heroicons/react/24/outline';
+import ReproductorRadio from "../categorias/Reproductor";
 
 export default function SideNav() {
   return (
-    <div className="flex h-full flex-col px-3 py-4 md:px-2">
-      <Link
-        className="mb-2 flex h-20 items-end justify-start rounded-md bg-blue-600 p-4 md:h-40"
-        href="/"
-      >
-        <div className="w-32 text-white md:w-40">
-          <AcmeLogo/>
+    <aside className="h-auto w-72 bg-white border-r overflow-y-auto">
+      <div className="p-4 space-y-6">
+        {/* Radio */}
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Radio en Vivo</h2>
+          <ReproductorRadio/>
         </div>
-      </Link>
-      <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
-        <NavLinks />
-        <div className="hidden h-auto w-full grow rounded-md bg-gray-50 md:block"></div>
-        <form>
-          <button className="flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3">
-            <PowerIcon className="w-6" />
-            <div className="hidden md:block">Sign Out</div>
-          </button>
-        </form>
+
+        {/* Latest Posts */}
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Últimas publicaciones</h2>
+          <ul className="space-y-3">
+            <li className="flex space-x-2">
+              <img
+                src="/img/post1.jpg"
+                alt="Post 1"
+                className="w-12 h-12 object-cover rounded"
+              />
+              <div>
+                <p className="text-sm font-medium">
+                  Fundación Ágora: Dedicados al bienestar social
+                </p>
+                <span className="text-xs text-gray-500">septiembre 23, 2025</span>
+              </div>
+            </li>
+            <li className="flex space-x-2">
+              <img
+                src="/img/post2.jpg"
+                alt="Post 2"
+                className="w-12 h-12 object-cover rounded"
+              />
+              <div>
+                <p className="text-sm font-medium">
+                  Eliminación Temporal de Derechos de Exportación
+                </p>
+                <span className="text-xs text-gray-500">septiembre 23, 2025</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        {/* Categorías */}
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Categorias</h2>
+          <ul className="space-y-2 text-sm">
+            <li>Ámbito</li>
+            <li>Deportes</li>
+            <li>Desayuno PyME</li>
+            <li>Economía</li>
+            <li>Internacional</li>
+            <li>Locales</li>
+            <li>Política</li>
+            <li>Programas</li>
+          </ul>
+        </div>
       </div>
-    </div>
+    </aside>
   );
 }

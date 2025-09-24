@@ -17,8 +17,15 @@ const config: Config = {
           500: '#0070F3',
           600: '#2F6FEB',
         },
+      }, 
+      animation: {
+        wave: 'wave 1.5s infinite ease-in-out',
       },
       keyframes: {
+        wave: {
+          '0%, 100%': { height: '10px' },
+          '50%': { height: '50px' },
+        },
         shimmer: {
           '100%': {
             transform: 'translateX(100%)',

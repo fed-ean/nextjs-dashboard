@@ -1,4 +1,4 @@
-import "./style-index.css";
+import "./style-noticias.css";
 
 
 export default function NoticiaPrincipalIzquierda(){

@@ -9,11 +9,8 @@ import "../ui/dashboard/style-noticias.css";
 export default function InvoicesPage() {
   return(
     <>
-    <NavBar />
 
-    <NoticiaEncabezado />
     <section>
-        <NoticiasCategorias />
         <NoticiasTexto />
     </section>
     </>

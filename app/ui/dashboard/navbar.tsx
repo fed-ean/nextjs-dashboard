@@ -28,21 +28,15 @@ export default function NavBar() {
       {/* Menú Offcanvas - Contenido del SideNav */}
       <div
         id="offcanvas-menu"
-        className={`fixed top-0 left-0 h-full w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 h-full w-[27%] bg-blue-900 shadow-xl transform transition-transform duration-300 ease-in-out text-white ${
           isMenuOpen ? 'translate-x-0' : '-translate-x-full'
         } z-50 overflow-y-auto flex flex-col`}
       >
-        {/* Encabezado del menú */}
-        <div className="flex h-[6rem]  items-center justify-start rounded-md bg-blue-600 p-4 md:h-[6rem]">
-          <div className="w-32 text-white md:w-40">
-            <p className='text-6xl'>EXPLORAR</p>
-          </div>
-        </div>
 
         {/* Cierre del menú */}
         <div className="flex justify-end p-4">
           <button
-            className="text-gray-400 transition duration-300 ease-in-out hover:text-gray-600 focus:outline-none"
+            className="text-gray-400 transition duration-300 ease-in-out hover:text-white focus:outline-none"
             onClick={toggleMenu}
             aria-label="Cerrar menú"
           >
@@ -63,22 +57,46 @@ export default function NavBar() {
           </button>
         </div>
 
+        {/* Encabezado del menú */}
+        <div className="flex h-[3rem] items-center justify-center rounded-md bg-blue-900 p-0 ">
+          <div className="w-[100%] text-white">
+            <p className="flex justify-center m-0 border-b">Explorar</p>
+          </div>
+        </div>
+
         {/* Enlaces de navegación y botón de Sign Out */}
-        <div className="flex grow flex-col justify-between space-y-2 px-3">
-          <div className="hidden h-auto w-full grow rounded-md bg-gray-50 md:block">
-            <a href="#" className="flex h-[3rem] grow items-center rounded-t-lg border-b-black transition duration-300 justify-center gap-1  bg-gray-50 p-3 text-sm font-medium hover:bg-blue-600 hover:text-white md:flex-none md:justify-start md:p-2 md:px-3 text-black">
+        <div className="flex grow flex-col justify-between space-y-2 ">
+          <div className="hidden h-auto w-[100%] grow rounded-md md:block">
+            <a href="#" className="flex h-[17%] grow items-center border-b-black transition duration-300 justify-center gap-1 p-4 text-base font-medium hover:bg-blue-100 hover:text-black md:flex-none md:justify-start md:p-2 md:px-3 text-white">
               Inicio
             </a>
-            <a href="#" className="flex h-[3rem] grow items-center rounded-t-lg border-b-black transition duration-300 justify-center gap-1  bg-gray-50 p-3 text-sm font-medium hover:bg-blue-600 hover:text-white md:flex-none md:justify-start md:p-2 md:px-3 text-black">
-              Inicio
+            <a href="#" className="flex h-[17%] grow items-center border-b-black transition duration-300 justify-center gap-1 p-4 text-base font-medium hover:bg-blue-100 hover:text-black md:flex-none md:justify-start md:p-2 md:px-3 text-white">
+              Politica
+            </a>
+            <a href="#" className="flex h-[17%] grow items-center border-b-black transition duration-300 justify-center gap-1 p-4 text-base font-medium hover:bg-blue-100 hover:text-black md:flex-none md:justify-start md:p-2 md:px-3 text-white">
+              Economia
+            </a>
+            <a href="#" className="flex h-[17%] grow items-center border-b-black transition duration-300 justify-center gap-1 p-4 text-base font-medium hover:bg-blue-100 hover:text-black md:flex-none md:justify-start md:p-2 md:px-3 text-white">
+              PYMES
+            </a>
+            <a href="#" className="flex h-[17%] grow items-center border-b-black transition duration-300 justify-center gap-1 p-4 text-base font-medium hover:bg-blue-100 hover:text-black md:flex-none md:justify-start md:p-2 md:px-3 text-white">
+              Interes general
             </a>
           </div>
-          <form>
-            <button className="flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3">
-              <PowerIcon className="w-6" />
-              <div className="hidden md:block">Sign Out</div>
+          <div className="flex justify-around mb-3">
+            <button className="flex h-[4rem] w-[4rem] mb-1 grow items-center justify-center gap-2 rounded-md bg-blue-200 p-3 text-sm font-medium hover:bg-blue-50 md:flex-none md:justify-start md:p-2 md:px-3">
+               
             </button>
-          </form>
+            <button className="flex h-[4rem] w-[4rem] mb-1 grow items-center justify-center gap-2 rounded-md bg-blue-200 p-3 text-sm font-medium hover:bg-blue-50 md:flex-none md:justify-start md:p-2 md:px-3">
+               
+            </button>
+            <button className="flex h-[4rem] w-[4rem] mb-1 grow items-center justify-center gap-2 rounded-md bg-blue-200 p-3 text-sm font-medium hover:bg-sky-100 md:flex-none md:justify-start md:p-2 md:px-3">
+               
+            </button>
+            <button className="flex h-[4rem] w-[4rem] mb-1 grow items-center justify-center gap-2 rounded-md bg-blue-200 p-3 text-sm font-medium hover:bg-sky-100 md:flex-none md:justify-start md:p-2 md:px-3">
+               
+            </button>
+          </div>
         </div>
       </div>
 
