@@ -1,47 +1,20 @@
+export default function CategoriasCard() {
+  return (
+    <div className="bg-white shadow-md rounded-lg overflow-hidden p-4 flex flex-col h-full">
+      {/* Imagen */}
+      <img
+        src="fotos/mirtha-gala.jpeg"
+        alt="Imagen Noticia"
+        className="w-full h-auto rounded-md mb-3 object-cover"
+      />
 
-
-import "./style-noticias.css";
-
-
-export default function CategoriasCard(){
-    return(
-        <div className="w-full sm:w-1/2 px-2 noticia-box">
-  <div className="flex flex-wrap gap-2 img-noticia">
-    <button>
-      <h4>
-        <a href="" className="text-blue-600 font-semibold hover:underline">
-          {" "}
-          PyME{" "}
+      {/* Texto de la noticia */}
+      <div className="mt-auto">
+        <a href="../Noticias" className="text-gray-800 font-medium hover:underline">
+          Mirtha Legrand se retirará a la edad de los 97 años dejando atrás un
+          legado del programa más visto de las familias argentinas
         </a>
-      </h4>
-    </button>
-    <button>
-      <h4>
-        <a href="" className="text-blue-600 font-semibold hover:underline">
-          {" "}
-          Política{" "}
-        </a>
-      </h4>
-    </button>
-    <button>
-      <h4>
-        <a href="" className="text-blue-600 font-semibold hover:underline">
-          {" "}
-          Local{" "}
-        </a>
-      </h4>
-    </button>
-  </div>
-  <div className="mt-4 text-noticia">
-    <a
-      href="../Noticias"
-      className="text-gray-800 hover:underline"
-    >
-      Mirtha Legrand se retirará a la edad de los 97 años dejando atrás un
-      legado del programa más visto de las familias argentinas
-    </a>
-  </div>
-</div>
-
-  )
-};
+      </div>
+    </div>
+  );
+}

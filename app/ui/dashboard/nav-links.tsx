@@ -4,32 +4,45 @@ import {
   DocumentDuplicateIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import "./style-index.css";
 
 // Map of links to display in the side navigation.
 // Depending on the size of the application, this would be stored in a database.
 const links = [
-  { name: 'Inicio', href: '/', icon: HomeIcon },
-  {
-    name: 'Categorias',
-    href: '/Categorias',
-    icon: DocumentDuplicateIcon,
+  { 
+    name: 'Inicio', 
+    href: '/' 
   },
-  { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
+
+  {
+    name: 'Politica', 
+    href: "/Categorias"
+  },
+  {
+    name: 'Economia',
+    href: '/Categorias',
+  },
+  {
+    name: 'PYMES',
+    href: '/Categorias',
+  },
+  {
+    name: 'Interes general',
+    href: '/Categorias',
+  },
 ];
 
 export default function NavLinks() {
   return (
     <>
       {links.map((link) => {
-        const LinkIcon = link.icon;
         return (
           <Link
             key={link.name}
             href={link.href}
-            className="flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3 text-black"
+            className="flex h-[16%] grow items-center border-b-black transition duration-300  justify-center gap-1 p-4 hover:bg-blue-100 md:flex-none md:justify-start md:p-2 md:px-3  "
           >
-            <LinkIcon className="w-6" />
-            <p className="hidden md:block text-black">{link.name}</p>
+            <p className='text-lg'>{link.name}</p>
           </Link>
         );
       })}

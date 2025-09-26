@@ -83,7 +83,7 @@ h1{
 
 .foto-principal img{
     border-radius: 4px;
-    width: 85dvh;
+    width: 60dvh;
     height: 65dvh;
 }
 
@@ -133,6 +133,7 @@ section{
     font-weight: bold;
     font-size: 2.6dvh;
     border-top: 1px solid var(--color-texto-claro);
+    width: 100%;
 }
 
 button{

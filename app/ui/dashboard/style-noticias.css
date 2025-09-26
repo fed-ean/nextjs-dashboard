@@ -216,3 +216,34 @@ p{
     width: 25dvh;
     justify-content: center;
 }
+
+@media (max-width: 768px){
+    h1{
+        font-size: 4.2dvh;
+    }
+    
+    h2{
+        font-size: 2.5dvh;
+    }
+
+    .principal h3{
+        margin: 1dvh 4dvh;
+        font-size: 2.9dvh; 
+    }
+
+    h4{
+        font-size: 1.6dvh;
+    }
+
+    .container-right{
+        width: 100%;
+    }
+
+    .text-descriptivo{
+        margin-top: 0;
+    }
+
+    .text{
+        margin: 0;
+    }
+}

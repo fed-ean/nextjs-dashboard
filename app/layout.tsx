@@ -1,6 +1,7 @@
 import './global.css';
 import ScrollToTopButton from './ui/scrollBoton';
 import NavBar from './ui/dashboard/navbar';
+import RadioPlayer from './ui/Reproductor';
 import Footer from './ui/dashboard/footer';
 export default function RootLayout({
   children,

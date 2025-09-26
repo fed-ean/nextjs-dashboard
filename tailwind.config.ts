@@ -1,4 +1,4 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from 'tailwindcss';
 
 const config: Config = {
   content: [
@@ -17,7 +17,13 @@ const config: Config = {
           500: '#0070F3',
           600: '#2F6FEB',
         },
-      }, 
+      },
+      fontFamily: {
+        merri: ['Merriweather', 'serif'],
+        playfair: ['Playfair Display', 'serif'],
+        inter: ['Inter', 'sans-serif'],
+        robotoSlab: ['Roboto Slab', 'serif'],
+      },
       animation: {
         wave: 'wave 1.5s infinite ease-in-out',
       },
@@ -35,6 +41,6 @@ const config: Config = {
     },
   },
   plugins: [require('@tailwindcss/forms')],
-}
+};
 
-export default config
+export default config;

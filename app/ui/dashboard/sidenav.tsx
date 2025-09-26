@@ -2,11 +2,11 @@ import ReproductorRadio from "../categorias/Reproductor";
 
 export default function SideNav() {
   return (
-    <aside className="h-auto w-72 bg-white border-r overflow-y-auto">
+    <aside className="h-auto w-100 bg-white border-r overflow-y-auto">
       <div className="p-4 space-y-6">
         {/* Radio */}
         <div>
-          <h2 className="text-lg font-semibold mb-2">Radio en Vivo</h2>
+          <h2 className="text-lg font-semibold mb-2 mt-10">Radio en Vivo</h2>
           <ReproductorRadio/>
         </div>
 

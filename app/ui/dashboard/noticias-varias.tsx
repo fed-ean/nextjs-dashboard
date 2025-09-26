@@ -1,6 +1,6 @@
 export default function NoticiasVarias() {
   return (
-      <div className="relative overflow-hidden rounded-lg shadow-lg card">
+      <div className="relative overflow-hidden rounded-lg shadow-lg mx-4 card">
         <img src="fotos/mirtha-gala.jpeg" className="w-full h-auto" alt="" />
         <div className="absolute inset-0 flex flex-col justify-end">
           <h5 className="text-white text-xl font-semibold leading-tight px-4 py-1 card-title ">
