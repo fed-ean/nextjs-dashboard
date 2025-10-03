@@ -40,9 +40,9 @@ export default function NavLinks() {
           <Link
             key={link.name}
             href={link.href}
-            className="flex h-[16%] grow items-center border-b-black transition duration-300  justify-center gap-1 p-4 hover:bg-blue-100 md:flex-none md:justify-start md:p-2 md:px-3  "
+            className="flex h-[18%] grow items-center border-b-black transition duration-300 justify-center gap-1 p-2 pl-[3rem] hover:bg-blue-100 md:flex-none md:justify-start md:p-2 md:pl-[3rem] md: md:px-3 hover:text-black"
           >
-            <p className='text-lg'>{link.name}</p>
+            {link.name}
           </Link>
         );
       })}

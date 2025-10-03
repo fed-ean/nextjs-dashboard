@@ -108,6 +108,7 @@ h4{
     top: 0;
     z-index: 1000;
 }
+
 .envivo{
     justify-self: center;
     background-color:#0a0a0a;
@@ -676,6 +677,20 @@ h1{
     padding: 5px;
     height: 12rem;
     width: 90%;
+}
+
+.noticia-principal{
+    height: 50%;
+}
+
+.noticia-principal-mini p{
+    margin: 0.5rem;
+    font-size: 2dvh;
+}
+
+.noticia-principal-mini img {
+    width: auto;
+    max-width: 40%;
 }
 
 .btn-envivo{

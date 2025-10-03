@@ -58,9 +58,9 @@ export default function NavBar() {
         </div>
 
         {/* Encabezado del menú */}
-        <div className="flex h-[3rem] items-center justify-center rounded-md bg-blue-900 p-0 ">
+        <div className="flex h-[2.4rem] items-center justify-center rounded-md bg-blue-900 p-2 m-1">
           <div className="w-[100%] text-white">
-            <p className="flex justify-center m-0 border-b text-3xl">Explorar</p>
+            <p className="flex justify-center p-1 m-0 border-b text-3xl">Explorar</p>
           </div>
         </div>
 
@@ -86,7 +86,7 @@ export default function NavBar() {
       <Link className="flex-shrink-0" href="/">
         <img src="fotos/radio blanco (1) (1).png" className="w-40 md:w-40" alt="Logo" />
       </Link>
-      <a href="login.html" className="text-white hover:text-gray-800 transition duration-300 focus:outline-none w-9 h-9 bg-white rounded-full hover:bg-gray-200">
+      <a href="../Login/" className="text-white hover:text-gray-800 transition duration-300 focus:outline-none w-9 h-9 bg-white rounded-full hover:bg-gray-200">
       </a>
       
     </nav>

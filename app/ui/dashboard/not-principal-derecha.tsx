@@ -21,10 +21,7 @@ export default function NoticiaPrincipalDerecha(){
         <a className="noticia-principal-mini" href="../../Noticias">
           <img src="fotos/mirtha.jpg" />
           <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis id
-            aut hic asperiores, cum, error laudantium sit facere ullam adipisci
-            eius dolorem, porro esse nesciunt. Corrupti voluptatem iste dolore
-            quae!
+            ¡MIRTHA LEGRAND DEJARÁ la tele a la edad de 98 AÑOS!
           </p>
         </a>
       </div>
