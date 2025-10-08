@@ -3,7 +3,7 @@ import "./style-noticias.css";
 
 export default function NoticiaEncabezado(){
     return(
-        <div className="principal">
+        <div className="principal" >
   <div className="text-container">
     <button>
       <h4> PyME </h4>

@@ -1,8 +1,14 @@
 import "./footer.css";
+import '../../fonts.css';
+import { PiMapPinBold } from "react-icons/pi";
+import { IoMdMail } from "react-icons/io";
+import { BsWhatsapp } from "react-icons/bs";
+import { FaIdCard } from "react-icons/fa";
+import { FaLinkedin } from "react-icons/fa";
 export default function Footer(){
     return(
 <footer className="footer">
-        <div className="div-conteiner">
+        <div className="div-conteiner titillium-web-regular">
             {/* Tailwind Classes for Layout and Spacing */}
             <div className="footer-section izquierda flex flex-col space-y-2">
                 <img src="fotos/image.png" alt="" className="footer-logo"/>
@@ -37,13 +43,13 @@ export default function Footer(){
             {/* Tailwind Classes for Layout and Spacing */}
             <div className="footer-section derecha flex flex-col space-y-2">
                 <h4 className="mb-3">Contacto</h4>
-                <p className="footer-section-p flex items-center space-x-2"><i className="fa-solid fa-circle-info text-2xl"></i > <span>Cuit 30-69894716-7</span></p>
-                <p className="footer-section-p flex items-center space-x-2"><i className="fa-brands fa-whatsapp text-2xl"></i> <span>11 4189-9250</span></p>
-                <p className="footer-section-p flex items-center space-x-2"><i className="fa-solid fa-square-phone text-2xl"></i> <span>15 5258-0226</span></p>
-                <p className="footer-section-p flex items-center space-x-2"><i className="fa-solid fa-envelope text-2xl"></i> <span>info@radioempresaria.cosm.ar</span></p>
-                <p className="footer-section-p flex items-center space-x-2"><i className="fa-solid fa-envelope text-2xl"></i> <span>radioempresaria92.5@gmail.com</span></p>
-                <p className="footer-section-p flex items-center space-x-2"><i className="fa-solid fa-location-dot text-2xl"></i> <span>Ruta 36 N°1354</span></p>
-                <a href="https://www.linkedin.com/company/fundacion-pro-buenos-aires/?viewAsMember=true" className="footer-a-contacto flex items-center space-x-2 mt-2"><i className="fa-brands fa-linkedin text-2xl"></i> <span>Linkedin</span></a>
+                <p className="footer-section-p flex items-center space-x-2"><i className="fa-circle-info text-2xl"><FaIdCard/></i > <span>Cuit 30-69894716-7</span></p>
+                <p className="footer-section-p flex items-center space-x-2"><i className="fa-whatsapp text-2xl"><BsWhatsapp/></i> <span>11 4189-9250</span></p>
+                <p className="footer-section-p flex items-center space-x-2"><i className="fa-square-phone text-2xl"><BsWhatsapp/></i> <span>15 5258-0226</span></p>
+                <p className="footer-section-p flex items-center space-x-2"><i className="fa-envelope text-2xl"><IoMdMail/></i> <span>info@radioempresaria.cosm.ar</span></p>
+                <p className="footer-section-p flex items-center space-x-2"><i className="fa-envelope text-2xl"><IoMdMail/></i> <span>radioempresaria92.5@gmail.com</span></p>
+                <p className="footer-section-p flex items-center space-x-2"><i className="fa-location-dot text-2xl"><PiMapPinBold/></i> <span>Ruta 36 N°1354</span></p>
+                <p className="footer-section-p flex items-center space-x-2"><i className="fa-linkedin text-2xl"><FaLinkedin/></i><span>Linkedin</span></p>
             </div>
         </div>
 

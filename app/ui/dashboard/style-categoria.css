@@ -39,30 +39,7 @@ ol a{
     --color-footer-titulo: #FFD700;
     --color-noticia-varias-hover-claro: #ffffff; /* Color del texto al hacer hover en noticias varias */
 }
-@media (prefers-color-scheme: dark) {
-    :root{
-    /* Colores para el tema OSCURO */
-    --color-fondo-claro: #202020; /* Fondo más oscuro */
-    --color-texto-claro: #ffffff; /* Texto claro */
-    --color-barra-navegacion-claro: #1a1a1a; /* Barra de navegación más oscura */
-    --color-footer-claro: #111; /* Pie de página muy oscuro */
-    --color-box-claro: #333333; /* Cajas de noticias más oscuras */
-    --color-sombra-ppal-claro: #1a1a1a; /* Sombras adaptadas al oscuro */
-    --color-sombra-sec-claro: #4a4a4a; /* Sombras adaptadas al oscuro */
-    --color-borde-negro-claro: #FFFFFF50; /* Borde claro */
-    --color-marcado-claro: rgb(70, 130, 180); /* Color de marcado/activo para oscuro */
-    --color-noticia-varias-hover-claro: #e0e0e0; /* Color del texto al hacer hover en noticias varias para oscuro */
-}}
-/* Las adaptamos al modo oscuro */
-@media (prefers-color-scheme: dark) {
-    :root {
-    --negro: #ececec;
-    --blanco: #303030;
-    --sombra-ppal: #242424;
-    --sombra-sec: #3c3c3c;
-    --borde-negro: #FFFFFF50;
-    }
-}
+
 body{
     background-color: var(--color-fondo-claro);
     color: var(--color-texto-claro);

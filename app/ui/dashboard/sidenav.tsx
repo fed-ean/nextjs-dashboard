@@ -7,7 +7,6 @@ export default function SideNav() {
         {/* Radio */}
         <div>
           <h2 className="text-lg font-semibold mb-2 mt-10">Radio en Vivo</h2>
-          <ReproductorRadio/>
         </div>
 
         {/* Latest Posts */}

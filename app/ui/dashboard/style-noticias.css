@@ -5,6 +5,7 @@ ol a{
     text-decoration: none;    
 }
 
+/*
 ::-webkit-scrollbar { width: 0px; height: 9px;}
 ::-webkit-scrollbar-button { width: 0px; height: 0px;}
 ::-webkit-scrollbar-thumb { background: transparent; border: 0px none #fff; border-radius: 10px;}
@@ -14,6 +15,7 @@ ol a{
 ::-webkit-scrollbar-track:hover { background: #e4e4e4;}
 ::-webkit-scrollbar-track:active { background: #d2d2d2;}
 ::-webkit-scrollbar-corner { background: transparent;}
+*/
 
 :root {
     --negro: #393939;
@@ -38,30 +40,6 @@ ol a{
     --color-marcado-claro: rgb(127, 195, 255); /* Color de marcado/activo */
     --color-footer-titulo: #FFD700;
     --color-noticia-varias-hover-claro: #ffffff; /* Color del texto al hacer hover en noticias varias */
-}
-@media (prefers-color-scheme: dark) {
-    :root{
-    /* Colores para el tema OSCURO */
-    --color-fondo-claro: #202020; /* Fondo más oscuro */
-    --color-texto-claro: #ffffff; /* Texto claro */
-    --color-barra-navegacion-claro: #1a1a1a; /* Barra de navegación más oscura */
-    --color-footer-claro: #111; /* Pie de página muy oscuro */
-    --color-box-claro: #333333; /* Cajas de noticias más oscuras */
-    --color-sombra-ppal-claro: #1a1a1a; /* Sombras adaptadas al oscuro */
-    --color-sombra-sec-claro: #4a4a4a; /* Sombras adaptadas al oscuro */
-    --color-borde-negro-claro: #FFFFFF50; /* Borde claro */
-    --color-marcado-claro: rgb(70, 130, 180); /* Color de marcado/activo para oscuro */
-    --color-noticia-varias-hover-claro: #e0e0e0; /* Color del texto al hacer hover en noticias varias para oscuro */
-}}
-/* Las adaptamos al modo oscuro */
-@media (prefers-color-scheme: dark) {
-    :root {
-    --negro: #ececec;
-    --blanco: #303030;
-    --sombra-ppal: #242424;
-    --sombra-sec: #3c3c3c;
-    --borde-negro: #FFFFFF50;
-    }
 }
 
 div.principal{

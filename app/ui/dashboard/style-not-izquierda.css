@@ -1,0 +1,95 @@
+@charset "UTF-8";
+/* Aquí definimos las Custom properties */
+
+ol a{
+    text-decoration: none;
+}
+
+h4{
+    font-size: 2dvh;
+    letter-spacing: 0.15rem;
+    margin: 1dvh 4dvh 1dvh 4dvh;
+    color: white;
+    font-weight: bold;
+}
+
+h1{
+    border-bottom: 1px solid rgb(165, 165, 165);
+    font-size: 7dvh;
+    margin: 0 35px;
+    padding: 14px;      
+    text-align: left;
+    color: rgb(255, 255, 255);
+    text-shadow: 1.5px 1px 5px rgba(0, 0, 20, 0.514);
+}
+
+.text-container{
+    background: rgba(18, 10, 85, 0.822);
+    backdrop-filter: blur(0.2rem);
+    -webkit-backdrop-filter: blur(0.6rem);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.274);
+    box-shadow: 0 8px 32px 0 rgb(0, 0, 0);
+    height: 30%;
+}
+
+div.principal{
+    width: 100%;
+    height: 100%;
+    background: url("../../../public/fotos/mirtha-gala.jpeg") no-repeat center;
+    background-size: cover;
+    border-radius: 0.3cm;
+    align-content: end;
+    overflow-y: scroll;
+}
+
+.principal button{
+    margin: 15px 5px 0 35px;
+    background: #2a2558;
+    border-radius: 25px;
+    border: 1px;
+}
+
+.principal p{
+    margin-top: -1.5dvh;
+}
+
+.principal h3{
+    font-size: 3.5dvh;
+    padding: 1px;
+    color: rgb(208, 206, 241);
+    text-align: center;
+    margin: 8dvh 0;
+}
+
+div p{
+    font-size: 2rem;
+    margin: 40px;
+    overflow-y: scroll;
+    /*
+    margin-top: 20px;
+    margin-bottom: 20px;*/
+}
+
+.noticia-principal{
+    border-radius: 0.3cm;
+    height: 100%;
+    overflow: auto;
+    color: black;
+    background-color: #241F55;
+}
+
+.noticia:hover{
+    transform: scale(1.02);
+}
+
+@media (max-width: 768px){
+    div.principal{
+        height: 50dvh;
+    }
+
+    .principal h3{
+        font-size: 2.5dvh;
+        margin: 3dvh 0;
+    }
+}
