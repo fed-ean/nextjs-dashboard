@@ -4,6 +4,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from '../ui/button';
+import Image from 'next/image';
 
 export default function LoginForm() {
   return (
@@ -13,10 +14,13 @@ export default function LoginForm() {
   </h2>
 
   <div className="w-full max-w-[80%] md:max-w-[50%] border rounded-md p-4">
-    <img
-      src="fotos/image.png"
+    <Image
+      src="/Radiocolor2.png"
       alt="Your Company"
       className="w-full h-auto object-contain rounded-md mb-4"
+      width={300}
+      height={100}
+
     />
     <div className="flex justify-center">
       <a

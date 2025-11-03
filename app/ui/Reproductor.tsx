@@ -47,7 +47,7 @@ export default function RadioPlayer() {
         <div className="w-12 h-12 flex items-center justify-center">
           <img  alt="Logo" className="w-8 h-8" />
           
-          <img src="" alt="" />
+          <img src="#" alt="imagen" />
         </div>
 
         {/* EN VIVO estilo cartel */}

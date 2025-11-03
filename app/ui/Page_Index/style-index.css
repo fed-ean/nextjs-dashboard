@@ -1,0 +1,660 @@
+@charset "UTF-8";
+/* Aquí definimos las Custom properties */
+
+footer.footer::-webkit-scrollbar { width: 0px ; height: 9px;}
+footer.footer::-webkit-scrollbar-button { width: 0px; height: 0px;}
+footer.footer::-webkit-scrollbar-thumb { background: transparent; border: 0px none #fff; border-radius: 10px;}
+footer.footer::-webkit-scrollbar-thumb:hover { background: #3a77a1;}
+footer.footer::-webkit-scrollbar-thumb:active { background: #8dd0d8;}
+footer.footer::-webkit-scrollbar-track {background: transparent;border: 0px solid #aaa; border-radius: 5px;}
+footer.footer::-webkit-scrollbar-track:hover { background: #e4e4e4;}
+footer.footer::-webkit-scrollbar-track:active { background: #d2d2d2;}
+footer.footer::-webkit-scrollbar-corner { background: transparent;}
+
+:root {
+    --negro: #393939;
+    --blanco: #ececec;
+    --sombra-ppal: #c9c9c9;
+    --sombra-sec: #ffffff;
+    --borde-negro: #00000050;
+    --marcado: rgb(127, 195, 255);
+  /* Tipografía */
+    --tipo-principal: Helvetica, Arial, sans-serif;
+}
+:root {
+    /* Colores para el tema CLARO */
+    --color-fondo-claro: #fffbf0; /* Color de fondo principal de la sección */
+    --color-texto-claro: #000000; /* Color de texto general */
+    --color-barra-navegacion-claro: #241F55; /* Color de la barra de navegación */
+    --color-footer-claro: #222; /* Color del pie de página */
+    --color-box-claro: #1e3e62; /* Color de las cajas de noticias */
+    --color-sombra-ppal-claro: #c9c9c9; /* Sombra principal */
+    --color-sombra-sec-claro: #ffffff; /* Sombra secundaria */
+    --color-borde-negro-claro: #00000050; /* Borde oscuro */
+    --color-marcado-claro: rgb(127, 195, 255); /* Color de marcado/activo */
+    --color-footer-titulo: #FFD700;
+    --color-noticia-varias-hover-claro: #ffffff; /* Color del texto al hacer hover en noticias varias */
+}
+
+body{
+    background-color: var(--color-fondo-claro);
+    color: var(--color-texto-claro);
+    scroll-behavior: smooth;
+}
+
+
+section{
+    margin: 0 100px;
+    background-color: var(--color-fondo-claro);
+    height: 100%;
+    width: 85%;
+    justify-self: center;
+}
+
+h1{
+    font-size: 5dvh;
+    border-bottom: 2px solid rgba(255, 0, 0, 0.664);
+    margin:0 35px;
+    padding: 20px;      
+    text-align: center;
+ }
+
+h2{
+    font-size: 3.5dvh;
+    padding: 25px 0 20px;
+    color: var(--color-texto-claro);
+}
+
+li{
+    list-style-type: none;
+}
+
+p{
+    text-align: justify;
+    color: white;
+}
+h4{
+    color: var(--color-footer-titulo);
+    font-size: 25px;
+}
+.navbar{
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.envivo{
+    justify-self: center;
+    background-color:#0a0a0a;
+    border-radius: 25px;
+    padding: 5px;
+    height: 20rem;
+    margin-top: 1rem;
+    width: 80%;
+    justify-content: center;
+    justify-items: center;
+}
+
+.btn-envivo{
+    height: 90px;
+    width: 90px;
+    display: flex;
+    background-color: #ff0d00;
+    border: 3px solid rgb(0, 0, 0);
+    border-radius: 50px;
+    padding: 0px;
+    font-size: 50px;
+    color: white;
+    margin: 1.8em;
+}
+
+.links-navbar{
+    text-decoration: none;
+    color: white;
+    display: flex;
+    align-items: center;
+}
+
+.barra-navegacion{
+    background-color: var(--color-barra-navegacion-claro);
+    padding: 0 10px;
+    display: flex;
+    justify-content: space-between;
+    color: var(--color-texto-claro);
+    border: none;
+    height: 9dvh;
+}
+
+.logo{
+    height: 5dvh;
+    width: 25dvh;
+    justify-content: center;
+}
+
+div.envivo p{
+    font-size: 30px;
+    margin: -3.2em;
+}
+
+/*NOTICIAS PRINCIPALES*/
+
+.noticia-principal{
+    border-radius: 0.3cm;
+    height: 100%;
+    overflow: auto;
+    color: white;
+    background-color: #241F55;
+}
+
+.noticia:hover{
+    transform: scale(1.02);
+}
+
+.text-box{
+    width: 100%;
+}
+
+.noticia-principal-mini {
+    width: 100%;
+    height: 100%;
+    background-color: #1e3e62;
+    display: flex;
+    overflow: hidden;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    align-items: center;
+    gap: 1rem;
+    box-sizing: border-box;
+}
+
+/*Espaciado entre las noticias principales chicas*/
+.stacked-cards {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    gap: 1rem; /* Espacio entre tarjetas */
+}
+
+.noticia-principal-mini img {
+    height: 100%;
+    width: auto;
+    max-width: 30%;
+    object-fit: cover;
+}
+
+.noticia-principal-mini p{
+    color: white;
+    font-size: 3dvh;
+    margin: 1.2rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    word-break: break-word; 
+}
+
+.noticia-principal-mini:hover{
+    transform: scale(1.01);
+    transition: .2s ease; 
+}
+
+/*                   NOTICIAS VARIAS                   */
+
+.noticias-varias .card{
+    width: 16rem;
+    height: 16rem;
+}
+
+.noticias-varias .card img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.noticias-varias .card .card-title {
+  color: #e0e0e0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: background-color 0.3s ease;
+  /* Impide que se pueda seleccionar el texto sobrante */
+  max-height: calc(1.5rem * 3); /* 3 líneas de altura (aproximadamente) */
+  line-height: 1.25rem;
+  user-select: none;
+}
+
+.noticias-varias .card:hover img{
+    filter: brightness(0.4);
+}
+
+
+.noticias-varias .card:hover .card-title{
+    background-color: rgb(0,0,0,0);
+}
+
+.noticias-varias{
+    column-gap: 1.5rem;
+    row-gap: 2rem; /*espaciado entre filas*/
+}
+
+
+
+/*       TARJETAS      */
+
+.tarjeta img{
+    position: relative;
+    border-radius: 5px;
+}
+
+.tarjeta p{
+    padding: 3px;
+    background-color: rgb(2,2,2);
+    margin-bottom:10px;
+    margin-left:10px;
+    margin-top: auto;
+    margin-right:auto;
+    position: absolute;
+    font-size: x-small;
+}
+
+.tarjeta h5{
+    text-decoration: solid;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: clamp(10px, 4vw + 1rem, 30px);
+    
+}
+
+
+/*para decorar los botones que estan en la barra de navegacion*/
+
+.navbar-toggler{
+    background-color: white;
+}    
+
+.btn-nav-bar{
+    height: 45px;
+    width: 45px;
+    border-radius: 5px;
+    position: relative;
+}
+
+.btn-nav-bar:hover{
+    background-color: rgba(255, 255, 255, 0.274);
+    border: none;
+}  
+
+.btn-nav-bar img{
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+
+.img-a-nav{
+    color: #ffffff;
+    position: absolute;
+    transform: translate(20%, 20%);
+}    
+
+/*Clase usada para el boton con que se extiende en la barra de navegacion*/
+.btn-nav-completo{
+    background-color: #241F55;
+}
+
+.categorias-nav a{
+    display: block;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 1.3rem 3rem;
+    color: white;
+}    
+
+.categorias-nav a:hover{
+    background-color: rgba(255, 255, 255, 0.356);
+    transition: .2s;
+}
+
+.categorias-nav:first-of-type h4{
+    padding: 1rem 3rem;
+    border-bottom: 1px solid white;
+    font-size: 20px;
+}
+
+.categorias-nav h4{
+    border-bottom: 1px solid rgba(255, 255, 255, 0.589);
+    padding: 0 1rem 1rem 1rem;
+    margin: 0 0.9rem;
+    font-size: 20px;
+    color: white;
+    text-align: center;
+    border-bottom-color: rgba(var(--color-texto-claro), 0.562);
+}
+.categorias-nav{
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-barra-navegacion-claro);
+}    
+
+
+.categorias-nav-header{
+    padding: 10px 10px 0 0;
+    margin: 0;
+}
+
+.contactos-nav{
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    background-color: var(--color-barra-navegacion-claro);
+}
+
+.contactos-nav i{
+    font-size: 2.5rem;
+    position: absolute;
+    align-self: center;
+}
+
+.contactos-nav a{
+    height: 3.5rem;
+    width: 3.5rem;
+    
+    border-radius: 7px;
+    display: flex;
+    justify-content: center;
+}
+
+.contactos-nav a:hover{
+    background-color: rgba(255, 255, 255, 0.356);
+    transition: .2s;
+}
+/*para las noticias en general*/
+.small-box {
+    height: 39.9dvh;
+}
+
+.text-noticia-title{
+    font-family: "Karla", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: bold;
+    font-style: normal;
+    text-align: center;
+    padding: .5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.664);
+    color: white;
+}
+
+.text-noticia{
+    font-family: "Karla", sans-serif;
+    font-size: 3.1dvh;
+    margin-top: -4.5rem;
+    margin-left: 14.3rem;
+    margin-right: 1.5rem;
+    width: 24rem;
+    color: white;
+}
+/* FOOTER */
+
+
+footer.footer {
+  width: 100vw;          /* ocupa todo el ancho de la ventana */
+  max-width: 100%;       /* evita que crezca más */
+  overflow-x: hidden;    /* evita scroll horizontal */
+  position: relative;
+  overflow-y: visible !important;
+  max-height: none !important;
+
+}
+
+.footer {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.div-conteiner {
+    width: 95%;
+    display: flex;
+    justify-content: space-between;
+    padding: 1.5rem ;
+    margin: 0 auto;
+    gap: 30px;
+}
+
+.footer-section .footer-brand {
+    flex: 1;
+    min-width: 200px;
+}
+
+.izquierda {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
+.izquierda p{
+    margin: 0;
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bolder;
+}
+.redes ul {
+    display: flex;
+    gap: 15px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-wrap: wrap;
+}
+
+.redes h4 {
+    margin: 0 0 8px 0;
+}
+
+.centro {
+    text-align: center;
+}
+
+.derecha {
+    text-align: center;
+}
+
+.footer-logo{
+    width: 300px;
+}
+.footer-span{
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;;
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.footer-bottom {
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+    padding-top: 2rem;
+    border-top: 1px solid; /* Ajusta el color del borde si es necesario */
+    border-top-color: var(--color-borde-negro-claro); /* Ajusta el color del borde si es necesario */
+    color: var(--color-noticia-varias-hover-claro); /* Un gris más suave para el texto pequeño */
+
+}
+.footer-bottom .footer-bottom-p{
+    text-align: center;
+}
+.footer-bottom-p a{
+    text-decoration: none;
+}
+.footer-bottom-ul{
+    display: contents;
+}
+.footer-bottom-ul li{
+    align-items:start;
+    display:contents;
+}
+.footer-bottom-ul a{
+    font-size: 1.3rem;
+    text-decoration: none;
+    color: #FFF; /* Un gris más suave para los enlaces */
+    text-align: start;
+    display: contents;
+}
+
+.footer p{
+    color: #FFFFFF;
+}
+/*footer secciones*/
+.footer-ul-li a{
+    text-decoration: none;
+    color: #FFF; /* Usa la variable */
+    text-align: start;
+    display: block;
+    font-size: 20px;
+}
+/*footer redes*/
+.youtube-menu{
+    color: #FF0000;
+}
+.fa-youtube{
+    color: #FF0000;
+}
+.fa-facebook{
+    color: #1877F2;
+}
+.instagram-gradient {
+    font-size: 40px;
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 50px;
+}
+.fa-x-twitter{
+    color: #dddddd;
+}
+.fa-telegram{
+    color: #0088CC;
+}
+/*footer contacto*/
+.footer-a-contacto{
+    display: block;
+    text-align: start;
+    text-decoration: none;
+    color: var(--color-texto-clar); /* Usa la variable */
+}
+.fa-envelope{
+    color: #ffffff;
+}
+.fa-circle-info{
+    color: #ffffff;
+}
+.fa-square-phone{
+    color: #4FCE5D;
+}
+.fa-linkedin{
+    font-size: 25px;
+    color: #1877F2;
+}
+.fa-location-dot{
+    color:#c70b0b;
+}
+.fa-whatsapp{
+    color: #4FCE5D;
+}
+/*footer contacto*/
+.footer-bottom-contacto{
+    display: flex;
+}
+
+@media (max-width: 768px) {
+
+section{
+    margin: 0 0 0 0;
+    width: 100%;
+}
+
+h1{
+    font-size: 3.5dvh;
+    border-bottom: 1px solid rgba(255, 0, 0, 0.664);
+    margin:0 15px;
+    padding: 10px;
+}
+
+    
+h2{
+    font-size: 2.3dvh;
+    margin-right: 0;
+    text-align: center;
+}
+
+.mx-3{
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+}
+
+.envivo{
+    padding: 5px;
+    height: 12rem;
+    width: 90%;
+}
+
+.noticia-principal{
+    height: 50%;
+}
+
+.noticia-principal-mini p{
+    margin: 0.5rem;
+    font-size: 2dvh;
+}
+
+.noticia-principal-mini img {
+    width: auto;
+    max-width: 40%;
+}
+
+.btn-envivo{
+    height: 60px;
+    width: 60px;
+    color: white;
+    margin: 0.9em;
+}
+
+div.envivo p{
+    font-size: 4dvh;
+    margin: -2.4em;
+}
+
+
+
+/*version responsiva del footer*/  
+.div-conteiner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.footer-section, .footer-brand {
+    width: 100%;
+    max-width: 500px;
+}
+
+.izquierda,.derecha {
+    align-items: center;
+    text-align: center;
+}
+
+.redes ul {
+    justify-content: center;
+}
+
+.footer-section a, .footer-section p {
+    font-size: 16px;
+}
+
+.footer-section i {
+    font-size: 24px;
+}
+}

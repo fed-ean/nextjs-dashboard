@@ -1,6 +1,6 @@
-import NavBar from "../ui/dashboard/navbar";
-import SideNav from "../ui/dashboard/sidenav";
-import NoticiaEncabezado from "../ui/dashboard/noticia-encabezado";
+import NavBar from "../ui/Page_Index/navbar";
+import SideNav from "../ui/Page_Index/sidenav";
+import NoticiaEncabezado from "../ui/Page_Index/noticia-encabezado";
 import "../global.css";
 export default function RootLayout({
   children,

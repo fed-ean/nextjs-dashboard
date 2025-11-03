@@ -1,0 +1,90 @@
+:root {
+  /* Ancho del sidebar */
+  --sidebar-width: 280px;
+
+  /* Espacio reservado para publicidad entre el sidebar y la noticia */
+  --ad-gap: 50px;
+
+  /* Altura del navbar (si es fijo, ayuda a evitar que tape la imagen) */
+  --navbar-height: 30px;
+
+  /* Alturas del hero (imagen principal) */
+  --hero-height-desktop: 50vh;  /* altura en pantallas grandes */
+  --hero-height-tablet: 60vh;   /* altura en tablets */
+  --hero-height-mobile: 45vh;   /* altura en móviles */
+
+  /* Máximo ancho del contenido de la noticia (puedes bajarlo si querés más espacio lateral) */
+  --content-max-width: 1100px;
+
+  /* Espaciado interno del texto (ajústalo si querés más o menos margen dentro del contenido) */
+  --content-padding: 1.25rem;
+}
+
+
+.hero-bleed {
+  position: sticky;
+  top: var(--navbar-height);    /* se pega debajo del navbar */
+  left: 0;
+  width: 75%;
+  height: var(--hero-height-desktop);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  z-index: 10;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* overlay */
+.hero-bleed .hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.25) 40%, rgba(0,0,0,0.55));
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* inner: título al final del hero */
+.hero-inner {
+  position: relative;
+  z-index: 3;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.post-content p{
+  font-size: 20px
+}
+
+/* Con sticky no hace falta padding-top tan grande; usamos margin-top igual a hero para separar */
+.content-container {
+  margin-right: calc(var(--sidebar-width) + var(--ad-gap));
+  width: 80%;
+  margin-top: 15px;
+  padding: 1rem;
+  z-index: 20;
+}
+
+
+/* Responsive: comportamiento relativo en pantallas pequeñas */
+@media (max-width: 1024px) {
+  :root { --ad-gap: 0px; --sidebar-width: 0px; }
+  .hero-bleed {
+    position: relative;
+    top: 0;
+    height: var(--hero-height-tablet);
+  }
+  .content-container {
+    margin-left: 0;
+    width: 100%;
+    padding-top: 1rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}

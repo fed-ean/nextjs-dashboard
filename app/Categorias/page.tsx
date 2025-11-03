@@ -1,6 +1,8 @@
 // app/noticias/page.tsx
 import { getClient } from "../lib/cliente";
 import { gql } from "@apollo/client";
+import NoticiasVarias from '../ui/Page_Index/noticias-varias';
+import { obtenerNoticias } from '../lib/db';
 import Link from "next/link";
 
 async function loadData() {
@@ -23,24 +25,18 @@ async function loadData() {
 }
 
 export default async function NoticiasPage() {
+  const noticiasRaw = await obtenerNoticias({ limit: 21 });
+    const demasNoticias = noticiasRaw.slice(3);
   const posts = await loadData();
 
   return (
-    <div className="m-9">
-      <h1>Noticias</h1>
-      {posts.map((post: any) => (
-        <div key={post.id} className="border p-4 my-4">
-          <h2 dangerouslySetInnerHTML={{ __html: post.title }} />
-          <div
-            dangerouslySetInnerHTML={{ __html: post.excerpt }}
-          />
-          <Link href={`/Categorias/${post.slug}`}>
-            <button className="bg-blue-500 text-white px-4 py-2 mt-2">
-              Leer más
-            </button>
-          </Link>
-        </div>
-      ))}
-    </div>
+    <>
+        <h1 className="mb-5">Noticias</h1>
+        <div className="grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-4 px-4">
+            {demasNoticias.map(noticia => (
+              <NoticiasVarias key={noticia.id} noticia={noticia} />
+            ))}
+          </div>
+      </>
   );
 }

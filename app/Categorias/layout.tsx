@@ -1,5 +1,5 @@
-import NavBar from "../ui/dashboard/navbar";
-import SideNav from "../ui/dashboard/sidenav";
+import NavBar from "../ui/Page_Index/navbar";
+import SideNav from "../ui/Page_Index/sidenav";
 import "../global.css";
 export default function RootLayout({
   children,
@@ -7,11 +7,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-auto flex-col md:flex-row md:overflow-hidden">
+    <div className="flex h-auto w-auto flex-col md:flex-row md:overflow-hidden">
         <div className="w-full flex-none md:w-64">
-            <SideNav/>
+            <SideNav />
         </div>
-        <div className="flex-grow p-6 md:overflow-y-auto md:p-12">
+        <div className="p-2 md:p-6">
             {children}
         </div>
     </div>

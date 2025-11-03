@@ -1,8 +1,11 @@
 import './global.css';
+import './fonts.css';
 import ScrollToTopButton from './ui/scrollBoton';
-import NavBar from './ui/dashboard/navbar';
+import NavBar from './ui/Page_Index/navbar';
 import RadioPlayer from './ui/Reproductor';
-import Footer from './ui/dashboard/footer';
+import AlAireRadio from './ui/AlAireRadio';
+import Footer from './ui/Page_Index/footer';
+
 export default function RootLayout({
   children,
 }: {
@@ -11,14 +14,15 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body>
-        <NavBar/>
-        <div>
+        <header>
+          <NavBar/>
+        </header>
+        <div className="pt-40">
           {children}
         </div>
         <ScrollToTopButton/>
-        <div></div>
         <Footer />
-        </body>
+      </body>
     </html>
   );
 }
