@@ -8,8 +8,11 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        fhd: '1920px',
+      },
       gridTemplateColumns: {
-        '13': 'repeat(13, minmax(0, 1fr))',
+        13: 'repeat(13, minmax(0, 1fr))',
       },
       colors: {
         blue: {
@@ -33,14 +36,11 @@ const config: Config = {
           '50%': { height: '50px' },
         },
         shimmer: {
-          '100%': {
-            transform: 'translateX(100%)',
-          },
+          '100%': { transform: 'translateX(100%)' },
         },
       },
     },
   },
-  plugins: [require('@tailwindcss/forms')],
 };
 
 export default config;
