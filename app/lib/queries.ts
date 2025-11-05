@@ -1,6 +1,10 @@
 // lib/queries.ts
 import { gql } from '@apollo/client';
 
+// ==============================================================================
+// QUERIES
+// ==============================================================================
+
 export const GET_ALL_CATEGORIES = gql`
   query AllCategories {
     categories(first: 100) {
@@ -13,15 +17,39 @@ export const GET_ALL_CATEGORIES = gql`
   }
 `;
 
-/* 1) slug como ARRAY */
+export const GET_CATEGORY_POST_IDS = gql`
+  query GetCategoryPostIds($slugs: [String!]!) {
+    categories(where: { slug: $slugs }) {
+      nodes {
+        posts(first: 9999) {
+          nodes {
+            databaseId
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_ALL_POST_IDS = gql`
+  query AllPostIds {
+    posts(first: 9999) {
+      nodes {
+        databaseId
+      }
+    }
+  }
+`;
+
 export const GET_CATEGORY_POSTS_BY_SLUG_ARRAY = gql`
   query GetCategoryPostsBySlugArray($slugs: [String!]!, $first: Int!, $after: String) {
     categories(where: { slug: $slugs }) {
       nodes {
-        databaseId
-        name
-        slug
         posts(first: $first, after: $after) {
+          pageInfo {
+            endCursor
+            hasNextPage
+          }
           nodes {
             databaseId
             title
@@ -32,59 +60,6 @@ export const GET_CATEGORY_POSTS_BY_SLUG_ARRAY = gql`
             tags { nodes { name slug } }
             categories { nodes { name slug } }
           }
-          pageInfo { endCursor hasNextPage }
-        }
-      }
-    }
-  }
-`;
-
-/* 2) slug simple (String) */
-export const GET_CATEGORY_POSTS_BY_SLUG = gql`
-  query GetCategoryPostsBySlug($slug: String!, $first: Int!, $after: String) {
-    categories(where: { slug: $slug }) {
-      nodes {
-        databaseId
-        name
-        slug
-        posts(first: $first, after: $after) {
-          nodes {
-            databaseId
-            title
-            excerpt
-            date
-            slug
-            featuredImage { node { sourceUrl } }
-            tags { nodes { name slug } }
-            categories { nodes { name slug } }
-          }
-          pageInfo { endCursor hasNextPage }
-        }
-      }
-    }
-  }
-`;
-
-/* 3) slugIn (por compatibilidad) */
-export const GET_CATEGORY_POSTS_BY_SLUGIN = gql`
-  query GetCategoryPostsBySlugIn($slugIn: [String!]!, $first: Int!, $after: String) {
-    categories(where: { slugIn: $slugIn }) {
-      nodes {
-        databaseId
-        name
-        slug
-        posts(first: $first, after: $after) {
-          nodes {
-            databaseId
-            title
-            excerpt
-            date
-            slug
-            featuredImage { node { sourceUrl } }
-            tags { nodes { name slug } }
-            categories { nodes { name slug } }
-          }
-          pageInfo { endCursor hasNextPage }
         }
       }
     }
@@ -94,6 +69,10 @@ export const GET_CATEGORY_POSTS_BY_SLUGIN = gql`
 export const GET_ALL_POSTS = gql`
   query AllPosts($first: Int!, $after: String) {
     posts(first: $first, after: $after) {
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
       nodes {
         databaseId
         title
@@ -104,7 +83,73 @@ export const GET_ALL_POSTS = gql`
         tags { nodes { name slug } }
         categories { nodes { name slug } }
       }
-      pageInfo { endCursor hasNextPage }
+    }
+  }
+`;
+
+// ==============================================================================
+// OPTIMIZED COMBINED QUERIES (New)
+// ==============================================================================
+
+export const GET_CATEGORY_DATA_COMBINED = gql`
+  query GetCategoryDataCombined($slugs: [String!]!, $first: Int!, $after: String) {
+    categories(where: { slug: $slugs }) {
+      nodes {
+        databaseId
+        name
+        slug
+        # Get all post IDs for total count
+        allPosts: posts(first: 9999) {
+          nodes {
+            databaseId
+          }
+        }
+        # Get the first page of posts
+        paginatedPosts: posts(first: $first, after: $after) {
+          pageInfo {
+            endCursor
+            hasNextPage
+          }
+          nodes {
+            databaseId
+            title
+            excerpt
+            date
+            slug
+            featuredImage { node { sourceUrl } }
+            tags { nodes { name slug } }
+            categories { nodes { name slug } }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_ALL_POST_DATA_COMBINED = gql`
+  query GetAllPostDataCombined($first: Int!, $after: String) {
+    # Get all post IDs for total count
+    allPosts: posts(first: 9999) {
+      nodes {
+        databaseId
+      }
+    }
+    # Get the first page of posts
+    paginatedPosts: posts(first: $first, after: $after) {
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      nodes {
+        databaseId
+        title
+        excerpt
+        date
+        slug
+        featuredImage { node { sourceUrl } }
+        tags { nodes { name slug } }
+        categories { nodes { name slug } }
+      }
     }
   }
 `;

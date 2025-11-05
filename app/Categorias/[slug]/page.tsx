@@ -1,43 +1,27 @@
 // app/Categorias/[slug]/page.tsx
 import React from "react";
-import { getCachedPostsPage } from "../../lib/wpRest";
-import  CategoryPagination  from "../../ui/categorias/CategoryPagination";
+import { getCachedPostsPage } from "../../lib/wpRest"; // <--- CAMBIADO de cacheProxy a wpRest
+import CategoryPagination from "../../ui/categorias/CategoryPagination";
+import CategoryGrid from "../../ui/categorias/CategoryGrid";
 
 const PER_PAGE = 9;
 
 export default async function CategoryPage({
   params,
+  searchParams,
 }: {
   params: { slug: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }) {
   const slug = params.slug;
-  const page = 1;
+  const page = Number(searchParams?.page || 1); // <--- AÑADIDO para leer la página de la URL
 
-  console.time(`[CategoryPage] ${slug} page ${page}`);
+  const { posts, total, totalPages, category } = await getCachedPostsPage(
+    slug,
+    page,
+    PER_PAGE
+  );
 
-  const { posts, total, totalPages, source } = await getCachedPostsPage(slug, page, PER_PAGE);
-
-  console.timeEnd(`[CategoryPage] ${slug} page ${page}`);
-
-  /** 
-   * 🧠 Cálculo robusto de páginas totales:
-   * - Si REST devuelve totalPages, lo usamos.
-   * - Si REST no devuelve totalPages y total <= posts.length, probablemente sea fallback GraphQL → desconocido (0).
-   * - Si total > posts.length (REST parcial sin totalPages), lo calculamos normalmente.
-   */
-  let computedTotalPages = 0;
-
-  if (totalPages && totalPages > 0) {
-    computedTotalPages = totalPages;
-  } else if (typeof total === "number" && total > 0) {
-    if (total > (posts?.length || 0)) {
-      computedTotalPages = Math.max(1, Math.ceil(total / PER_PAGE));
-    } else {
-      computedTotalPages = 0; // desconocido, deja que la paginación siga activa
-    }
-  }
-
-  // 💡 Si no hay posts
   if (!posts || posts.length === 0) {
     return (
       <div className="text-center py-10">
@@ -51,36 +35,16 @@ export default async function CategoryPage({
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold capitalize mb-6">{slug}</h1>
+      {/* Usamos el nombre de la categoría obtenido de la API para el título */}
+      <h1 className="text-3xl font-bold capitalize mb-6">{category?.name || slug}</h1>
 
-      <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-6">
-        {posts.map((post: any) => (
-          <article
-            key={post.id || post.slug}
-            className="bg-white shadow rounded-xl overflow-hidden hover:shadow-md transition"
-          >
-            {post.featuredImage && (
-              <img
-                src={post.featuredImage}
-                alt={post.title}
-                className="w-full h-48 object-cover"
-              />
-            )}
-            <div className="p-4">
-              <h2 className="font-semibold text-lg mb-2">{post.title}</h2>
-              <p className="text-gray-600 text-sm line-clamp-3">
-                {post.excerpt?.replace(/<[^>]+>/g, "")}
-              </p>
-            </div>
-          </article>
-        ))}
-      </div>
+      <CategoryGrid posts={posts} currentSectionSlug={slug} />
 
       <div className="mt-8">
         <CategoryPagination
           basePath={`/Categorias/${slug}`}
           current={page}
-          totalPages={computedTotalPages}
+          totalPages={totalPages} // <--- Usamos el totalPages directamente de la API
           perPage={PER_PAGE}
         />
       </div>

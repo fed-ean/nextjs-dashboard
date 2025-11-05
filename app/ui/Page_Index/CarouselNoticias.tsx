@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import NoticiaLeft from './noticia-left';
+import CarouselCard from './CarouselCard';
 
 type Noticia = {
   slug?: string;
@@ -25,86 +25,59 @@ export default function CarouselNoticias({
   autoPlay?: boolean;
   autoPlayInterval?: number;
 }) {
-  const totalPuntos = Math.ceil(noticias.length / slidesPerView);
-
+  const totalSlides = Math.ceil(noticias.length / slidesPerView);
   const grandeRef = useRef<HTMLDivElement | null>(null);
-  const puntosRef = useRef<NodeListOf<HTMLLIElement> | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
-  // --- Puntos de navegación ---
-  useEffect(() => {
-    const puntos = document.querySelectorAll('.punto');
-    puntosRef.current = puntos as NodeListOf<HTMLLIElement>;
-    const handlers: Array<() => void> = [];
-
-    puntos.forEach((cadaPunto, i) => {
-      const clickHandler = () => setCurrentSlide(i);
-      cadaPunto.addEventListener('click', clickHandler);
-      handlers.push(() => cadaPunto.removeEventListener('click', clickHandler));
-    });
-
-    return () => handlers.forEach((remove) => remove());
-  }, [totalPuntos]);
-
-  // --- Movimiento del carrusel ---
+  // --- Carousel Movement ---
   useEffect(() => {
     const grande = grandeRef.current;
-    const puntos = puntosRef.current;
-
-    if (!grande || !puntos) return;
+    if (!grande) return;
 
     const movePercent = (100 / noticias.length) * slidesPerView;
     const operacion = currentSlide * -movePercent;
     grande.style.transform = `translateX(${operacion}%)`;
-
-    puntos.forEach((p, i) => p.classList.toggle('activo', i === currentSlide));
   }, [currentSlide, noticias.length, slidesPerView]);
 
-  // --- AutoPlay controlado ---
+  // --- Controlled AutoPlay ---
   useEffect(() => {
-    if (!autoPlay) return;
-
-    if (paused) {
+    if (!autoPlay || isPaused) {
       if (intervalRef.current) clearInterval(intervalRef.current);
       return;
     }
 
     intervalRef.current = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % totalPuntos);
+      setCurrentSlide((prev) => (prev + 1) % totalSlides);
     }, autoPlayInterval);
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [autoPlay, autoPlayInterval, paused, totalPuntos]);
+  }, [autoPlay, autoPlayInterval, isPaused, totalSlides]);
 
-  // --- Handlers para botones ---
+  // --- Cyclic Navigation ---
   const handleNext = () => {
-    if (currentSlide < totalPuntos - 1) {
-      setCurrentSlide((prev) => prev + 1);
-    }
+    setCurrentSlide((prev) => (prev + 1) % totalSlides);
   };
 
   const handlePrev = () => {
-    if (currentSlide > 0) {
-      setCurrentSlide((prev) => prev - 1);
-    }
+    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
   };
 
   return (
     <div
-      className="carrousel w-full mx-auto my-8 relative"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
+      className="relative w-full max-w-7xl mx-auto my-6 group"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
     >
-      {/* --- Contenedor grande --- */}
-      <div className="grande overflow-hidden">
+      {/* --- Main Carousel --- */}
+      <div className="overflow-hidden">
         <div
           ref={grandeRef}
-          className="grande-img flex transition-transform duration-500 ease-in-out"
+          className="flex transition-transform duration-700 ease-in-out"
           style={{
             width: `${(noticias.length / slidesPerView) * 100}%`,
           }}
@@ -115,44 +88,43 @@ export default function CarouselNoticias({
               style={{
                 width: `${100 / noticias.length}%`,
               }}
-              className="flex-shrink-0 p-2"
+              className="flex-shrink-0 p-4"
             >
-              <NoticiaLeft noticia={noticia} />
+              <CarouselCard noticia={noticia} />
             </div>
           ))}
         </div>
       </div>
 
-      {/* --- Botones de navegación --- */}
+      {/* --- Navigation Buttons --- */}
       <button
         onClick={handlePrev}
-        disabled={currentSlide === 0}
-        className={`absolute top-1/2 left-0 transform -translate-y-1/2 bg-white/80 text-black p-3 rounded-full shadow-md hover:bg-white transition ${
-          currentSlide === 0 ? 'opacity-50 cursor-not-allowed' : ''
-        }`}
+        className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-white/50 text-black p-3 rounded-full shadow-lg hover:bg-white/80 transition-all duration-300 opacity-0 group-hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-blue-500 z-10"
         aria-label="Anterior"
       >
-        ←
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
       </button>
 
       <button
         onClick={handleNext}
-        disabled={currentSlide === totalPuntos - 1}
-        className={`absolute top-1/2 right-0 transform -translate-y-1/2 bg-white/80 text-black p-3 rounded-full shadow-md hover:bg-white transition ${
-          currentSlide === totalPuntos - 1 ? 'opacity-50 cursor-not-allowed' : ''
-        }`}
+        className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-white/50 text-black p-3 rounded-full shadow-lg hover:bg-white/80 transition-all duration-300 opacity-0 group-hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-blue-500 z-10"
         aria-label="Siguiente"
       >
-        →
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
       </button>
 
-      {/* --- Puntos de navegación --- */}
-      <ul className="puntos flex justify-center mt-4 space-x-2">
-        {Array.from({ length: totalPuntos }).map((_, i) => (
+      {/* --- Navigation Dots --- */}
+      <ul className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+        {Array.from({ length: totalSlides }).map((_, i) => (
           <li
             key={i}
-            className={`punto w-3 h-3 rounded-full bg-gray-400 cursor-pointer transition-colors ${
-              i === currentSlide ? 'activo bg-blue-600' : ''
+            onClick={() => setCurrentSlide(i)}
+            className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 ${
+              i === currentSlide ? 'bg-blue-600 scale-125' : 'bg-gray-400/50 hover:bg-gray-400'
             }`}
           ></li>
         ))}

@@ -1,6 +1,6 @@
 import AcmeLogo from '@/app/ui/acme-logo';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
-import { obtenerNoticias } from './lib/db';
+import { obtenerNoticias, obtenerNoticiasPorCategoria } from './lib/db';
 import { getClient } from "./lib/cliente";
 import { gql } from "@apollo/client";
 import Link from 'next/link';
@@ -11,11 +11,13 @@ import NoticiaSecundariaCard from './ui/Page_Index/not-principal-derecha';
 import NoticiaPrincipalIzquierda from './ui/Page_Index/not-principal-izquierda';
 import NoticiasVarias from './ui/Page_Index/noticias-varias';
 import NoticiasVariasEstilizada from "./ui/Page_Index/noticias-varias-page";
+import CarouselNoticias from './ui/Page_Index/CarouselNoticias';
 import './fonts.css';
 import './ui/Page_Index/style-index.css';
 
 export default async function Page() {
   const noticiasRaw = await obtenerNoticias({ limit: 15 }); 
+  const noticiasDesayunoPymes = await obtenerNoticiasPorCategoria({ limit: 10, categoryName: "Desayuno Pymes" });
 
   const noticiaPrincipal = noticiasRaw[0] || null;
   const noticiasSecundarias = noticiasRaw.slice(1, 4) || [];
@@ -79,6 +81,11 @@ export default async function Page() {
           
         </div>
       </main>
+
+      <section className="container mx-auto px-4 mt-10">
+        <h2 className="titillium-web-semibold">Desayuno Pymes</h2>
+        <CarouselNoticias noticias={noticiasDesayunoPymes} slidesPerView={1} />
+      </section>
       
        <section className="container mx-auto px-4 mt-10">
         <h2 className="titillium-web-semibold">Noticias Varias</h2>
@@ -93,4 +100,3 @@ export default async function Page() {
     </>
   );
 }
-

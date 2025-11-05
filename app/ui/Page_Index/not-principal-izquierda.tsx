@@ -26,6 +26,7 @@ export default function NoticiaPrincipalIzquierda({ noticia }) {
                         src={noticia.imagenUrl}
                         alt={noticia.titulo}
                         fill // La imagen se expande para llenar el padre
+                        sizes="(max-width: 768px) 100vw, 60vw"
                         style={{ objectFit: 'cover' }} // Para que la imagen cubra sin distorsionarse
                         className="transition-transform duration-300 group-hover:scale-105" // Efecto hover
                         priority={true} // Prioridad para la imagen principal
