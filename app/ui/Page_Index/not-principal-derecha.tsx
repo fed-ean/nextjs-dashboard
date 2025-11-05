@@ -39,7 +39,7 @@ export default function NoticiaSecundariaCard({ noticia }){
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-10"></div>
 
                 {/* CONTENIDO DE TEXTO (z-20) */}
-                <div className="absolute bottom-0 left-0 p-4 z-20 text-white text-container">
+                <div className="absolute bottom-0 left-0 p-4 z-20 text-container">
                     <h3 className="text-xl font-bold titillium-web-regular leading-snug">
                         {tituloCorto}
                     </h3>

@@ -31,9 +31,9 @@ const ICON_BY_SLUG: Record<string, any> = {
 };
 
 const programas = [
-  { name: 'Reporte Regional', href: '/programas/reporte-regional', Icon: IconReporteRegional },
-  { name: 'Desayuno PYME', href: '/programas/desayuno-pyme', Icon: IconDesayunoPYME },
-  { name: 'Cadena VerdeAmarrilla', href: '/programas/cadena-verdeamarrilla', Icon: IconCadenaVerdeAmarrilla },
+  { name: 'Reporte Regional', href: '/Categorias/reporte-regional', Icon: IconReporteRegional },
+  { name: 'Desayuno PYME', href: '/Categorias/desayuno-pymes', Icon: IconDesayunoPYME },
+  { name: 'Cadena VerdeAmarrilla', href: '/Categorias/cadena-verdeamarrilla', Icon: IconCadenaVerdeAmarrilla },
   { name: 'Varias', href: '/programas/varias', Icon: IconVarias },
 ];
 

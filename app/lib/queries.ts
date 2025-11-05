@@ -87,6 +87,31 @@ export const GET_ALL_POSTS = gql`
   }
 `;
 
+export const SEARCH_POSTS = gql`
+  query SearchPosts($search: String!) {
+    posts(where: { search: $search }) {
+      nodes {
+        databaseId
+        title
+        excerpt
+        slug
+        date
+        featuredImage {
+          node {
+            sourceUrl
+          }
+        }
+        categories {
+          nodes {
+            name
+            slug
+          }
+        }
+      }
+    }
+  }
+`;
+
 // ==============================================================================
 // OPTIMIZED COMBINED QUERIES (New)
 // ==============================================================================

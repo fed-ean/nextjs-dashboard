@@ -55,7 +55,7 @@ export default function CarouselCard({ noticia }: { noticia: Noticia }) {
           {categories?.nodes?.map((category) => (
             <Link
               key={category.slug}
-              href={`/category/${category.slug}`}
+              href={`/categorias/${category.slug}`}
               className="bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full hover:bg-blue-700 transition-colors"
             >
               {category.name}
