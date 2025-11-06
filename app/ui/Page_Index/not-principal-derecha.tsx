@@ -7,7 +7,7 @@ import "./style-not-izquierda.css";
 // Asegúrate de importar tus estilos si son externos
 // import "./style-noticias.css"; 
 
-export default function NoticiaSecundariaCard({ noticia }){
+export default function NoticiaSecundariaCard({ noticia, priority = false }){
     if (!noticia) return null;
 
     // Se asume que la noticia tiene slug, id e imagenUrl.
@@ -30,9 +30,10 @@ export default function NoticiaSecundariaCard({ noticia }){
                     src={noticia.imagenUrl} 
                     alt={noticia.titulo} 
                     fill // Se estira para llenar el contenedor padre (200px de alto)
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     style={{ objectFit: 'cover' }} // Asegura que no se distorsione
                     className="transition-transform duration-300 group-hover:scale-105" // Efecto de zoom
-                    priority={false} // No es de máxima prioridad
+                    priority={priority} // No es de máxima prioridad
                 />
                 
                 {/* OVERLAY OSCURO (z-10) */}

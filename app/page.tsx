@@ -55,6 +55,7 @@ export default async function Page() {
     <NoticiaSecundariaCard
       key={noticiasSecundarias[0].id}
       noticia={noticiasSecundarias[0]}
+      priority={true}
     />
   )}
 
@@ -83,7 +84,7 @@ export default async function Page() {
       </main>
 
       <section className="container mx-auto px-4 mt-10">
-        <h2 className="titillium-web-semibold">Desayuno Pymes</h2>
+        <h2 className="titillium-web-semibold p-0">Desayuno Pymes</h2>
         <CarouselNoticias noticias={noticiasDesayunoPymes} slidesPerView={1} />
       </section>
       

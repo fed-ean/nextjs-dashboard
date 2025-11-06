@@ -56,6 +56,7 @@ export default function AlAireRadio() {
             alt='Imagen'
             width={300}
             height={100}
+            priority
           />
         </div>
 

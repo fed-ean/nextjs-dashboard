@@ -3,18 +3,26 @@ import Link from 'next/link';
 import LinksNav from '@/app/ui/Page_Index/nav-links';
 import NavLinks from '@/app/ui/Page_Index/side-nav';
 import AlAireRadio from '../AlAireRadio';
-import { useState } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import { BsTwitterX } from "react-icons/bs";
 import { Youtube, Instagram, Facebook, Telegram} from './iconos';
 import { BsList } from "react-icons/bs";
 import { CiMail } from "react-icons/ci";
 import SearchForm from './search-form';
 
-export default function NavBar() {
+// Corrected version that accepts the newsComponent prop
+export default function NavBar({ newsComponent }: { newsComponent?: ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
+
+  // Close side menu on path change for better UX
+  useEffect(() => {
+    closeMenu();
+  }, [pathname]);
 
   return (
     <>
@@ -80,18 +88,23 @@ export default function NavBar() {
         </div>
 
         {/* Contenido del menú */}
-        <div className="flex grow flex-col justify-between">
-          {/* Pasamos la función `closeMenu` al componente de enlaces */}
-          <NavLinks onLinkClick={closeMenu} />
+        <div className="flex grow flex-col justify-between overflow-y-auto">
+            {/* Enlaces de Navegación */}
+            <NavLinks onLinkClick={closeMenu} />
+            
+            {/* Ultimas Noticias - Rendered from the prop */}
+            <div className="flex-grow">
+              {newsComponent}
+            </div>
           
-          {/* Iconos de redes sociales */}
-          <div className="flex justify-around mb-6 px-2">
-             <a href="https://instagram.com/mi-perfil" aria-label="Instagram" className="p-2"><Instagram className="w-8 h-8"/></a>
-             <a href="https://twitter.com/mi-perfil" aria-label="Twitter" className="p-2"><BsTwitterX className="w-8 h-8 text-white"/></a>
-             <a href="https://youtube.com/mi-canal" aria-label="YouTube" className="p-2"><Youtube className="w-8 h-8"/></a>
-             <a href="#" aria-label="Facebook" className="p-2"><Facebook className="w-8 h-8"/></a>
-             <a href="#" aria-label="Telegram" className="p-2"><Telegram className="w-8 h-8"/></a>
-          </div>
+            {/* Iconos de redes sociales */}
+            <div className="flex justify-around mt-auto mb-6 px-2">
+               <a href="https://instagram.com/mi-perfil" aria-label="Instagram" className="p-2"><Instagram className="w-8 h-8"/></a>
+               <a href="https://twitter.com/mi-perfil" aria-label="Twitter" className="p-2"><BsTwitterX className="w-8 h-8 text-white"/></a>
+               <a href="https://youtube.com/mi-canal" aria-label="YouTube" className="p-2"><Youtube className="w-8 h-8"/></a>
+               <a href="#" aria-label="Facebook" className="p-2"><Facebook className="w-8 h-8"/></a>
+               <a href="#" aria-label="Telegram" className="p-2"><Telegram className="w-8 h-8"/></a>
+            </div>
         </div>
       </div>
 

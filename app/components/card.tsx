@@ -1,19 +1,28 @@
-// components/NewsCard.jsx
+// components/NewsCard.tsx
 import Link from 'next/link';
 import Image from 'next/image';
 import React from 'react';
-import { extractFirstImageSrc, htmlToPlainText } from './extractImageFromHtml';
+import { htmlToPlainText } from './extractImageFromHtml'; // Keep for alt text
+
+// This component now expects a 'post' object that has a structure consistent with your GraphQL queries,
+// including 'title', 'slug', 'excerpt', and 'featuredImage'.
 
 export default function NewsCard({ post }) {
-  const titleHtml = post?.title || '';
-  const contentHtml = post?.content || '';
-  const slug = post?.slug || post?.id;
+  // Return null or a placeholder if post data is not available
+  if (!post) {
+    return null; 
+  }
 
-  const imgSrc = extractFirstImageSrc(contentHtml);
-  const excerpt = (() => {
-    const plain = htmlToPlainText(contentHtml || '');
-    return plain.length > 140 ? plain.slice(0, 137) + '...' : plain;
-  })();
+  const { slug, title, featuredImage } = post;
+
+  // Use the featured image URL directly from the post data
+  const imgSrc = featuredImage?.node?.sourceUrl;
+
+  // The title is already HTML, so we can use it directly with dangerouslySetInnerHTML
+  const titleHtml = title || '';
+
+  // Correct URL structure based on the project file structure
+  const postUrl = `/Categorias/Noticias/${slug}`;
 
   return (
     <article className="news-card" style={{
@@ -23,38 +32,57 @@ export default function NewsCard({ post }) {
       display: 'flex',
       flexDirection: 'column',
       background: '#fff',
-      boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
+      boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+      height: '100%' // Ensures uniform card height in a grid layout
     }}>
-      <Link href={`/posts/${encodeURIComponent(slug)}`} legacyBehavior>
-        <a aria-label={`Ir a noticia ${htmlToPlainText(titleHtml)}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+      {/* Modern Next.js Link component implementation */}
+      <Link 
+        href={postUrl}
+        aria-label={`Ir a noticia ${htmlToPlainText(titleHtml)}`}
+        style={{ 
+          color: 'inherit', 
+          textDecoration: 'none', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          flexGrow: 1 
+        }}
+      >
+        {/* Image Section */}
+        <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%' /* 16:9 Aspect Ratio */ }}>
           {imgSrc ? (
-            <div style={{ position: 'relative', width: '100%', height: 180 }}>
-              <Image
-                src={imgSrc}
-                alt={htmlToPlainText(titleHtml) || 'Imagen noticia'}
-                fill
-                style={{ objectFit: 'cover' }}
-                // Si no configuraste next.config.js para dominios externa, descomenta la línea unoptimized
-                unoptimized={true}
-              />
-            </div>
+            <Image
+              src={imgSrc}
+              alt={htmlToPlainText(titleHtml) || 'Imagen de la noticia'}
+              fill
+              style={{ objectFit: 'cover' }}
+              // If you haven't configured next.config.js for external domains, this is needed
+              unoptimized={true} 
+            />
           ) : (
-            <div style={{ width: '100%', height: 140, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
+            // Placeholder for when there is no image
+            <div style={{ 
+              width: '100%', 
+              height: '100%',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              background: '#f8fafc' 
+            }}>
               <span style={{ color: '#94a3b8' }}>No image</span>
             </div>
           )}
+        </div>
 
-          <div style={{ padding: '1rem' }}>
-            <h3 style={{ margin: 0, fontSize: '1.05rem', lineHeight: '1.2', marginBottom: 8 }}
-                dangerouslySetInnerHTML={{ __html: titleHtml }} />
-
-            <p style={{ margin: 0, color: '#475569', fontSize: '0.95rem' }}>{excerpt || 'Sin resumen'}</p>
-
-            <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>Leer noticia →</span>
-            </div>
-          </div>
-        </a>
+        {/* Content Section */}
+        <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+          <h3 
+            style={{ margin: 0, fontSize: '1.05rem', lineHeight: '1.2'}}
+            dangerouslySetInnerHTML={{ __html: titleHtml }} 
+          />
+        </div>
       </Link>
     </article>
   );

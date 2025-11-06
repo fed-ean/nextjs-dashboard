@@ -69,7 +69,7 @@ export default function CarouselNoticias({
 
   return (
     <div
-      className="relative w-full max-w-7xl mx-auto my-6 group"
+      className="relative w-full max-w-7xl mx-auto group"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >

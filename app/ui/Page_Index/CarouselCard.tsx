@@ -37,7 +37,7 @@ export default function CarouselCard({ noticia }: { noticia: Noticia }) {
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden flex flex-col md:flex-row max-w-7xl mx-auto" style={{ minHeight: '400px' }}>
       {/* Columna de la Imagen */}
-      <div className="md:w-1/2 relative">
+      <div className="relative h-96 md:h-auto md:w-1/2">
         {imagenUrl ? (
           <Image
             src={imagenUrl}

@@ -1,5 +1,7 @@
+// app/lib/db.js
 import { gql } from '@apollo/client';
-import { getClient } from './cliente'; // <- AJUSTA la ruta si tu estructura es diferente
+// CORRECTED: Use the new server-only client
+import { getServerSideClient } from './server-cliente.js';
 
 const GET_NOTICIAS_QUERY = gql`
   query GetNoticias($first: Int, $status: PostStatusEnum) {
@@ -22,7 +24,6 @@ const GET_NOTICIAS_QUERY = gql`
             sourceUrl
           }
         }
-        # opcional: categories { nodes { databaseId name slug } }
       }
     }
   }
@@ -56,20 +57,19 @@ const GET_NOTICIAS_POR_CATEGORIA_QUERY = gql`
 `;
 
 /**
- * Obtiene las noticias del endpoint GraphQL.
- * @param {object} options - { limit = 10, status = 'PUBLISH' }
- * @returns {Array} noticias
+ * Obtiene las noticias del endpoint GraphQL (SERVER-SIDE ONLY).
  */
 export async function obtenerNoticias({ limit = 10, status = 'PUBLISH' } = {}) {
   try {
-    const client = getClient();
+    // CORRECTED: Use the server-side client
+    const client = getServerSideClient(); 
     const { data } = await client.query({
       query: GET_NOTICIAS_QUERY,
       variables: {
         first: limit,
         status,
       },
-      fetchPolicy: 'no-cache', // si querés, cambialo a 'network-only' o quitálo
+      fetchPolicy: 'no-cache',
     });
 
     if (!data || !data.posts) {
@@ -79,10 +79,9 @@ export async function obtenerNoticias({ limit = 10, status = 'PUBLISH' } = {}) {
 
     const noticias = (data.posts.nodes || []).map(node => ({
       id: node.id,
-      fechaPublicacion: node.post_date,
-      slug: node.post_name, // tu alias en la query ya lo dejó como 'post_name: slug'
+      fecha: node.post_date, // Corrected to use 'fecha' to match the Sidenav component
+      slug: node.post_name,
       titulo: node.post_title,
-      extracto: node.post_content,
       contenidoRaw: node.post_content,
       imagenUrl: node.featuredImage?.node?.sourceUrl || null,
     }));
@@ -95,13 +94,12 @@ export async function obtenerNoticias({ limit = 10, status = 'PUBLISH' } = {}) {
 }
 
 /**
- * Obtiene las noticias de una categoría específica del endpoint GraphQL.
- * @param {object} options - { limit = 10, status = 'PUBLISH', categoryName }
- * @returns {Array} noticias
+ * Obtiene las noticias de una categoría específica (SERVER-SIDE ONLY).
  */
 export async function obtenerNoticiasPorCategoria({ limit = 10, status = 'PUBLISH', categoryName } = {}) {
   try {
-    const client = getClient();
+    // CORRECTED: Use the server-side client
+    const client = getServerSideClient();
     const { data } = await client.query({
       query: GET_NOTICIAS_POR_CATEGORIA_QUERY,
       variables: {
@@ -119,10 +117,9 @@ export async function obtenerNoticiasPorCategoria({ limit = 10, status = 'PUBLIS
 
     const noticias = (data.posts.nodes || []).map(node => ({
       id: node.id,
-      fechaPublicacion: node.post_date,
+      fecha: node.post_date, // Corrected to use 'fecha' to match the Sidenav component
       slug: node.post_name,
       titulo: node.post_title,
-      extracto: node.post_content,
       contenidoRaw: node.post_content,
       imagenUrl: node.featuredImage?.node?.sourceUrl || null,
     }));
@@ -133,4 +130,3 @@ export async function obtenerNoticiasPorCategoria({ limit = 10, status = 'PUBLIS
     return [];
   }
 }
-""

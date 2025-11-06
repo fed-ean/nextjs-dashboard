@@ -24,6 +24,7 @@ export default function NoticiasVariasEstilizada({ noticia }: { noticia: Noticia
   if (!noticia) return null;
 
   const title = noticia.titulo || noticia.title || 'Sin título';
+  // CORRECCIÓN: La URL debe apuntar a la ruta correcta de las noticias
   const urlNoticia = `/Categorias/Noticias/${noticia.slug || ''}`;
   const categories: Category[] = (noticia.categories?.nodes as Category[]) || (noticia.categories as Category[]) || [];
   const firstCat = categories[0];
@@ -31,7 +32,7 @@ export default function NoticiasVariasEstilizada({ noticia }: { noticia: Noticia
   const fecha = noticia.fecha ? new Date(noticia.fecha).toLocaleDateString() : null;
 
   return (
-    <article className="group">
+    <article className="group h-96">
       <Link href={urlNoticia} className="block no-underline" aria-label={title}>
         <div className="relative overflow-hidden rounded-2xl shadow-2xl transition-transform transform-gpu group-hover:scale-[1.02] duration-300">
           {/* CONTENEDOR PARA IMAGEN (responsive) */}
