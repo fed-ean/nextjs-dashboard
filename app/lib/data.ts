@@ -1,4 +1,10 @@
-import postgres from 'postgres';
+// app/lib/data.ts
+import { getClient } from './cliente';
+import {
+  GET_ALL_POSTS,
+  SEARCH_POSTS,
+  GET_ALL_POST_DATA_COMBINED,
+} from './queries';
 import {
   CustomerField,
   CustomersTableType,
@@ -8,70 +14,53 @@ import {
   Revenue,
 } from './definitions';
 import { formatCurrency } from './utils';
+import { gql } from '@apollo/client';
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+// Helper function to get the Apollo client
+const client = getClient();
 
-export async function fetchRevenue() {
-  try {
-    // Artificially delay a response for demo purposes.
-    // Don't do this in production :)
-
-    // console.log('Fetching revenue data...');
-    // await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    const data = await sql<Revenue[]>`SELECT * FROM revenue`;
-
-    // console.log('Data fetch completed after 3 seconds.');
-
-    return data;
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch revenue data.');
-  }
+// There's no direct equivalent for Revenue in the GraphQL schema.
+// Returning an empty array to avoid breaking components that use this.
+export async function fetchRevenue(): Promise<Revenue[]> {
+  console.log('Fetching revenue data (mocked)...');
+  return [];
 }
 
-export async function fetchLatestInvoices() {
+// Fetches the latest 5 posts and adapts them to the LatestInvoiceRaw shape.
+export async function fetchLatestInvoices(): Promise<any[]> { // Using any for now as the shape is different
   try {
-    const data = await sql<LatestInvoiceRaw[]>`
-      SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
-      FROM invoices
-      JOIN customers ON invoices.customer_id = customers.id
-      ORDER BY invoices.date DESC
-      LIMIT 5`;
+    const { data } = await client.query({
+      query: GET_ALL_POSTS,
+      variables: { first: 5, after: null },
+    });
 
-    const latestInvoices = data.map((invoice) => ({
-      ...invoice,
-      amount: formatCurrency(invoice.amount),
+    const latestPosts = data.posts.nodes.map((post: any) => ({
+      id: post.databaseId,
+      name: post.categories.nodes.length > 0 ? post.categories.nodes[0].name : 'Uncategorized', // Placeholder for customer name
+      image_url: post.featuredImage?.node?.sourceUrl || '/user.svg', // Placeholder for customer image
+      email: post.slug, // Placeholder for customer email
+      amount: formatCurrency(10000), // Placeholder amount, GraphQL schema doesn't have it
     }));
-    return latestInvoices;
+
+    return latestPosts;
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch the latest invoices.');
+    console.error('GraphQL Error:', error);
+    throw new Error('Failed to fetch the latest posts.');
   }
 }
 
+// Fetches card data using post counts as a stand-in for invoice/customer counts.
 export async function fetchCardData() {
   try {
-    // You can probably combine these into a single SQL query
-    // However, we are intentionally splitting them to demonstrate
-    // how to initialize multiple queries in parallel with JS.
-    const invoiceCountPromise = sql`SELECT COUNT(*) FROM invoices`;
-    const customerCountPromise = sql`SELECT COUNT(*) FROM customers`;
-    const invoiceStatusPromise = sql`SELECT
-         SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS "paid",
-         SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
-         FROM invoices`;
+    const { data } = await client.query({
+      query: GET_ALL_POST_DATA_COMBINED,
+      variables: { first: 1, after: null }, // We only need the count, so fetch 1
+    });
 
-    const data = await Promise.all([
-      invoiceCountPromise,
-      customerCountPromise,
-      invoiceStatusPromise,
-    ]);
-
-    const numberOfInvoices = Number(data[0][0].count ?? '0');
-    const numberOfCustomers = Number(data[1][0].count ?? '0');
-    const totalPaidInvoices = formatCurrency(data[2][0].paid ?? '0');
-    const totalPendingInvoices = formatCurrency(data[2][0].pending ?? '0');
+    const numberOfInvoices = data.allPosts.nodes.length;
+    const numberOfCustomers = 0; // No customer concept in GraphQL schema
+    const totalPaidInvoices = formatCurrency(0); // No invoice status in GraphQL schema
+    const totalPendingInvoices = formatCurrency(0); // No invoice status in GraphQL schema
 
     return {
       numberOfCustomers,
@@ -80,139 +69,125 @@ export async function fetchCardData() {
       totalPendingInvoices,
     };
   } catch (error) {
-    console.error('Database Error:', error);
+    console.error('GraphQL Error:', error);
     throw new Error('Failed to fetch card data.');
   }
 }
 
 const ITEMS_PER_PAGE = 6;
+
+// Fetches posts based on a search query or gets a paginated list of all posts.
 export async function fetchFilteredInvoices(
   query: string,
   currentPage: number,
-) {
+): Promise<InvoicesTable[]> {
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   try {
-    const invoices = await sql<InvoicesTable[]>`
-      SELECT
-        invoices.id,
-        invoices.amount,
-        invoices.date,
-        invoices.status,
-        customers.name,
-        customers.email,
-        customers.image_url
-      FROM invoices
-      JOIN customers ON invoices.customer_id = customers.id
-      WHERE
-        customers.name ILIKE ${`%${query}%`} OR
-        customers.email ILIKE ${`%${query}%`} OR
-        invoices.amount::text ILIKE ${`%${query}%`} OR
-        invoices.date::text ILIKE ${`%${query}%`} OR
-        invoices.status ILIKE ${`%${query}%`}
-      ORDER BY invoices.date DESC
-      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
-    `;
+    let posts: any[] = [];
+    if (query) {
+      // Search functionality - Note: WPGraphQL search doesn't support pagination out of the box.
+      const { data } = await client.query({
+        query: SEARCH_POSTS,
+        variables: { search: query },
+      });
+      posts = data.posts.nodes;
+    } else {
+      // Pagination functionality for all posts
+       const { data } = await client.query({
+        query: GET_ALL_POSTS,
+        // The WPGraphQL OffsetPagination is not standard. After/first is used for cursor-based pagination.
+        // We will fetch all and slice, which is inefficient but works without offset pagination.
+        // A better approach would be to implement proper cursor-based pagination in the UI.
+        variables: { first: 1000, after: null }, // Fetch a large number and manually paginate
+      });
+      posts = data.posts.nodes.slice(offset, offset + ITEMS_PER_PAGE);
+    }
 
-    return invoices;
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch invoices.');
-  }
-}
-
-export async function fetchInvoicesPages(query: string) {
-  try {
-    const data = await sql`SELECT COUNT(*)
-    FROM invoices
-    JOIN customers ON invoices.customer_id = customers.id
-    WHERE
-      customers.name ILIKE ${`%${query}%`} OR
-      customers.email ILIKE ${`%${query}%`} OR
-      invoices.amount::text ILIKE ${`%${query}%`} OR
-      invoices.date::text ILIKE ${`%${query}%`} OR
-      invoices.status ILIKE ${`%${query}%`}
-  `;
-
-    const totalPages = Math.ceil(Number(data[0].count) / ITEMS_PER_PAGE);
-    return totalPages;
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch total number of invoices.');
-  }
-}
-
-export async function fetchInvoiceById(id: string) {
-  try {
-    const data = await sql<InvoiceForm[]>`
-      SELECT
-        invoices.id,
-        invoices.customer_id,
-        invoices.amount,
-        invoices.status
-      FROM invoices
-      WHERE invoices.id = ${id};
-    `;
-
-    const invoice = data.map((invoice) => ({
-      ...invoice,
-      // Convert amount from cents to dollars
-      amount: invoice.amount / 100,
+    // Adapt the post data to the InvoicesTable shape
+    return posts.map((post: any) => ({
+      id: post.databaseId.toString(),
+      amount: 10000, // Placeholder
+      date: post.date,
+      status: 'paid', // Placeholder
+      name: post.title,
+      email: post.slug,
+      image_url: post.featuredImage?.node?.sourceUrl || '/user.svg',
     }));
-
-    return invoice[0];
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch invoice.');
+    console.error('GraphQL Error:', error);
+    throw new Error('Failed to fetch invoices/posts.');
   }
 }
 
-export async function fetchCustomers() {
+// Calculates the total number of pages for posts.
+export async function fetchInvoicesPages(query: string): Promise<number> {
   try {
-    const customers = await sql<CustomerField[]>`
-      SELECT
-        id,
-        name
-      FROM customers
-      ORDER BY name ASC
+     let totalPosts = 0;
+     if (query) {
+       const { data } = await client.query({
+         query: SEARCH_POSTS,
+         variables: { search: query },
+       });
+       totalPosts = data.posts.nodes.length;
+     } else {
+       const { data } = await client.query({
+         query: GET_ALL_POST_DATA_COMBINED,
+         variables: { first: 1, after: null }, // Only need the count
+       });
+       totalPosts = data.allPosts.nodes.length;
+     }
+
+    return Math.ceil(totalPosts / ITEMS_PER_PAGE);
+  } catch (error) {
+    console.error('GraphQL Error:', error);
+    throw new Error('Failed to fetch total number of pages for posts.');
+  }
+}
+
+// Fetches a single post by its database ID.
+export async function fetchInvoiceById(id: string): Promise<InvoiceForm | undefined> {
+   const GET_POST_BY_ID = gql`
+      query GetPostById($id: ID!) {
+        post(id: $id, idType: DATABASE_ID) {
+          databaseId
+          title
+          excerpt
+        }
+      }
     `;
 
-    return customers;
-  } catch (err) {
-    console.error('Database Error:', err);
-    throw new Error('Failed to fetch all customers.');
+  try {
+    const { data } = await client.query({
+      query: GET_POST_BY_ID,
+      variables: { id },
+    });
+
+    if (!data.post) {
+      return undefined;
+    }
+
+    // Adapt post data to InvoiceForm shape
+    return {
+      id: data.post.databaseId,
+      customer_id: '1', // Placeholder
+      amount: 100, // Placeholder
+      status: 'pending', // Placeholder
+    };
+  } catch (error) {
+    console.error('GraphQL Error:', error);
+    throw new Error('Failed to fetch invoice/post.');
   }
 }
 
-export async function fetchFilteredCustomers(query: string) {
-  try {
-    const data = await sql<CustomersTableType[]>`
-		SELECT
-		  customers.id,
-		  customers.name,
-		  customers.email,
-		  customers.image_url,
-		  COUNT(invoices.id) AS total_invoices,
-		  SUM(CASE WHEN invoices.status = 'pending' THEN invoices.amount ELSE 0 END) AS total_pending,
-		  SUM(CASE WHEN invoices.status = 'paid' THEN invoices.amount ELSE 0 END) AS total_paid
-		FROM customers
-		LEFT JOIN invoices ON customers.id = invoices.customer_id
-		WHERE
-		  customers.name ILIKE ${`%${query}%`} OR
-        customers.email ILIKE ${`%${query}%`}
-		GROUP BY customers.id, customers.name, customers.email, customers.image_url
-		ORDER BY customers.name ASC
-	  `;
+// No customer concept in the GraphQL schema.
+export async function fetchCustomers(): Promise<CustomerField[]> {
+  console.log('Fetching customers (mocked)...');
+  return [];
+}
 
-    const customers = data.map((customer) => ({
-      ...customer,
-      total_pending: formatCurrency(customer.total_pending),
-      total_paid: formatCurrency(customer.total_paid),
-    }));
-
-    return customers;
-  } catch (err) {
-    console.error('Database Error:', err);
-    throw new Error('Failed to fetch customer table.');
-  }
+// No customer concept in the GraphQL schema.
+export async function fetchFilteredCustomers(query: string): Promise<CustomersTableType[]> {
+    console.log('Fetching filtered customers (mocked)...');
+    return [];
 }
