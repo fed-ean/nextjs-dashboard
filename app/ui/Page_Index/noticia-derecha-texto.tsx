@@ -1,4 +1,3 @@
-import "./style-noticias.css";
 
 export default function NoticiasTexto() {
   return(

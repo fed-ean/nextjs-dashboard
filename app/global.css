@@ -94,33 +94,33 @@ section{
     justify-self: center;
 }
 
-h1{
+/* h1{
     font-size: 25px;
     margin:0 35px;
     padding: 20px;      
     text-align: center;
     color: var(--color-texto-claro);
-}
+} */
 
-h2{
+/* h2{
     font-size: 20px;
     margin-left: 20px;
     padding: 50px 0 20px;
     color: var(--color-texto-claro);
-}
+} */
 
 li{
     list-style-type: none;
 }
 
-p{
+/* p{
     text-align: justify;
     color: rgb(0, 0, 0);
-}
-h4{
+} */
+/* h4{
     color: var(--color-footer-titulo);
     font-size: 25px;
-}
+} */
 
 .navbar{
     position: sticky;
