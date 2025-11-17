@@ -1,8 +1,25 @@
 import Link from 'next/link';
-import { graphQLFetch } from '@/app/lib/graphQLFetch';
-import { GET_ALL_CATEGORIES, GET_ALL_POSTS } from '@/app/lib/queries';
 
-// Define interfaces for the data we're fetching
+const GQL_ENDPOINT = "/graphql";
+
+// Las consultas GraphQL como cadenas de texto
+const GET_ALL_CATEGORIES_QUERY = `
+  query AllCategories {
+    categories(first: 100) {
+      nodes { databaseId name slug }
+    }
+  }
+`;
+
+const GET_LATEST_POSTS_QUERY = `
+  query AllPosts($first: Int!, $after: String) {
+    posts(first: $first, after: $after) {
+      nodes { databaseId title slug date }
+    }
+  }
+`;
+
+// Interfaces para la tipificación de los datos
 interface Category {
   databaseId: number;
   name: string;
@@ -16,39 +33,50 @@ interface Post {
   date: string;
 }
 
-interface AllCategoriesData {
-  categories: {
-    nodes: Category[];
-  };
+// Función auxiliar para realizar una única petición GraphQL
+async function fetchGraphQL(query: string, variables?: Record<string, any>) {
+    try {
+        const response = await fetch(GQL_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, variables }),
+            next: { revalidate: 3600 }, // Revalidar cada hora
+        });
+
+        if (!response.ok) {
+            console.error(`Error en la petición a GraphQL: ${response.statusText}`);
+            return null;
+        }
+
+        const json = await response.json();
+        if (json.errors) {
+            console.error(`Error en la respuesta de GraphQL:`, json.errors);
+            return null;
+        }
+
+        return json.data;
+    } catch (error) {
+        console.error("Fallo en la petición fetch a GraphQL:", error);
+        return null; // Devuelve null si hay un error de red o de parseo
+    }
 }
 
-interface AllPostsData {
-  posts: {
-    nodes: Post[];
-  };
-}
-
+// El componente SideNav que obtiene y muestra los datos
 export default async function SideNav() {
-  // Fetch categories and latest posts in parallel
-  const [categoriesData, postsData] = await Promise.all([
-    graphQLFetch<AllCategoriesData>({
-      query: GET_ALL_CATEGORIES,
-      revalidate: 60 * 60, // Revalidate every hour
-    }),
-    graphQLFetch<AllPostsData>({
-      query: GET_ALL_POSTS,
-      variables: { first: 5, after: null }, // Fetch 5 latest posts
-      revalidate: 5 * 60, // Revalidate every 5 minutes
-    }),
+  // Realiza las peticiones en paralelo
+  const [categoriesResult, postsResult] = await Promise.all([
+    fetchGraphQL(GET_ALL_CATEGORIES_QUERY),
+    fetchGraphQL(GET_LATEST_POSTS_QUERY, { first: 5, after: null }),
   ]);
 
-  const categories = categoriesData?.categories?.nodes || [];
-  const latestPosts = postsData?.posts?.nodes || [];
+  // Extrae los datos de forma segura, con fallback a un array vacío
+  const categories: Category[] = categoriesResult?.categories?.nodes || [];
+  const latestPosts: Post[] = postsResult?.posts?.nodes || [];
 
   return (
     <aside className="h-auto w-full bg-white border-r overflow-y-auto">
       <div className="p-4 space-y-6">
-        {/* Latest Posts */}
+        {/* Sección de Últimas Publicaciones */}
         {latestPosts.length > 0 && (
           <div>
             <h2 className="text-lg font-semibold mb-2 mt-10">Últimas publicaciones</h2>
@@ -56,13 +84,9 @@ export default async function SideNav() {
               {latestPosts.map((post) => (
                 <li key={post.databaseId}>
                   <Link href={`/Categorias/Noticias/${post.slug}`} className="hover:underline">
-                    <p className="text-sm font-medium">{post.title}</p>
+                    <p className="text-sm font-medium" dangerouslySetInnerHTML={{ __html: post.title }} />
                     <span className="text-xs text-gray-500">
-                      {new Date(post.date).toLocaleDateString('es-ES', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
+                      {new Date(post.date).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
                     </span>
                   </Link>
                 </li>
@@ -71,7 +95,7 @@ export default async function SideNav() {
           </div>
         )}
 
-        {/* Categories */}
+        {/* Sección de Categorías */}
         {categories.length > 0 && (
           <div>
             <h2 className="text-lg font-semibold mb-2">Categorías</h2>
@@ -85,6 +109,11 @@ export default async function SideNav() {
               ))}
             </ul>
           </div>
+        )}
+
+        {/* Placeholder si no se carga ninguna sección */}
+        {latestPosts.length === 0 && categories.length === 0 && (
+            <div className='p-4 text-center text-gray-500'>No se pudo cargar el contenido de la barra lateral.</div>
         )}
       </div>
     </aside>

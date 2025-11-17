@@ -1,6 +1,6 @@
 // app/interes-general/page.tsx
 import React from "react";
-import { getAllPostsPaginated } from "../lib/wpRest";
+import { fetchAllPostsPaginated } from "../lib/data-fetcher"; // <-- CAMBIO DE IMPORTACIÓN
 import CategoryPagination from "../ui/categorias/CategoryPagination";
 import CategoryGrid from "../ui/categorias/CategoryGrid";
 
@@ -13,7 +13,8 @@ export default async function InteresGeneralPage({
 }) {
   const page = Number(searchParams?.page || 1);
 
-  const { posts, total, totalPages } = await getAllPostsPaginated(
+  // La llamada a la función ahora usa el nuevo nombre
+  const { posts, total, totalPages } = await fetchAllPostsPaginated(
     page,
     PER_PAGE
   );

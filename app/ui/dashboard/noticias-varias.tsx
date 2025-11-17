@@ -1,15 +1,32 @@
-export default function NoticiasVarias() {
-  return (
-      <div className="relative overflow-hidden rounded-lg shadow-lg mx-4 card">
-        <img src="fotos/mirtha-gala.jpeg" className="w-full h-auto" alt="" />
-        <div className="absolute inset-0 flex flex-col justify-end">
-          <h5 className="text-white text-xl px-4 py-1 titillium-web-regular card-title">
-            Lorem ipsum dolor sit amet consectetur adipisicing elsit?
-            Placeat ipsa corporis exercitationem? Qui vitae harum ea dicta
-            doloremque. Quam recusandae debitis laudantium. Deleniti nulla
-            ratione unde harum fugit!
-          </h5>
-        </div>
+interface Post {
+    databaseId: number;
+    title: string;
+    slug: string;
+    excerpt: string;
+    featuredImage: { node: { sourceUrl: string; }; };
+    categories: { nodes: { name: string; }[]; };
+  }
+  
+  interface NoticiasVariasProps {
+    posts: Post[];
+    page: number;
+    categoriaSlug: string;
+    categoriaNombre: string;
+  }
+  
+  export default function NoticiasVarias({ posts, page, categoriaSlug, categoriaNombre }: NoticiasVariasProps) {
+    return (
+      <div>
+        {posts.map((post) => (
+          <div key={post.databaseId} className="relative overflow-hidden rounded-lg shadow-lg mx-4 card">
+            <img src={post.featuredImage?.node.sourceUrl || '/placeholder.png'} className="w-full h-auto" alt={post.title} />
+            <div className="absolute inset-0 flex flex-col justify-end">
+              <h5 className="text-white text-xl px-4 py-1 titillium-web-regular card-title">
+                {post.title}
+              </h5>
+            </div>
+          </div>
+        ))}
       </div>
-  );
-}
+    );
+  }

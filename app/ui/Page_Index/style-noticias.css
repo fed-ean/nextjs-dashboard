@@ -25,7 +25,6 @@
   position: sticky;
   top: var(--navbar-height);    /* se pega debajo del navbar */
   left: 0;
-  width: 75%;
   height: var(--hero-height-desktop);
   background-repeat: no-repeat;
   background-size: cover;
@@ -64,10 +63,8 @@
 
 /* Con sticky no hace falta padding-top tan grande; usamos margin-top igual a hero para separar */
 .content-container {
-  margin-right: calc(var(--sidebar-width) + var(--ad-gap));
-  width: 80%;
   margin-top: 15px;
-  padding: 1rem;
+  padding: 0; /* Eliminado el padding para que lo controle Tailwind */
   z-index: 20;
 }
 

@@ -2,7 +2,7 @@
 import React from 'react';
 import CategoryGrid from '../../../../ui/categorias/CategoryGrid';
 import CategoryPagination from '../../../../ui/categorias/CategoryPagination';
-import { getCachedPostsPage } from '../../../../lib/wpRest'; // <-- RUTA CORREGIDA
+import { getCachedPostsPage } from '../../../../lib/data-fetcher'; // <-- CAMBIO AQUÍ
 
 type Props = { params: { slug: string; page: string } };
 
@@ -14,7 +14,7 @@ export default async function CategoryPageNumbered({ params }: Props) {
   const PER_PAGE = 9;
 
   try {
-    // Se ha eliminado el parámetro TTL, ya no es necesario
+    // La llamada a la función es compatible con la nueva implementación
     const { posts, total, totalPages, category } = await getCachedPostsPage(slug, pageNum, PER_PAGE);
 
     const computedTotalPages = totalPages && totalPages > 0 ? totalPages : Math.max(1, Math.ceil((total || posts.length) / PER_PAGE));

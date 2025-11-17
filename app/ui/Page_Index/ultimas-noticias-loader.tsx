@@ -1,30 +1,84 @@
 // app/ui/Page_Index/ultimas-noticias-loader.tsx
-import { fetchLatestInvoices } from '@/app/lib/data';
-import UltimasNoticiasSidenav from './ultimas-noticias-sidenav';
+import NoticiasVarias from "../dashboard/noticias-varias";
 
-type Noticia = {
-  id: string;
-  slug?: string;
-  titulo?: string;
-  title?: string;
-  imagenUrl?: string;
-  fecha?: string;
-  [k: string]: any;
-};
+// Usar la variable de entorno para el endpoint de GraphQL
+const GQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT_URL || "/graphql";
 
-// This is now a pure Server Component
+const GET_LATEST_POSTS_QUERY = `
+  query GetLatestPosts {
+    posts(first: 3) {
+      nodes {
+        databaseId
+        title
+        slug
+        excerpt
+        featuredImage { node { sourceUrl } }
+        categories(first: 1) { nodes { name } }
+      }
+    }
+  }
+`;
+
+interface Post {
+  databaseId: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  featuredImage: { node: { sourceUrl: string; }; };
+  categories: { nodes: { name: string; }[]; };
+}
+
+async function fetchLatestPosts(): Promise<{ posts: Post[]; error: string | null }> {
+    try {
+        const response = await fetch(GQL_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: GET_LATEST_POSTS_QUERY }),
+            next: { revalidate: 3600 }, 
+        });
+
+        if (!response.ok) {
+            throw new Error(`La respuesta de la red no fue OK: ${response.statusText}`);
+        }
+
+        const json = await response.json();
+        if (json.errors) {
+            throw new Error(json.errors.map((e: any) => e.message).join(', '));
+        }
+
+        return { posts: json.data?.posts?.nodes || [], error: null };
+
+    } catch (err: any) {
+        console.error("Error al obtener los últimos posts:", err.message);
+        return { posts: [], error: "No se pudieron cargar las últimas noticias." };
+    }
+}
+
+const ErrorDisplay = ({ message }: { message: string }) => (
+    <div className="text-center py-8 px-4 bg-red-50 rounded-lg border border-red-200">
+        <h3 className="font-bold text-red-700">Error de Carga</h3>
+        <p className="text-red-600">{message}</p>
+        <p className="text-sm text-gray-500 mt-2">Inténtelo de nuevo más tarde.</p>
+    </div>
+);
+
 export default async function UltimasNoticiasLoader() {
-  // Fetch the data using the correct function
-  const latestInvoices = await fetchLatestInvoices();
+  const { posts, error } = await fetchLatestPosts();
 
-  // Adapt the fetched data to the Noticia type
-  const ultimasNoticias: Noticia[] = latestInvoices.map(invoice => ({
-    id: invoice.id,
-    titulo: invoice.name, // Map name to titulo
-    imagenUrl: invoice.image_url, // Map image_url to imagenUrl
-    // You can add other fields here if needed, like a formatted date
-  }));
+  if (error) {
+    return <ErrorDisplay message={error} />;
+  }
+  
+  if (posts.length === 0) {
+      return null; 
+  }
 
-  // It just fetches and renders the data presentation component
-  return <UltimasNoticiasSidenav noticias={ultimasNoticias} />;
+  return (
+    <NoticiasVarias 
+      posts={posts} 
+      page={1} 
+      categoriaSlug="" 
+      categoriaNombre=""
+    />
+  );
 }

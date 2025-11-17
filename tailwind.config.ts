@@ -26,6 +26,11 @@ const config: Config = {
         playfair: ['Playfair Display', 'serif'],
         inter: ['Inter', 'sans-serif'],
         robotoSlab: ['Roboto Slab', 'serif'],
+        alegreya: ['Alegreya', 'serif'],
+        'alegreya-extrabold': ['Alegreya', 'serif'],
+      },
+      fontWeight: {
+        'alegreya-extrabold': '800',
       },
       animation: {
         wave: 'wave 1.5s infinite ease-in-out',

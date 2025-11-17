@@ -29,11 +29,11 @@ export default function UltimasNoticiasSidenav({ noticias }: { noticias: Noticia
   }
 
   return (
-    <div className="p-4 border-t border-blue-800">
-      <h3 className="text-base font-bold text-white mb-4 uppercase tracking-wider">
+    <div className="p-4">
+      <h3 className="text-base font-bold text-gray-800 mb-4 uppercase tracking-wider">
         Últimas publicaciones
       </h3>
-      <div className="space-y-3">
+      <div className="space-y-4">
         {noticias.map((noticia) => {
           const title = noticia.titulo || noticia.title || 'Sin título';
           const urlNoticia = `/Categorias/Noticias/${noticia.slug || ''}`;
@@ -43,33 +43,35 @@ export default function UltimasNoticiasSidenav({ noticias }: { noticias: Noticia
             <Link
               key={noticia.id}
               href={urlNoticia}
-              className="relative group block w-full h-24 rounded-lg overflow-hidden shadow-lg"
+              className="group flex items-start space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
             >
-              {/* Imagen de fondo */}
-              {noticia.imagenUrl ? (
-                <Image
-                  src={noticia.imagenUrl}
-                  alt={title}
-                  fill
-                  sizes="150px"
-                  className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-110"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-700"></div>
-              )}
+              {/* Imagen Miniatura */}
+              <div className="flex-shrink-0">
+                {noticia.imagenUrl ? (
+                  <Image
+                    src={noticia.imagenUrl}
+                    alt={title}
+                    width={80}
+                    height={80}
+                    className="w-20 h-20 object-cover rounded-md shadow-sm"
+                  />
+                ) : (
+                  <div className="w-20 h-20 bg-gray-200 rounded-md flex items-center justify-center">
+                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l-1-1m-4 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                  </div>
+                )}
+              </div>
 
-              {/* Gradiente para legibilidad del texto */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-
-              {/* Contenido de texto superpuesto */}
-              <div className="absolute bottom-0 left-0 w-full p-2">
-                <h4 className="text-sm font-semibold text-white leading-snug line-clamp-2 transition-colors duration-200 group-hover:text-blue-300">
+              {/* Contenido de Texto */}
+              <div className="flex-1 min-w-0">
+                <h4 className="text-sm font-semibold text-gray-800 leading-snug line-clamp-3 group-hover:text-blue-600">
                   {title}
                 </h4>
                 {formattedDate && (
-                  <time className="text-xs text-gray-300 mt-1 block">
-                    {formattedDate}
-                  </time>
+                  <div className="flex items-center mt-1.5 text-xs text-gray-500">
+                    <span className="mr-1.5">⌚</span>
+                    <time>{formattedDate}</time>
+                  </div>
                 )}
               </div>
             </Link>

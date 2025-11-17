@@ -7,47 +7,44 @@ import './style-not-izquierda.css'; // Asegúrate de que este CSS existe
 import '../../fonts.css';
 
 export default function NoticiaPrincipalIzquierda({ noticia }) {
+    // Comprobación de seguridad: si no hay noticia, no se renderiza nada.
     if (!noticia) return null;
 
     const urlNoticia = `/Categorias/Noticias/${noticia.slug}`;
+    // Se usa la estructura de datos CORRECTA: `featuredImage.node.sourceUrl`
+    const imageUrl = noticia.featuredImage?.node?.sourceUrl;
+    // Se usa `title` en lugar de `titulo` y se añade un fallback.
+    const title = noticia.title || 'Título no disponible';
 
     return (
-        // Contenedor principal de la columna izquierda (ocupa 7/12 para dejar espacio a la derecha)
-        // Puedes ajustar el ancho de la columna según tu diseño final.
         <div className="w-full md:w-7/12 p-4">
-            <Link href={urlNoticia} passHref> {/* `passHref` y `legacyBehavior` no son necesarios con Link moderno */}
-                {/* EL CONTENEDOR DE LA IMAGEN DEBE SER RELATIVO Y TENER UN ALTO FIJO/MINIMO.
-                  Añadimos 'group' para efectos de hover en el Link.
-                */}
+            <Link href={urlNoticia} passHref>
                 <div className="relative h-[300px] md:h-full w-full overflow-hidden rounded-lg shadow-lg cursor-pointer group">
                     
-                    {/* IMAGEN OPTIMIZADA CON NEXT/IMAGE Y 'FILL' */}
-                    <Image
-                        src={noticia.imagenUrl}
-                        alt={noticia.titulo}
-                        fill // La imagen se expande para llenar el padre
-                        sizes="(max-width: 768px) 100vw, 60vw"
-                        style={{ objectFit: 'cover' }} // Para que la imagen cubra sin distorsionarse
-                        className="transition-transform duration-300 group-hover:scale-105" // Efecto hover
-                        priority={true} // Prioridad para la imagen principal
-                    />
+                    {/* RENDERIZADO CONDICIONAL DE LA IMAGEN */}
+                    {imageUrl ? (
+                        <Image
+                            src={imageUrl} // Se usa la URL correcta y verificada
+                            alt={title}    // Se usa el título correcto
+                            fill
+                            sizes="(max-width: 768px) 100vw, 60vw"
+                            style={{ objectFit: 'cover' }}
+                            className="transition-transform duration-300 group-hover:scale-105"
+                            priority={true}
+                        />
+                    ) : (
+                        // Si no hay imagen, se muestra un placeholder para evitar errores.
+                        <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                            <span className="text-gray-500">Sin Imagen</span>
+                        </div>
+                    )}
 
-                    {/* OVERLAY OSCURO PARA MEJORAR LA LEGIBILIDAD DEL TEXTO */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
 
-                    {/* CONTENIDO DE TEXTO (TITULO Y CATEGORIA) */}
                     <div className="absolute bottom-0 left-0 z-20 text-container">
-                        {/* Puedes añadir la categoría si la tienes en `noticia.categoria` */}
-                        {/* <span className="bg-blue-600 px-3 py-1 text-sm uppercase tracking-widest rounded mb-2 inline-block">
-                            {noticia.categoria || 'SECCIONES'} 
-                        </span> */}
-                        <h2 className="text-3xl md:text-4xl font-bold titillium-web-regular text-white">
-                            {noticia.titulo}
+                        <h2 className="text-3xl md:text-4xl font-alegreya-extrabold text-white">
+                            {title} {/* Se usa el título correcto */}
                         </h2>
-                        {/* Opcional: Autor y Leer Más */}
-                        {/* <div className="mt-2 text-sm text-gray-300">
-                            by Radio Empresaria <span className="ml-4">READ MORE →</span>
-                        </div> */}
                     </div>
                 </div>
             </Link>

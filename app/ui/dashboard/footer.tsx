@@ -1,67 +1,118 @@
-import "./footer.css";
-import '../../fonts.css';
-import { PiMapPinBold } from "react-icons/pi";
+'use client';
+
+import Link from 'next/link';
+import {
+  FaYoutube, 
+  FaFacebookSquare, 
+  FaInstagram, 
+  FaTelegramPlane, 
+  FaLinkedin, 
+  FaWhatsapp
+} from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 import { IoMdMail } from "react-icons/io";
-import { BsWhatsapp } from "react-icons/bs";
+import { PiMapPinBold } from "react-icons/pi";
 import { FaIdCard } from "react-icons/fa";
-import { FaLinkedin } from "react-icons/fa";
-export default function Footer(){
-    return(
-<footer className="footer">
-        <div className="div-conteiner titillium-web-regular">
-            {/* Tailwind Classes for Layout and Spacing */}
-            <div className="footer-section izquierda flex flex-col space-y-2">
-                <img src="fotos/image.png" alt="" className="footer-logo"/>
-                <p>Radio Empresaria es una emisora online</p>
-                <p>creada por la Fundación Pro Buenos Aires</p>
-                <p>con el objetivo de acompañar y difundir a pymes</p>
-                <p>comercios, emprendedores y</p>
-                <p>grandes empresas de nuestra región.</p>
-                <div className="redes mt-4">
-                    <h4 className="mb-2">Redes</h4>
-                    <ul className="flex space-x-4">
-                        <li><a href="https://www.youtube.com/@fprobaires" target="_blank"><i className="fa-brands fa-youtube text-3xl"></i></a></li>
-                        <li><a href="https://www.facebook.com/RadioEmpresaria" target="_blank"><i className="fa-brands fa-facebook text-3xl"></i></a></li>
-                        <li><a href="#" target="_blank"><i className="fa-brands fa-instagram instagram-gradient text-3xl"></i></a></li>
-                        <li><a href="#" target="_blank"><i className="fa-brands fa-x-twitter text-3xl"></i></a></li>
-                        <li><a href="https://t.me/radioempresaria" target="_blank" ><i className="fa-brands fa-telegram text-3xl"></i></a></li>
-                    </ul>
-                </div>
-            </div>
 
-            {/* Tailwind Classes for Spacing and Alignment */}
-            <div className="footer-brand centro">
-                <h4 className="mb-3">Secciones</h4>
-                <ul className="footer-ul space-y-1">
-                    <li className="footer-ul-li"><a href="categorias/politica.html">Politica</a></li>
-                    <li className="footer-ul-li"><a href="#">Economia</a></li>
-                    <li className="footer-ul-li"><a href="#">PYMES</a></li>
-                    <li className="footer-ul-li"><a href="#">Interes general</a></li>
-                </ul>
-            </div>
+const socialLinks = [
+  { href: "https://www.youtube.com/@fprobaires", icon: FaYoutube, label: "YouTube" },
+  { href: "https://www.facebook.com/RadioEmpresaria", icon: FaFacebookSquare, label: "Facebook" },
+  { href: "#", icon: FaInstagram, label: "Instagram" },
+  { href: "https://x.com/RadioEmpresaria", icon: FaXTwitter, label: "Twitter" },
+  { href: "#", icon: FaTelegramPlane, label: "Telegram" },
+];
 
-            {/* Tailwind Classes for Layout and Spacing */}
-            <div className="footer-section derecha flex flex-col space-y-2">
-                <h4 className="mb-3">Contacto</h4>
-                <p className="footer-section-p flex items-center space-x-2"><i className="fa-circle-info text-2xl"><FaIdCard/></i > <span>Cuit 30-69894716-7</span></p>
-                <p className="footer-section-p flex items-center space-x-2"><i className="fa-whatsapp text-2xl"><BsWhatsapp/></i> <span>11 4189-9250</span></p>
-                <p className="footer-section-p flex items-center space-x-2"><i className="fa-square-phone text-2xl"><BsWhatsapp/></i> <span>15 5258-0226</span></p>
-                <p className="footer-section-p flex items-center space-x-2"><i className="fa-envelope text-2xl"><IoMdMail/></i> <span>info@radioempresaria.cosm.ar</span></p>
-                <p className="footer-section-p flex items-center space-x-2"><i className="fa-envelope text-2xl"><IoMdMail/></i> <span>radioempresaria92.5@gmail.com</span></p>
-                <p className="footer-section-p flex items-center space-x-2"><i className="fa-location-dot text-2xl"><PiMapPinBold/></i> <span>Ruta 36 N°1354</span></p>
-                <p className="footer-section-p flex items-center space-x-2"><i className="fa-linkedin text-2xl"><FaLinkedin/></i><span>Linkedin</span></p>
-            </div>
-        </div>
+const contactInfo = [
+    { icon: FaIdCard, text: "Cuit 30-69894716-7" },
+    { icon: FaWhatsapp, text: "11 4189-9250" },
+    { icon: IoMdMail, text: "info@radioempresaria.com.ar" },
+    { icon: PiMapPinBold, text: "Ruta 36 N°1354" },
+    { icon: FaLinkedin, text: "LinkedIn" },
+];
 
-        {/* Tailwind Classes for Layout and Spacing */}
-        <div className="footer-bottom flex flex-col md:flex-row md:justify-between items-center py-3">
-            <ul className="footer-bottom-ul flex space-x-4 mb-2 md:mb-0">
-                <li><a href="">Terminos y condiciones</a></li>
-                <li><a href="">Politica privacidad</a></li>
+const siteSections = [
+  { href: "/Categorias/politica", name: "Política" },
+  { href: "/Categorias/economia", name: "Economía" },
+  { href: "/Categorias/pymes", name: "PYMES" },
+  { href: "/Categorias/interes-general", name: "Interés General" },
+];
+
+const legalLinks = [
+  { href: "/terminos", name: "Términos y Condiciones" },
+  { href: "/privacidad", name: "Política de Privacidad" },
+];
+
+export default function Footer() {
+  return (
+    <footer className="bg-gray-900 text-white pt-16 pb-6 mt-12 titillium-web-regular">
+      <div className="container mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+          
+          {/* Columna 1: Sobre nosotros */}
+          <div className="flex flex-col">
+            <img src="/RadioAColor.png" alt="Radio Empresaria Logo" className="h-12 w-auto mb-4 self-start"/>
+            <p className="text-gray-400 text-sm">
+              Radio online de la Fundación Pro Buenos Aires, dedicada a pymes, comercios, emprendedores y grandes empresas de nuestra región.
+            </p>
+          </div>
+
+          {/* Columna 2: Secciones */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Secciones</h3>
+            <ul className="space-y-3">
+              {siteSections.map(section => (
+                <li key={section.name}>
+                  <Link href={section.href} className="text-gray-400 hover:text-white transition-colors">
+                    {section.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
-            <p className="footer-bottom-p mb-1">&copy; Copyright 2025 Radio Empresaria. Todos los derechos reservados.</p>
-            <p className="footer-bottom-p">&copy; Este sitio fue desarrollado por <a href="contacto.html" className="text-blue-500 hover:text-blue-700">Click aqui</a></p>
+          </div>
+
+          {/* Columna 3: Legal */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Legal</h3>
+            <ul className="space-y-3">
+              {legalLinks.map(link => (
+                <li key={link.name}>
+                  <Link href={link.href} className="text-gray-400 hover:text-white transition-colors">
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Columna 4: Contacto */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Contacto</h3>
+            <ul className="space-y-4 text-sm">
+              {contactInfo.map((item, index) => (
+                <li key={index} className="flex items-center">
+                  <item.icon className="text-xl mr-3 text-gray-400" />
+                  <span className="text-gray-400">{item.text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
         </div>
+
+        {/* Redes Sociales y Copyright */}
+        <div className="border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center">
+          <div className="flex space-x-5 mb-4 md:mb-0">
+            {socialLinks.map(social => (
+              <a key={social.label} href={social.href} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors text-2xl">
+                <social.icon />
+              </a>
+            ))}
+          </div>
+          <p className="text-gray-500 text-sm text-center">
+            &copy; {new Date().getFullYear()} Radio Empresaria. Todos los derechos reservados.
+          </p>
+        </div>
+      </div>
     </footer>
-    )
-    };
+  );
+}

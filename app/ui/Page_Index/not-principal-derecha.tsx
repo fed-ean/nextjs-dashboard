@@ -8,40 +8,42 @@ import "./style-not-izquierda.css";
 // import "./style-noticias.css"; 
 
 export default function NoticiaSecundariaCard({ noticia, priority = false }){
-    if (!noticia) return null;
+    // Añadimos una comprobación de seguridad por si la noticia o el título no existen.
+    if (!noticia || !noticia.title) return null;
 
-    // Se asume que la noticia tiene slug, id e imagenUrl.
-    const urlNoticia = `/Categorias/Noticias/${noticia.slug}`; 
-    // Truncamos el título para que quepa bien en el espacio pequeño.
-    const tituloCorto = noticia.titulo.length > 80 ? noticia.titulo.substring(0, 80) + '...' : noticia.titulo;
+    const urlNoticia = `/Categorias/Noticias/${noticia.slug}`;
+    
+    // Usamos `noticia.title` en lugar de `noticia.titulo`.
+    const tituloCorto = noticia.title.length > 80 ? noticia.title.substring(0, 80) + '...' : noticia.title;
+    
+    // Obtenemos la URL de la imagen del objeto `featuredImage`.
+    const imageUrl = noticia.featuredImage?.node?.sourceUrl;
 
     return(
-        // El Link envuelve toda la card para hacerla clickeable
         <Link href={urlNoticia} passHref>
-            {/* CONTENEDOR DE LA CARD:
-              - relative: Requerido para que Image fill funcione.
-              - h-[200px]: VITAL para darle una altura visible y fija a la tarjeta.
-              - w-full: Ocupa todo el ancho del contenedor padre (w-5/12 en page.js).
-            */}
             <div className="relative h-[250px] w-full overflow-hidden rounded-lg shadow-lg cursor-pointer group mt-2">
                 
-                {/* IMAGEN OPTIMIZADA */}
-                <Image 
-                    src={noticia.imagenUrl} 
-                    alt={noticia.titulo} 
-                    fill // Se estira para llenar el contenedor padre (200px de alto)
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    style={{ objectFit: 'cover' }} // Asegura que no se distorsione
-                    className="transition-transform duration-300 group-hover:scale-105" // Efecto de zoom
-                    priority={priority} // No es de máxima prioridad
-                />
+                {/* Si la URL de la imagen existe, la mostramos. Si no, mostramos un placeholder. */}
+                {imageUrl ? (
+                    <Image 
+                        src={imageUrl} 
+                        alt={noticia.title} // Usamos `noticia.title`
+                        fill 
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        style={{ objectFit: 'cover' }} 
+                        className="transition-transform duration-300 group-hover:scale-105"
+                        priority={priority}
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                        <span className="text-gray-500">Sin Imagen</span>
+                    </div>
+                )}
                 
-                {/* OVERLAY OSCURO (z-10) */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-10"></div>
 
-                {/* CONTENIDO DE TEXTO (z-20) */}
                 <div className="absolute bottom-0 left-0 p-4 z-20 text-container">
-                    <h3 className="text-xl font-bold titillium-web-regular leading-snug">
+                    <h3 className="text-xl font-alegreya-extrabold leading-snug">
                         {tituloCorto}
                     </h3>
                 </div>

@@ -1,6 +1,6 @@
 // app/Categorias/[slug]/page.tsx
 import React from "react";
-import { getCachedPostsPage } from "../../lib/wpRest"; // <--- CAMBIADO de cacheProxy a wpRest
+import { getCachedPostsPage } from "../../lib/data-fetcher"; // <-- CAMBIO AQUÍ
 import CategoryPagination from "../../ui/categorias/CategoryPagination";
 import CategoryGrid from "../../ui/categorias/CategoryGrid";
 
@@ -14,8 +14,9 @@ export default async function CategoryPage({
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
   const slug = params.slug;
-  const page = Number(searchParams?.page || 1); // <--- AÑADIDO para leer la página de la URL
+  const page = Number(searchParams?.page || 1);
 
+  // La llamada a la función sigue siendo la misma
   const { posts, total, totalPages, category } = await getCachedPostsPage(
     slug,
     page,
@@ -35,7 +36,6 @@ export default async function CategoryPage({
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
-      {/* Usamos el nombre de la categoría obtenido de la API para el título */}
       <h1 className="text-3xl font-bold capitalize mb-6">{category?.name || slug}</h1>
 
       <CategoryGrid posts={posts} currentSectionSlug={slug} />
@@ -44,7 +44,7 @@ export default async function CategoryPage({
         <CategoryPagination
           basePath={`/Categorias/${slug}`}
           current={page}
-          totalPages={totalPages} // <--- Usamos el totalPages directamente de la API
+          totalPages={totalPages}
           perPage={PER_PAGE}
         />
       </div>

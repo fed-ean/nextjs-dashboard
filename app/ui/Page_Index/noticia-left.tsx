@@ -39,7 +39,7 @@ export default function NoticiaLeft({ noticia }: { noticia: Noticia }) {
 
             {/* Texto a la derecha (centrado) */}
             <div className="flex-1 flex flex-col text-start h-[300px]">
-    <h2 className="text-1xl md:text-2xl font-bold titillium-web-regular leading-tight text-gray-900 pt-6 pe-4 group-hover:text-blue-700 hover:underline transition-colors duration-300 m-0 overflow-hidden text-ellipsis">
+    <h2 className="text-1xl md:text-2xl font-alegreya-extrabold leading-tight text-gray-900 pt-6 pe-4 group-hover:text-blue-700 hover:underline transition-colors duration-300 m-0 overflow-hidden text-ellipsis">
         {noticia.titulo}
     </h2>
     <p className="text-1xl md:text-2xl font-bold titillium-web-regular pe-4 pt-2 m-0 leading-tight text-red-600 group-hover:text-blue-700 hover:underline transition-colors duration-300 overflow-hidden text-ellipsis line-clamp-3">

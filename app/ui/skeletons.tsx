@@ -1,217 +1,157 @@
-// Loading animation
-const shimmer =
-  'before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent';
+const shimmer = `before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent`;
 
-export function CardSkeleton() {
+// --- Skeleton para la tarjeta de noticia principal del GRID SUPERIOR ---
+function NoticiaPrincipalGridSkeleton() {
   return (
-    <div
-      className={`${shimmer} relative overflow-hidden rounded-xl bg-gray-100 p-2 shadow-sm`}
-    >
-      <div className="flex p-4">
-        <div className="h-5 w-5 rounded-md bg-gray-200" />
-        <div className="ml-2 h-6 w-16 rounded-md bg-gray-200 text-sm font-medium" />
-      </div>
-      <div className="flex items-center justify-center truncate rounded-xl bg-white px-4 py-8">
-        <div className="h-7 w-20 rounded-md bg-gray-200" />
+    <div className={`${shimmer} relative w-full md:w-7/12 p-4`}>
+      <div className="h-full rounded-lg bg-gray-800"></div>
+    </div>
+  );
+}
+
+// --- Skeleton para la tarjeta de noticia secundaria del GRID SUPERIOR ---
+function NoticiaSecundariaGridSkeleton() {
+  return (
+    <div className={`${shimmer} relative bg-gray-800 rounded-lg h-48`}>
+    </div>
+  );
+}
+
+// --- Skeleton para el GRID COMPLETO de noticias principales ---
+export function GridNoticiasPrincipalesSkeleton() {
+  return (
+    <div className="flex flex-wrap md:flex-nowrap md:min-h-[500px] 2xl:h-[820px]">
+      <NoticiaPrincipalGridSkeleton />
+      <div className="w-full md:w-5/12 p-4 flex flex-col flex-1 gap-4">
+        <NoticiaSecundariaGridSkeleton />
+        <NoticiaSecundariaGridSkeleton />
       </div>
     </div>
   );
 }
 
-export function CardsSkeleton() {
+
+// --- Skeleton para la tarjeta de noticias varias ---
+function NoticiaVariasSkeleton() {
   return (
-    <>
-      <CardSkeleton />
-      <CardSkeleton />
-      <CardSkeleton />
-      <CardSkeleton />
-    </>
+      <div className={`${shimmer} relative aspect-video bg-gray-800 rounded-lg`}></div>
   );
 }
 
-export function RevenueChartSkeleton() {
+// --- Skeleton para la SECCIÓN COMPLETA de noticias varias ---
+export function SeccionNoticiasVariasSkeleton() {
   return (
-    <div className={`${shimmer} relative w-full overflow-hidden md:col-span-4`}>
-      <div className="mb-4 h-8 w-36 rounded-md bg-gray-100" />
-      <div className="rounded-xl bg-gray-100 p-4">
-        <div className="sm:grid-cols-13 mt-0 grid h-[410px] grid-cols-12 items-end gap-2 rounded-md bg-white p-4 md:gap-4" />
-        <div className="flex items-center pb-2 pt-6">
-          <div className="h-5 w-5 rounded-full bg-gray-200" />
-          <div className="ml-2 h-4 w-20 rounded-md bg-gray-200" />
+    <section className="container mx-auto px-4 mt-10">
+      <div className="h-8 w-48 bg-gray-700 rounded-md mb-4"></div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <NoticiaVariasSkeleton />
+        <NoticiaVariasSkeleton />
+        <NoticiaVariasSkeleton />
+        <NoticiaVariasSkeleton />
+        <NoticiaVariasSkeleton />
+        <NoticiaVariasSkeleton />
+      </div>
+    </section>
+  )
+}
+
+
+// --- Skeleton para el carrusel principal ---
+export function CarouselNoticiasSkeleton() {
+  return (
+    <section className="container mx-auto px-4 mt-10">
+      <div className="h-8 w-48 bg-gray-700 rounded-md mb-4"></div>
+      <div className={`${shimmer} relative w-full h-[300px] bg-gray-800 overflow-hidden rounded-lg`}>
+      </div>
+    </section>
+  )
+}
+
+// --- Skeleton COMPLETO para una sección de noticias (Reporte Internacional) ---
+export function ReporteNoticiasSkeleton() {
+    // Re-usamos los skeletons del grid superior ya que son muy similares
+  return (
+    <section className="container mx-auto px-4 mt-10">
+      <div className="h-9 w-64 bg-gray-700 rounded-md mb-6"></div>
+      <div className={`${shimmer} relative h-80 rounded-2xl overflow-hidden shadow-2xl bg-gray-800 mb-6`}></div>
+      <div className="flex justify-center">
+        <div className="grid w-full max-w-3xl grid-cols-1 md:grid-cols-3 gap-6">
+          <div className={`${shimmer} relative aspect-square rounded-xl bg-gray-800`}></div>
+          <div className={`${shimmer} relative aspect-square rounded-xl bg-gray-800`}></div>
+          <div className={`${shimmer} relative aspect-square rounded-xl bg-gray-800`}></div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
-export function InvoiceSkeleton() {
+// --- Skeleton para una PÁGINA DE CATEGORÍA COMPLETA ---
+export function PaginaCategoriaSkeleton() {
   return (
-    <div className="flex flex-row items-center justify-between border-b border-gray-100 py-4">
-      <div className="flex items-center">
-        <div className="mr-2 h-8 w-8 rounded-full bg-gray-200" />
-        <div className="min-w-0">
-          <div className="h-5 w-40 rounded-md bg-gray-200" />
-          <div className="mt-2 h-4 w-12 rounded-md bg-gray-200" />
-        </div>
-      </div>
-      <div className="mt-2 h-4 w-12 rounded-md bg-gray-200" />
-    </div>
-  );
-}
+    <div className="container mx-auto px-4 py-8">
+      {/* Placeholder para el título de la categoría */}
+      <div className={`h-10 w-1/3 bg-gray-700 rounded-md mb-8 ${shimmer} overflow-hidden`}></div>
 
-export function LatestInvoicesSkeleton() {
-  return (
-    <div
-      className={`${shimmer} relative flex w-full flex-col overflow-hidden md:col-span-4`}
-    >
-      <div className="mb-4 h-8 w-36 rounded-md bg-gray-100" />
-      <div className="flex grow flex-col justify-between rounded-xl bg-gray-100 p-4">
-        <div className="bg-white px-6">
-          <InvoiceSkeleton />
-          <InvoiceSkeleton />
-          <InvoiceSkeleton />
-          <InvoiceSkeleton />
-          <InvoiceSkeleton />
-        </div>
-        <div className="flex items-center pb-2 pt-6">
-          <div className="h-5 w-5 rounded-full bg-gray-200" />
-          <div className="ml-2 h-4 w-20 rounded-md bg-gray-200" />
-        </div>
+      {/* Grid de noticias */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        <NoticiaVariasSkeleton />
+        <NoticiaVariasSkeleton />
+        <NoticiaVariasSkeleton />
+        <NoticiaVariasSkeleton />
+        <NoticiaVariasSkeleton />
+        <NoticiaVariasSkeleton />
+        <NoticiaVariasSkeleton />
+        <NoticiaVariasSkeleton />
+        <NoticiaVariasSkeleton />
       </div>
-    </div>
-  );
-}
 
-export default function DashboardSkeleton() {
-  return (
-    <>
-      <div
-        className={`${shimmer} relative mb-4 h-8 w-36 overflow-hidden rounded-md bg-gray-100`}
-      />
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <CardSkeleton />
-        <CardSkeleton />
-        <CardSkeleton />
-        <CardSkeleton />
-      </div>
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
-        <RevenueChartSkeleton />
-        <LatestInvoicesSkeleton />
-      </div>
-    </>
-  );
-}
-
-export function TableRowSkeleton() {
-  return (
-    <tr className="w-full border-b border-gray-100 last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg">
-      {/* Customer Name and Image */}
-      <td className="relative overflow-hidden whitespace-nowrap py-3 pl-6 pr-3">
-        <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-full bg-gray-100"></div>
-          <div className="h-6 w-24 rounded bg-gray-100"></div>
-        </div>
-      </td>
-      {/* Email */}
-      <td className="whitespace-nowrap px-3 py-3">
-        <div className="h-6 w-32 rounded bg-gray-100"></div>
-      </td>
-      {/* Amount */}
-      <td className="whitespace-nowrap px-3 py-3">
-        <div className="h-6 w-16 rounded bg-gray-100"></div>
-      </td>
-      {/* Date */}
-      <td className="whitespace-nowrap px-3 py-3">
-        <div className="h-6 w-16 rounded bg-gray-100"></div>
-      </td>
-      {/* Status */}
-      <td className="whitespace-nowrap px-3 py-3">
-        <div className="h-6 w-16 rounded bg-gray-100"></div>
-      </td>
-      {/* Actions */}
-      <td className="whitespace-nowrap py-3 pl-6 pr-3">
-        <div className="flex justify-end gap-3">
-          <div className="h-[38px] w-[38px] rounded bg-gray-100"></div>
-          <div className="h-[38px] w-[38px] rounded bg-gray-100"></div>
-        </div>
-      </td>
-    </tr>
-  );
-}
-
-export function InvoicesMobileSkeleton() {
-  return (
-    <div className="mb-2 w-full rounded-md bg-white p-4">
-      <div className="flex items-center justify-between border-b border-gray-100 pb-8">
-        <div className="flex items-center">
-          <div className="mr-2 h-8 w-8 rounded-full bg-gray-100"></div>
-          <div className="h-6 w-16 rounded bg-gray-100"></div>
-        </div>
-        <div className="h-6 w-16 rounded bg-gray-100"></div>
-      </div>
-      <div className="flex w-full items-center justify-between pt-4">
-        <div>
-          <div className="h-6 w-16 rounded bg-gray-100"></div>
-          <div className="mt-2 h-6 w-24 rounded bg-gray-100"></div>
-        </div>
-        <div className="flex justify-end gap-2">
-          <div className="h-10 w-10 rounded bg-gray-100"></div>
-          <div className="h-10 w-10 rounded bg-gray-100"></div>
+      {/* Placeholder para la paginación */}
+      <div className="flex justify-center mt-12">
+        <div className={`flex items-center gap-4 ${shimmer} overflow-hidden`}>
+            <div className="h-10 w-24 bg-gray-700 rounded-md"></div>
+            <div className="h-10 w-10 bg-gray-700 rounded-full"></div>
+            <div className="h-10 w-24 bg-gray-700 rounded-md"></div>
         </div>
       </div>
     </div>
   );
 }
 
-export function InvoicesTableSkeleton() {
+// --- Skeleton para una PÁGINA DE NOTICIA INDIVIDUAL ---
+export function NoticiaIndividualSkeleton() {
   return (
-    <div className="mt-6 flow-root">
-      <div className="inline-block min-w-full align-middle">
-        <div className="rounded-lg bg-gray-50 p-2 md:pt-0">
-          <div className="md:hidden">
-            <InvoicesMobileSkeleton />
-            <InvoicesMobileSkeleton />
-            <InvoicesMobileSkeleton />
-            <InvoicesMobileSkeleton />
-            <InvoicesMobileSkeleton />
-            <InvoicesMobileSkeleton />
+    <div>
+      {/* Hero Section Skeleton */}
+      <div className={`${shimmer} relative overflow-hidden w-full h-80 md:h-96 bg-gray-800`}>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="relative h-full flex flex-col justify-end max-w-5xl mx-auto p-6 md:p-10">
+          <div className="w-full space-y-4">
+            <div className="h-5 w-1/4 bg-gray-700 rounded-lg" />
+            <div className="h-10 w-3/4 bg-gray-700 rounded-lg" />
+            <div className="h-10 w-1/2 bg-gray-700 rounded-lg" />
+            <div className="h-5 w-1/3 bg-gray-700 rounded-lg mt-2" />
           </div>
-          <table className="hidden min-w-full text-gray-900 md:table">
-            <thead className="rounded-lg text-left text-sm font-normal">
-              <tr>
-                <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
-                  Customer
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Email
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Amount
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Date
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Status
-                </th>
-                <th
-                  scope="col"
-                  className="relative pb-4 pl-3 pr-6 pt-2 sm:pr-6"
-                >
-                  <span className="sr-only">Edit</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white">
-              <TableRowSkeleton />
-              <TableRowSkeleton />
-              <TableRowSkeleton />
-              <TableRowSkeleton />
-              <TableRowSkeleton />
-              <TableRowSkeleton />
-            </tbody>
-          </table>
         </div>
+      </div>
+
+      {/* Main Content Skeleton */}
+      <div className="content-container">
+        <article className="bg-white rounded-xl shadow-xl p-6 md:p-10 prose max-w-none">
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <div className={`${shimmer} relative h-4 bg-gray-200 rounded overflow-hidden w-full`} />
+              <div className={`${shimmer} relative h-4 bg-gray-200 rounded overflow-hidden w-11/12`} />
+              <div className={`${shimmer} relative h-4 bg-gray-200 rounded overflow-hidden w-full`} />
+              <div className={`${shimmer} relative h-4 bg-gray-200 rounded overflow-hidden w-5/6`} />
+            </div>
+            <div className={`${shimmer} relative h-72 bg-gray-200 rounded-lg overflow-hidden`} />
+            <div className="space-y-3">
+              <div className={`${shimmer} relative h-4 bg-gray-200 rounded overflow-hidden w-full`} />
+              <div className={`${shimmer} relative h-4 bg-gray-200 rounded overflow-hidden w-5/6`} />
+              <div className={`${shimmer} relative h-4 bg-gray-200 rounded overflow-hidden w-full`} />
+            </div>
+          </div>
+        </article>
       </div>
     </div>
   );

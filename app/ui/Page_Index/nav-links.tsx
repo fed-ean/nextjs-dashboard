@@ -3,12 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
-import { getClient } from '../../lib/cliente';
-import {
-  GET_ALL_CATEGORIES,
-  GET_CATEGORY_DATA_COMBINED,
-  GET_ALL_POST_DATA_COMBINED
-} from '../../lib/queries';
+
 
 // ==============================================================================
 // ICONOS (Sin cambios)
@@ -53,12 +48,16 @@ export default function LinksNav() {
 
   useEffect(() => {
     let mounted = true;
-    const client = getClient();
 
     async function loadCategories() {
       try {
-        const { data } = await client.query({ query: GET_ALL_CATEGORIES, fetchPolicy: 'cache-first' });
-        const cats = data?.categories?.nodes ?? [];
+        const response = await fetch('/api/categories');
+        if (!response.ok) {
+          // Si la respuesta no es OK, intenta parsear el cuerpo del error
+          const errorData = await response.json();
+          throw new Error(errorData.details || `Failed to fetch categories: ${response.status}`);
+        }
+        const cats = await response.json();
         const wantedOrder = ['politica', 'economia', 'pymes'];
         const mainCats = wantedOrder.map(slug => cats.find((c: any) => c.slug === slug)).filter(Boolean);
 
@@ -73,8 +72,8 @@ export default function LinksNav() {
         ];
 
         if (mounted) setLinks(builtLinks);
-      } catch (err) {
-        console.error('Error cargando categorías para navbar', err);
+      } catch (err: any) {
+        console.error('Error cargando categorías para navbar:', err.message);
       }
     }
 
@@ -84,23 +83,7 @@ export default function LinksNav() {
 
   // ========= FUNCIÓN DE PRECARGA OPTIMIZADA =========
   const handlePrefetch = (href: string) => {
-    const PER_PAGE = 9; // El número de posts por página
-    const client = getClient();
-
-    if (href.startsWith('/Categorias/')) {
-      const slug = href.substring('/Categorias/'.length);
-      if (slug) {
-        client.query({
-          query: GET_CATEGORY_DATA_COMBINED,
-          variables: { slugs: [slug], first: PER_PAGE, after: null }
-        }).catch(()=>{}); // El catch silencioso evita errores en consola si falla
-      }
-    } else if (href === '/interes-general') {
-      client.query({
-        query: GET_ALL_POST_DATA_COMBINED,
-        variables: { first: PER_PAGE, after: null }
-      }).catch(()=>{});
-    }
+   
   };
 
   return (

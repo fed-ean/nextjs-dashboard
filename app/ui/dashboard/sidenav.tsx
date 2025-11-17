@@ -1,50 +1,19 @@
-import ReproductorRadio from "../categorias/Reproductor";
+import UltimasNoticiasSidenav from "../Page_Index/ultimas-noticias-sidenav";
+import { fetchLatestInvoices } from "../../lib/data";
 
-export default function SideNav() {
+export default async function SideNav() {
+  const latestInvoices = await fetchLatestInvoices();
+
   return (
-    <aside className="h-auto w-100 bg-white border-r overflow-y-auto">
+    // Se elimina `overflow-y-auto` para un scroll más fluido a nivel de página
+    <aside className="h-full w-full bg-white border-r">
       <div className="p-4 space-y-6">
-        {/* Radio */}
-        <div>
-          <h2 className="text-lg font-semibold mb-2 mt-10">Radio en Vivo</h2>
+        <div className="mt-8">
+          <UltimasNoticiasSidenav noticias={latestInvoices} />
         </div>
 
-        {/* Latest Posts */}
         <div>
-          <h2 className="text-lg font-semibold mb-2">Últimas publicaciones</h2>
-          <ul className="space-y-3">
-            <li className="flex space-x-2">
-              <img
-                src="/img/post1.jpg"
-                alt="Post 1"
-                className="w-12 h-12 object-cover rounded"
-              />
-              <div>
-                <p className="text-sm font-medium">
-                  Fundación Ágora: Dedicados al bienestar social
-                </p>
-                <span className="text-xs text-gray-500">septiembre 23, 2025</span>
-              </div>
-            </li>
-            <li className="flex space-x-2">
-              <img
-                src="/img/post2.jpg"
-                alt="Post 2"
-                className="w-12 h-12 object-cover rounded"
-              />
-              <div>
-                <p className="text-sm font-medium">
-                  Eliminación Temporal de Derechos de Exportación
-                </p>
-                <span className="text-xs text-gray-500">septiembre 23, 2025</span>
-              </div>
-            </li>
-          </ul>
-        </div>
-
-        {/* Categorías */}
-        <div>
-          <h2 className="text-lg font-semibold mb-2">Categorias</h2>
+          <h2 className="text-lg font-semibold mb-2">Categorías</h2>
           <ul className="space-y-2 text-sm">
             <li>Ámbito</li>
             <li>Deportes</li>

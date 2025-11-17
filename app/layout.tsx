@@ -5,13 +5,13 @@ import ScrollToTopButton from './ui/scrollBoton';
 import NavBar from './ui/Page_Index/navbar';
 import Footer from './ui/Page_Index/footer';
 import UltimasNoticiasLoader from './ui/Page_Index/ultimas-noticias-loader';
+import ReproductorMovil from './ui/ReproductorMovil';
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Correctly define the newsComponent in the Server Component
   const newsComponent = (
     <Suspense fallback={<div className="p-4 text-gray-400">Cargando noticias...</div>}>
       <UltimasNoticiasLoader />
@@ -21,11 +21,11 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body>
+        <ReproductorMovil />
         <header>
-          {/* Pass the server-rendered component as a prop to the Client Component */}
           <NavBar newsComponent={newsComponent} />
         </header>
-        <div className="pt-40">
+        <div className="pt-32 lg:pt-52">
           {children}
         </div>
         <ScrollToTopButton/>

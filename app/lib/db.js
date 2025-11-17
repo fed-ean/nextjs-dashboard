@@ -1,8 +1,8 @@
 // app/lib/db.js
 import { gql } from '@apollo/client';
-// CORRECTED: Use the new server-only client
 import { getServerSideClient } from './server-cliente.js';
 
+// --- CONSULTA GENERAL DE NOTICIAS ---
 const GET_NOTICIAS_QUERY = gql`
   query GetNoticias($first: Int, $status: PostStatusEnum) {
     posts(
@@ -13,15 +13,22 @@ const GET_NOTICIAS_QUERY = gql`
       }
     ) {
       nodes {
-        id
+        databaseId
         post_date: date
-        post_content: content
-        post_title: title
-        post_status: status
-        post_name: slug
+        content
+        title
+        excerpt
+        status
+        slug
         featuredImage {
           node {
             sourceUrl
+          }
+        }
+        categories {
+          nodes {
+            name
+            slug
           }
         }
       }
@@ -29,6 +36,7 @@ const GET_NOTICIAS_QUERY = gql`
   }
 `;
 
+// --- CONSULTA DE NOTICIAS POR CATEGORÍA ---
 const GET_NOTICIAS_POR_CATEGORIA_QUERY = gql`
   query GetNoticiasPorCategoria($first: Int, $status: PostStatusEnum, $categoryName: String) {
     posts(
@@ -40,15 +48,22 @@ const GET_NOTICIAS_POR_CATEGORIA_QUERY = gql`
       }
     ) {
       nodes {
-        id
+        databaseId
         post_date: date
-        post_content: content
-        post_title: title
-        post_status: status
-        post_name: slug
+        content
+        title
+        excerpt
+        status
+        slug
         featuredImage {
           node {
             sourceUrl
+          }
+        }
+        categories {
+          nodes {
+            name
+            slug
           }
         }
       }
@@ -57,36 +72,53 @@ const GET_NOTICIAS_POR_CATEGORIA_QUERY = gql`
 `;
 
 /**
+ * Procesa y mapea los datos de un nodo de post para la mayoría de los componentes.
+ */
+const mapPostNode = (node) => ({
+    databaseId: node.databaseId,
+    slug: node.slug,
+    title: node.title,
+    content: node.content,
+    excerpt: node.excerpt,
+    imagenUrl: node.featuredImage?.node?.sourceUrl || null,
+    featuredImage: node.featuredImage,
+    categories: node.categories || { nodes: [] },
+    fechaPublicacion: node.post_date,
+    date: node.post_date 
+});
+
+/**
+ * Procesa y mapea los datos de un nodo de post específicamente para el carrusel,
+ * asegurando que la propiedad 'titulo' esté presente.
+ */
+const mapPostNodeForCarousel = (node) => ({
+    ...mapPostNode(node),
+    titulo: node.title,
+});
+
+/**
  * Obtiene las noticias del endpoint GraphQL (SERVER-SIDE ONLY).
  */
-export async function obtenerNoticias({ limit = 10, status = 'PUBLISH' } = {}) {
+export async function obtenerNoticias({ limit = 10, offset = 0, status = 'PUBLISH' } = {}) {
   try {
-    // CORRECTED: Use the server-side client
-    const client = getServerSideClient(); 
+    const client = getServerSideClient();
+    const totalToFetch = limit + offset;
     const { data } = await client.query({
       query: GET_NOTICIAS_QUERY,
       variables: {
-        first: limit,
+        first: totalToFetch,
         status,
       },
       fetchPolicy: 'no-cache',
     });
 
     if (!data || !data.posts) {
-      console.warn('GraphQL: respuesta sin posts:', data);
       return [];
     }
 
-    const noticias = (data.posts.nodes || []).map(node => ({
-      id: node.id,
-      fecha: node.post_date, // Corrected to use 'fecha' to match the Sidenav component
-      slug: node.post_name,
-      titulo: node.post_title,
-      contenidoRaw: node.post_content,
-      imagenUrl: node.featuredImage?.node?.sourceUrl || null,
-    }));
+    const nodesAfterOffset = (data.posts.nodes || []).slice(offset);
+    return nodesAfterOffset.map(mapPostNode);
 
-    return noticias;
   } catch (error) {
     console.error('Error al obtener noticias de GraphQL:', error);
     return [];
@@ -98,7 +130,6 @@ export async function obtenerNoticias({ limit = 10, status = 'PUBLISH' } = {}) {
  */
 export async function obtenerNoticiasPorCategoria({ limit = 10, status = 'PUBLISH', categoryName } = {}) {
   try {
-    // CORRECTED: Use the server-side client
     const client = getServerSideClient();
     const { data } = await client.query({
       query: GET_NOTICIAS_POR_CATEGORIA_QUERY,
@@ -111,22 +142,41 @@ export async function obtenerNoticiasPorCategoria({ limit = 10, status = 'PUBLIS
     });
 
     if (!data || !data.posts) {
-      console.warn('GraphQL: respuesta sin posts para la categoría:', categoryName, data);
       return [];
     }
 
-    const noticias = (data.posts.nodes || []).map(node => ({
-      id: node.id,
-      fecha: node.post_date, // Corrected to use 'fecha' to match the Sidenav component
-      slug: node.post_name,
-      titulo: node.post_title,
-      contenidoRaw: node.post_content,
-      imagenUrl: node.featuredImage?.node?.sourceUrl || null,
-    }));
+    return (data.posts.nodes || []).map(mapPostNode);
 
-    return noticias;
   } catch (error) {
     console.error(`Error al obtener noticias de la categoría ${categoryName} de GraphQL:`, error);
+    return [];
+  }
+}
+
+/**
+ * Obtiene las noticias de una categoría específica para el carrusel (SERVER-SIDE ONLY).
+ */
+export async function obtenerNoticiasPorCategoriaParaCarrusel({ limit = 10, status = 'PUBLISH', categoryName } = {}) {
+  try {
+    const client = getServerSideClient();
+    const { data } = await client.query({
+      query: GET_NOTICIAS_POR_CATEGORIA_QUERY,
+      variables: {
+        first: limit,
+        status,
+        categoryName,
+      },
+      fetchPolicy: 'no-cache',
+    });
+
+    if (!data || !data.posts) {
+      return [];
+    }
+
+    return (data.posts.nodes || []).map(mapPostNodeForCarousel);
+
+  } catch (error) {
+    console.error(`Error al obtener noticias de la categoría ${categoryName} para el carrusel de GraphQL:`, error);
     return [];
   }
 }

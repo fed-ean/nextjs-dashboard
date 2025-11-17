@@ -1,5 +1,6 @@
 // app/lib/data.ts
-import { getClient } from './cliente';
+// Se fuerza la re-compilación añadiendo este comentario.
+import { getServerSideClient } from './server-cliente';
 import {
   GET_ALL_POSTS,
   SEARCH_POSTS,
@@ -16,8 +17,8 @@ import {
 import { formatCurrency } from './utils';
 import { gql } from '@apollo/client';
 
-// Helper function to get the Apollo client
-const client = getClient();
+// Se corrige la llamada a la función para que coincida con la importación.
+const client = getServerSideClient();
 
 // There's no direct equivalent for Revenue in the GraphQL schema.
 // Returning an empty array to avoid breaking components that use this.
@@ -26,8 +27,8 @@ export async function fetchRevenue(): Promise<Revenue[]> {
   return [];
 }
 
-// Fetches the latest 5 posts and adapts them to the LatestInvoiceRaw shape.
-export async function fetchLatestInvoices(): Promise<any[]> { // Using any for now as the shape is different
+// Fetches the latest 5 posts and adapts them to the shape needed by the UI components.
+export async function fetchLatestInvoices(): Promise<any[]> {
   try {
     const { data } = await client.query({
       query: GET_ALL_POSTS,
@@ -36,10 +37,10 @@ export async function fetchLatestInvoices(): Promise<any[]> { // Using any for n
 
     const latestPosts = data.posts.nodes.map((post: any) => ({
       id: post.databaseId,
-      name: post.categories.nodes.length > 0 ? post.categories.nodes[0].name : 'Uncategorized', // Placeholder for customer name
-      image_url: post.featuredImage?.node?.sourceUrl || '/user.svg', // Placeholder for customer image
-      email: post.slug, // Placeholder for customer email
-      amount: formatCurrency(10000), // Placeholder amount, GraphQL schema doesn't have it
+      title: post.title, // Correctly map post title
+      imagenUrl: post.featuredImage?.node?.sourceUrl || '/img/placeholder.png', // Map featured image URL
+      fecha: post.date, // Map post date
+      slug: post.slug, // Map post slug
     }));
 
     return latestPosts;
@@ -86,20 +87,15 @@ export async function fetchFilteredInvoices(
   try {
     let posts: any[] = [];
     if (query) {
-      // Search functionality - Note: WPGraphQL search doesn't support pagination out of the box.
       const { data } = await client.query({
         query: SEARCH_POSTS,
         variables: { search: query },
       });
       posts = data.posts.nodes;
     } else {
-      // Pagination functionality for all posts
-       const { data } = await client.query({
+      const { data } = await client.query({
         query: GET_ALL_POSTS,
-        // The WPGraphQL OffsetPagination is not standard. After/first is used for cursor-based pagination.
-        // We will fetch all and slice, which is inefficient but works without offset pagination.
-        // A better approach would be to implement proper cursor-based pagination in the UI.
-        variables: { first: 1000, after: null }, // Fetch a large number and manually paginate
+        variables: { first: 1000, after: null },
       });
       posts = data.posts.nodes.slice(offset, offset + ITEMS_PER_PAGE);
     }
@@ -112,7 +108,7 @@ export async function fetchFilteredInvoices(
       status: 'paid', // Placeholder
       name: post.title,
       email: post.slug,
-      image_url: post.featuredImage?.node?.sourceUrl || '/user.svg',
+      image_url: post.featuredImage?.node?.sourceUrl || '/img/placeholder.png',
     }));
   } catch (error) {
     console.error('GraphQL Error:', error);
@@ -133,7 +129,7 @@ export async function fetchInvoicesPages(query: string): Promise<number> {
      } else {
        const { data } = await client.query({
          query: GET_ALL_POST_DATA_COMBINED,
-         variables: { first: 1, after: null }, // Only need the count
+         variables: { first: 1, after: null },
        });
        totalPosts = data.allPosts.nodes.length;
      }

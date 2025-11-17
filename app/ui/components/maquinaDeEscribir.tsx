@@ -39,15 +39,13 @@ export default function Typewriter({
 
   return (
     <span
-      className={`inline-block max-w-full md:max-w-[60ch] whitespace-normal break-words align-middle ${className}`}
+      className={`block w-full text-center max-w-full md:max-w-[60ch] whitespace-normal break-words align-middle ${className}`}
       aria-live="polite"
     >
-      {/* El texto puede ocupar varias líneas y su tamaño lo controla el padre (p. ej. h1 con clases responsivas) */}
       <span className="inline-block leading-tight">
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-sky-400">
           {display}
         </span>
-        {/* Cursor */}
         <span
           className="inline-block ml-1 align-bottom h-6 w-[2px] animate-blink"
           aria-hidden="true"
