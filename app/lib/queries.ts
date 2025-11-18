@@ -83,12 +83,23 @@ export const SEARCH_POSTS = gql`
   }
 `;
 
-// AÑADIDA LA CONSULTA QUE FALTABA
+// CONSULTA PARA EL BUILD
 export const GET_ALL_POST_DATA_COMBINED = gql`
   query GetAllPostDataCombined {
     posts(first: 9999) {
       nodes {
         databaseId
+      }
+    }
+  }
+`;
+
+// NUEVA CONSULTA: Para obtener todos los slugs para generateStaticParams
+export const GET_ALL_POST_SLUGS = gql`
+  query GetAllPostSlugs {
+    posts(first: 10000) {
+      nodes {
+        slug
       }
     }
   }
