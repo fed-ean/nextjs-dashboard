@@ -1,8 +1,8 @@
 // app/ui/Page_Index/ultimas-noticias-loader.tsx
 import NoticiasVarias from "../dashboard/noticias-varias";
 
-// Usar la variable de entorno para el endpoint de GraphQL
-const GQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT_URL || "/graphql";
+// CORRECCIÓN: Usar la URL absoluta y completa para el endpoint de GraphQL.
+const GQL_ENDPOINT = "https://radioempresaria.com.ar/graphql";
 
 const GET_LATEST_POSTS_QUERY = `
   query GetLatestPosts {
@@ -30,15 +30,17 @@ interface Post {
 
 async function fetchLatestPosts(): Promise<{ posts: Post[]; error: string | null }> {
     try {
+        // El fetch ahora usará la URL completa y funcionará en el servidor.
         const response = await fetch(GQL_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ query: GET_LATEST_POSTS_QUERY }),
-            next: { revalidate: 3600 }, 
+            next: { revalidate: 3600 }, // Cache de 1 hora
         });
 
         if (!response.ok) {
-            throw new Error(`La respuesta de la red no fue OK: ${response.statusText}`);
+            const errorText = await response.text();
+            throw new Error(`La respuesta de la red no fue OK: ${response.status} ${errorText}`);
         }
 
         const json = await response.json();
