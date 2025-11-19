@@ -4,7 +4,7 @@ import parse, { domToReact, HTMLReactParserOptions, Element, DOMNode } from "htm
 import "@/app/ui/Page_Index/style-noticias.css";
 
 // --- TIPOS DE DATOS DE TYPESCRIPT ---
-// Definimos la estructura de los datos para evitar errores y usar `any`.
+// Definimos la estructura de los datos para evitar errores y el uso de `any`.
 
 interface Category {
   databaseId: number;
@@ -43,7 +43,6 @@ interface PostData {
 
 const GQL_ENDPOINT = "https://radioempresaria.com.ar/graphql";
 
-// Query para `generateStaticParams`. Se define como string para evitar errores de compilación.
 const GET_ALL_POST_SLUGS = `
   query GetAllPostSlugs {
     posts(first: 10000) {
@@ -54,7 +53,6 @@ const GET_ALL_POST_SLUGS = `
   }
 `;
 
-// Query para obtener el contenido de un post por su slug.
 const GET_POST_BY_SLUG = `
   query GetPostBySlug($slug: ID!) {
     post(id: $slug, idType: SLUG) {
@@ -69,8 +67,8 @@ const GET_POST_BY_SLUG = `
 `;
 
 // --- GENERACIÓN DE PÁGINAS ESTÁTICAS ---
-
-export async function generateStaticParams(): Promise<{ slug: string }[]> {
+// Se elimina la anotación de tipo de retorno explícita para evitar conflictos con la inferencia de tipos de Next.js.
+export async function generateStaticParams() {
   try {
     const response = await fetch(GQL_ENDPOINT, {
       method: 'POST',
@@ -93,6 +91,7 @@ export async function generateStaticParams(): Promise<{ slug: string }[]> {
         return [];
     }
 
+    // La función devuelve el formato correcto: un array de objetos con la propiedad `slug`.
     return data.posts.nodes.map((post) => ({ slug: post.slug }));
 
   } catch (error) {
@@ -146,7 +145,7 @@ async function getPostData(slug: string): Promise<{ post: Post | null; error: st
 }
 
 // --- COMPONENTE DE LA PÁGINA ---
-
+// La firma del componente es la correcta y estándar para Next.js App Router.
 export default async function Page({ params }: { params: { slug: string } }) {
   const { slug } = params;
   const { post, error } = await getPostData(slug);
@@ -157,7 +156,6 @@ export default async function Page({ params }: { params: { slug: string } }) {
 
   const featuredUrl = post.featuredImage?.node?.sourceUrl || null;
 
-  // Opciones para el parser de HTML, con tipado correcto.
   const parseOptions: HTMLReactParserOptions = {
     replace: (domNode: DOMNode) => {
       if (domNode instanceof Element && domNode.attribs) {
