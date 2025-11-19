@@ -7,7 +7,7 @@ import "../../../ui/Page_Index/style-noticias.css";
 const GQL_ENDPOINT = "https://radioempresaria.com.ar/graphql";
 
 type PostPageProps = {
-  params: { slug: string };
+  params: { slug: string } | Promise<{ slug: string }>;
 };
 
 
