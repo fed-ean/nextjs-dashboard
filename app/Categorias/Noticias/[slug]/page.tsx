@@ -6,9 +6,6 @@ import "../../../ui/Page_Index/style-noticias.css";
 
 const GQL_ENDPOINT = "https://radioempresaria.com.ar/graphql";
 
-type PostPageProps = {
-  params: { slug: string } | Promise<{ slug: string }>;
-};
 
 
 export async function generateStaticParams() {
@@ -85,7 +82,8 @@ async function getPostData(slug: string) {
     }
 }
 
-export default async function PostPage({ params }: PostPageProps) {
+export default async function PostPage({ params }: { params: { slug: string } }) {
+
 
   const { slug } = params;
   const { post, error } = await getPostData(slug);
