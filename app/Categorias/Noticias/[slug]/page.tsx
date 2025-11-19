@@ -1,11 +1,5 @@
 import React from "react";
 
-interface PageProps {
-  params: {
-    slug: string;
-  };
-}
-
 async function getPostData(slug: string) {
   try {
     const res = await fetch(`https://radioempresarial.com/wp-json/wp/v2/posts?slug=${slug}`, {
@@ -18,7 +12,6 @@ async function getPostData(slug: string) {
 
     const json = await res.json();
 
-    // WordPress devuelve array, no objeto
     if (!json || json.length === 0) {
       return { post: null, error: "Post no encontrado" };
     }
@@ -29,7 +22,7 @@ async function getPostData(slug: string) {
   }
 }
 
-export default async function Page({ params }: PageProps) {
+export default async function Page({ params }: { params: { slug: string } }) {
   const { slug } = params;
 
   const { post, error } = await getPostData(slug);
