@@ -1,15 +1,11 @@
 // app/Categorias/Noticias/[slug]/page.tsx
 import React from "react";
 import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
-import { GET_ALL_POST_SLUGS } from "../../../lib/queries";
-import "../../../fonts.css";
-import "../../../ui/Page_Index/style-noticias.css";
+import { GET_ALL_POST_SLUGS } from "../../../../lib/queries";
+import "../../../../fonts.css";
+import "../../../../ui/Page_Index/style-noticias.css";
 
 const GQL_ENDPOINT = "https://radioempresaria.com.ar/graphql";
-
-type PageProps = {
-  params: { slug: string };
-};
 
 export async function generateStaticParams() {
   try {
@@ -85,7 +81,7 @@ async function getPostData(slug: string) {
     }
 }
 
-export default async function PostPage({ params }: PageProps) {
+export default async function Page({ params }: { params: { slug: string } }) {
   const { slug } = params;
   const { post, error } = await getPostData(slug);
 
