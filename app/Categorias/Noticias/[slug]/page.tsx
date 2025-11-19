@@ -8,10 +8,9 @@ const GQL_ENDPOINT = "https://radioempresaria.com.ar/graphql";
 
 /* ----------------------------- TIPO CORRECTO ----------------------------- */
 interface PageProps {
-  params: {
-    slug: string;
-  };
+  params: { slug: string } | Promise<{ slug: string }>;
 }
+
 
 /* ----------------------- GENERATE STATIC PARAMS -------------------------- */
 export async function generateStaticParams() {
@@ -83,7 +82,9 @@ const ErrorDisplay = ({
 );
 
 /* ------------------------- FETCH DE POST POR API ------------------------- */
-async function getPostData(slug: string) {
+export default async function Page({ params }: { params: { slug: string } }) {
+  const slug = await params.slug; // por si es un Promise
+
   try {
     const response = await fetch(GQL_ENDPOINT, {
       method: "POST",
