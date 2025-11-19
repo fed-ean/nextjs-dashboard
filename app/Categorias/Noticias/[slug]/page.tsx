@@ -1,219 +1,63 @@
-// app/Categorias/Noticias/[slug]/page.tsx
 import React from "react";
-import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
-import { GET_ALL_POST_SLUGS } from "../../../lib/queries";
-import "../../../ui/Page_Index/style-noticias.css";
 
-const GQL_ENDPOINT = "https://radioempresaria.com.ar/graphql";
-
-/* ----------------------------- TIPO CORRECTO ----------------------------- */
 interface PageProps {
-  params: { slug: string } | Promise<{ slug: string }>;
+  params: {
+    slug: string;
+  };
 }
 
-
-/* ----------------------- GENERATE STATIC PARAMS -------------------------- */
-export async function generateStaticParams() {
+async function getPostData(slug: string) {
   try {
-    const response = await fetch(GQL_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        query: GET_ALL_POST_SLUGS.loc.source.body,
-      }),
-      next: { revalidate: 3600 },
+    const res = await fetch(`https://radioempresarial.com/wp-json/wp/v2/posts?slug=${slug}`, {
+      next: { revalidate: 60 },
     });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch slugs: ${response.statusText}`);
+    if (!res.ok) {
+      return { post: null, error: `HTTP error: ${res.status}` };
     }
 
-    const json = await response.json();
-    if (json.errors) {
-      throw new Error(
-        `GraphQL error fetching slugs: ${json.errors
-          .map((e: any) => e.message)
-          .join(", ")}`
-      );
+    const json = await res.json();
+
+    // WordPress devuelve array, no objeto
+    if (!json || json.length === 0) {
+      return { post: null, error: "Post no encontrado" };
     }
 
-    const slugs = json.data.posts.nodes.map((post: { slug: string }) => ({
-      slug: post.slug,
-    }));
-
-    return slugs.length > 0 ? slugs : [];
-  } catch (error) {
-    console.error("Could not generate static params:", error);
-    return [];
-  }
-}
-
-/* --------------------------- QUERY POR SLUG --------------------------- */
-const GET_POST_BY_SLUG = `
-  query GetPostBySlug($slug: ID!) {
-    post(id: $slug, idType: SLUG) {
-      databaseId
-      title
-      content
-      date
-      featuredImage { node { sourceUrl } }
-      categories { nodes { databaseId name slug } }
-    }
-  }
-`;
-
-/* ------------------------------- ERROR UI ------------------------------ */
-const ErrorDisplay = ({
-  message,
-  details,
-}: {
-  message: string;
-  details?: string;
-}) => (
-  <div className="text-center py-10 px-4">
-    <h1 className="text-2xl font-bold text-red-600 mb-4">
-      Error al Cargar la Noticia
-    </h1>
-    <p className="text-gray-700">{message}</p>
-    {details && (
-      <p className="text-sm text-gray-500 mt-2">Detalle: {details}</p>
-    )}
-  </div>
-);
-
-/* ------------------------- FETCH DE POST POR API ------------------------- */
-export default async function Page({ params }: { params: { slug: string } }) {
-  const slug = await params.slug; // por si es un Promise
-
-  try {
-    const response = await fetch(GQL_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        query: GET_POST_BY_SLUG,
-        variables: { slug },
-      }),
-      next: { revalidate: 3600 },
-    });
-
-    if (!response.ok) {
-      throw new Error(
-        `Network response was not OK: ${await response.text()}`
-      );
-    }
-
-    const json = await response.json();
-    if (json.errors) {
-      throw new Error(
-        json.errors.map((e: any) => e.message).join(", ")
-      );
-    }
-
-    return { post: json.data.post, error: null };
+    return { post: json[0], error: null };
   } catch (err: any) {
-    console.error(`Failed to fetch post [slug: ${slug}]:`, err.message);
-    return { post: null, error: err.message };
+    return { post: null, error: err.message || "Error desconocido" };
   }
 }
 
-/* ---------------------------- PÁGINA FINAL ----------------------------- */
-export default async function PostPage({ params }: PageProps) {
+export default async function Page({ params }: PageProps) {
   const { slug } = params;
 
   const { post, error } = await getPostData(slug);
 
-  if (error || !post) {
+  if (error) {
     return (
-      <ErrorDisplay
-        message={
-          error ||
-          "La noticia que buscas no existe o ha sido eliminada."
-        }
-      />
+      <div className="p-4">
+        <h2>Error al cargar el post</h2>
+        <p>{error}</p>
+      </div>
     );
   }
 
-  const featuredUrl =
-    post.featuredImage?.node?.sourceUrl || null;
-
-  const parseOptions: HTMLReactParserOptions = {
-    replace: (domNode: any) => {
-      if (domNode.type !== "tag") return;
-
-      const { name, attribs, children } = domNode;
-
-      if (name === "p")
-        return (
-          <p className="leading-relaxed text-gray-800">
-            {domToReact(children, parseOptions)}
-          </p>
-        );
-
-      if (name === "img")
-        return (
-          <img
-            src={attribs.src}
-            alt={attribs.alt || ""}
-            loading="lazy"
-            className="w-full h-auto rounded-md my-4"
-          />
-        );
-
-      if (name === "iframe")
-        return (
-          <div className="w-full my-4 aspect-video">
-            <iframe
-              src={attribs.src}
-              title={attribs.title || "Embed"}
-              frameBorder="0"
-              allowFullScreen
-              className="w-full h-full rounded-md"
-            />
-          </div>
-        );
-
-      return undefined;
-    },
-  };
+  if (!post) {
+    return (
+      <div className="p-4">
+        <h2>Post no encontrado</h2>
+      </div>
+    );
+  }
 
   return (
-    <div className="relative">
-      {featuredUrl && (
-        <header
-          className="hero-bleed"
-          style={{ backgroundImage: `url(${featuredUrl})` }}
-        >
-          <div className="hero-overlay" />
-          <div className="hero-inner max-w-[2200px] mx-auto px-6 py-16 md:py-28">
-            <div className="flex flex-col gap-3">
-              <div className="badges flex flex-wrap gap-2">
-                {post.categories?.nodes?.map((c: any) => (
-                  <a
-                    key={c.databaseId}
-                    href={`/Categorias/${c.slug}`}
-                    className="inline-block bg-white/10 backdrop-blur-sm text-white text-xs font-semibold uppercase px-3 py-1 rounded-md"
-                  >
-                    {c.name}
-                  </a>
-                ))}
-              </div>
-
-              <h1
-                className="text-white text-2xl md:text-3xl lg:text-4xl font-extrabold"
-                dangerouslySetInnerHTML={{ __html: post.title }}
-              />
-            </div>
-          </div>
-        </header>
-      )}
-
-      <main className="content-container">
-        <article className="bg-white rounded-xl shadow-xl p-4 md:p-6 prose max-w-none">
-          <div className="post-content text-gray-800">
-            {parse(post.content || "", parseOptions)}
-          </div>
-        </article>
-      </main>
-    </div>
+    <main className="p-4">
+      <h1 className="text-3xl font-bold mb-4">{post.title?.rendered}</h1>
+      <article
+        className="prose"
+        dangerouslySetInnerHTML={{ __html: post.content?.rendered || "" }}
+      />
+    </main>
   );
 }
