@@ -1,4 +1,5 @@
-import { ApolloClient, InMemoryCache } from "@apollo/client";
+// app/lib/cliente.ts
+import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 
 const GRAPHQL_URI =
   process.env.NEXT_PUBLIC_WPGRAPHQL_ENDPOINT ||
@@ -6,7 +7,8 @@ const GRAPHQL_URI =
 
 export function getClient() {
   return new ApolloClient({
-    uri: GRAPHQL_URI,
+    // En versiones modernas de @apollo/client se usa `link` con HttpLink
+    link: new HttpLink({ uri: GRAPHQL_URI }),
     cache: new InMemoryCache(),
   });
 }
