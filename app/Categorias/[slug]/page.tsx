@@ -3,25 +3,21 @@ import React from "react";
 import { getCachedPostsPage } from "../../lib/data-fetcher"; // <-- CAMBIO AQUÍ
 import CategoryPagination from "../../ui/categorias/CategoryPagination";
 import CategoryGrid from "../../ui/categorias/CategoryGrid";
+const PER_PAGE = 9;
 
-export default async function CategoryPage(
-  props: {
-    params: { slug: string };
-    searchParams?: { [key: string]: string | string[] | undefined };
-  }
-) {
+export default async function CategoryPage(props: any) {
   const { params, searchParams } = props;
 
   const slug = params.slug;
   const page = Number(searchParams?.page || 1);
 
-  const { posts, total, totalPages, category } = await getCachedPostsPage(
+  const { posts, totalPages, category } = await getCachedPostsPage(
     slug,
     page,
     PER_PAGE
   );
 
-  if (!posts || posts.length === 0) {
+  if (!posts?.length) {
     return (
       <div className="text-center py-10">
         <h1 className="text-2xl font-semibold mb-3">No hay publicaciones</h1>
