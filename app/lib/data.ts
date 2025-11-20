@@ -152,15 +152,15 @@ export async function fetchInvoicesPages(query: string): Promise<number> {
 
 // Fetches a single post by its database ID.
 export async function fetchInvoiceById(id: string): Promise<InvoiceForm | undefined> {
-   const GET_POST_BY_ID = gql`
-      query GetPostById($id: ID!) {
-        post(id: $id, idType: DATABASE_ID) {
-          databaseId
-          title
-          excerpt
-        }
+  const GET_POST_BY_ID = gql`
+    query GetPostById($id: ID!) {
+      post(id: $id, idType: DATABASE_ID) {
+        databaseId
+        title
+        excerpt
       }
-    `;
+    }
+  `;
 
   try {
     const { data } = await client.query<{ post?: { databaseId?: number } }>({
@@ -172,10 +172,12 @@ export async function fetchInvoiceById(id: string): Promise<InvoiceForm | undefi
       return undefined;
     }
 
-    // Adapt post data to InvoiceForm shape
+    const dbId = data.post.databaseId;
+
     return {
-      id: data.post.databaseId,
-      customer_id: '1', // Placeholder
+      // Convertimos a string de forma segura
+      id: dbId !== undefined && dbId !== null ? String(dbId) : '',
+      customer_id: '1', // Placeholder (ajustá si tenés un valor real)
       amount: 100, // Placeholder
       status: 'pending', // Placeholder
     };
