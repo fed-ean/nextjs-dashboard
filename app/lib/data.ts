@@ -1,5 +1,5 @@
 // app/lib/data.ts
-// Se fuerza la re-compilación añadiendo este comentario.
+// Reescrito con tipos explícitos para evitar 'data is unknown'
 import { getServerSideClient } from './server-cliente';
 import {
   GET_ALL_POSTS,
@@ -17,8 +17,13 @@ import {
 import { formatCurrency } from './utils';
 import { gql } from '@apollo/client';
 
-// Se corrige la llamada a la función para que coincida con la importación.
 const client = getServerSideClient();
+
+// Tipos auxiliares mínimos para los resultados GraphQL
+type Node = any;
+type PostsResult = { posts: { nodes: Node[]; pageInfo?: { endCursor?: string | null; hasNextPage?: boolean } } };
+type AllPostsCombinedResult = { posts: { nodes: Node[] } };
+type SearchPostsResult = { posts: { nodes: Node[] } };
 
 // There's no direct equivalent for Revenue in the GraphQL schema.
 // Returning an empty array to avoid breaking components that use this.
@@ -30,17 +35,19 @@ export async function fetchRevenue(): Promise<Revenue[]> {
 // Fetches the latest 5 posts and adapts them to the shape needed by the UI components.
 export async function fetchLatestInvoices(): Promise<any[]> {
   try {
-    const { data } = await client.query({
+    const { data } = await client.query<PostsResult>({
       query: GET_ALL_POSTS,
       variables: { first: 5, after: null },
     });
 
-    const latestPosts = data.posts.nodes.map((post: any) => ({
+    const nodes = data?.posts?.nodes ?? [];
+
+    const latestPosts = nodes.map((post: any) => ({
       id: post.databaseId,
-      title: post.title, // Correctly map post title
-      imagenUrl: post.featuredImage?.node?.sourceUrl || '/img/placeholder.png', // Map featured image URL
-      fecha: post.date, // Map post date
-      slug: post.slug, // Map post slug
+      title: post.title,
+      imagenUrl: post.featuredImage?.node?.sourceUrl || '/img/placeholder.png',
+      fecha: post.date,
+      slug: post.slug,
     }));
 
     return latestPosts;
@@ -53,15 +60,16 @@ export async function fetchLatestInvoices(): Promise<any[]> {
 // Fetches card data using post counts as a stand-in for invoice/customer counts.
 export async function fetchCardData() {
   try {
-    const { data } = await client.query({
+    const { data } = await client.query<AllPostsCombinedResult>({
       query: GET_ALL_POST_DATA_COMBINED,
-      variables: { first: 1, after: null }, // We only need the count, so fetch 1
+      variables: { first: 1, after: null },
     });
 
-    const numberOfInvoices = data.allPosts.nodes.length;
+    // GET_ALL_POST_DATA_COMBINED returns posts -> nodes (no allPosts property)
+    const numberOfInvoices = data?.posts?.nodes?.length ?? 0;
     const numberOfCustomers = 0; // No customer concept in GraphQL schema
-    const totalPaidInvoices = formatCurrency(0); // No invoice status in GraphQL schema
-    const totalPendingInvoices = formatCurrency(0); // No invoice status in GraphQL schema
+    const totalPaidInvoices = formatCurrency(0); // Placeholder
+    const totalPendingInvoices = formatCurrency(0); // Placeholder
 
     return {
       numberOfCustomers,
@@ -87,22 +95,22 @@ export async function fetchFilteredInvoices(
   try {
     let posts: any[] = [];
     if (query) {
-      const { data } = await client.query({
+      const { data } = await client.query<SearchPostsResult>({
         query: SEARCH_POSTS,
         variables: { search: query },
       });
-      posts = data.posts.nodes;
+      posts = data?.posts?.nodes ?? [];
     } else {
-      const { data } = await client.query({
+      const { data } = await client.query<PostsResult>({
         query: GET_ALL_POSTS,
         variables: { first: 1000, after: null },
       });
-      posts = data.posts.nodes.slice(offset, offset + ITEMS_PER_PAGE);
+      posts = (data?.posts?.nodes ?? []).slice(offset, offset + ITEMS_PER_PAGE);
     }
 
     // Adapt the post data to the InvoicesTable shape
     return posts.map((post: any) => ({
-      id: post.databaseId.toString(),
+      id: post.databaseId?.toString() ?? '',
       amount: 10000, // Placeholder
       date: post.date,
       status: 'paid', // Placeholder
@@ -121,17 +129,17 @@ export async function fetchInvoicesPages(query: string): Promise<number> {
   try {
      let totalPosts = 0;
      if (query) {
-       const { data } = await client.query({
+       const { data } = await client.query<SearchPostsResult>({
          query: SEARCH_POSTS,
          variables: { search: query },
        });
-       totalPosts = data.posts.nodes.length;
+       totalPosts = data?.posts?.nodes?.length ?? 0;
      } else {
-       const { data } = await client.query({
+       const { data } = await client.query<AllPostsCombinedResult>({
          query: GET_ALL_POST_DATA_COMBINED,
          variables: { first: 1, after: null },
        });
-       totalPosts = data.allPosts.nodes.length;
+       totalPosts = data?.posts?.nodes?.length ?? 0;
      }
 
     return Math.ceil(totalPosts / ITEMS_PER_PAGE);
@@ -154,12 +162,12 @@ export async function fetchInvoiceById(id: string): Promise<InvoiceForm | undefi
     `;
 
   try {
-    const { data } = await client.query({
+    const { data } = await client.query<{ post?: { databaseId?: number } }>({
       query: GET_POST_BY_ID,
       variables: { id },
     });
 
-    if (!data.post) {
+    if (!data?.post) {
       return undefined;
     }
 
