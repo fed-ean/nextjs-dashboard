@@ -104,3 +104,76 @@ export const GET_ALL_POST_SLUGS = gql`
     }
   }
 `;
+
+
+export const GET_CATEGORY_POSTS_BY_SLUG_ARRAY = gql`
+  query GetCategoryPostsBySlugArray($slugs: [String], $first: Int, $after: String) {
+    categories(where: { slug: $slugs }) {
+      nodes {
+        id
+        name
+        slug
+        posts(first: $first, after: $after) {
+          nodes {
+            id
+            title
+            slug
+            featuredImage {
+              node {
+                sourceUrl
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_CATEGORY_POSTS_BY_SLUG = gql`
+  query GetCategoryPostsBySlug($slug: String, $first: Int, $after: String) {
+    categories(where: { slug: $slug }) {
+      nodes {
+        id
+        name
+        slug
+        posts(first: $first, after: $after) {
+          nodes {
+            id
+            title
+            slug
+            featuredImage {
+              node {
+                sourceUrl
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_CATEGORY_POSTS_BY_SLUGIN = gql`
+  query GetCategoryPostsBySlugIn($slugIn: [String], $first: Int, $after: String) {
+    categories(where: { slugIn: $slugIn }) {
+      nodes {
+        id
+        name
+        slug
+        posts(first: $first, after: $after) {
+          nodes {
+            id
+            title
+            slug
+            featuredImage {
+              node {
+                sourceUrl
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
