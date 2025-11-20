@@ -1,7 +1,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { obtenerNoticiasPorCategoria } from '@/app/lib/db.js';
+import { obtenerNoticiasPorCategoria } from '@/app/lib/db.ts';
 
 // --- TIPOS (Actualizados para coincidir con db.js) ---
 type Noticia = {

@@ -1,4 +1,4 @@
-import { obtenerNoticias } from '@/app/lib/db.js';
+import { obtenerNoticias } from '@/app/lib/db.ts';
 import NoticiaPrincipalIzquierda from '@/app/ui/Page_Index/not-principal-izquierda';
 import NoticiaSecundariaCard from '@/app/ui/Page_Index/not-principal-derecha';
 
