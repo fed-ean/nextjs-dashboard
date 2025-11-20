@@ -1,5 +1,4 @@
 // app/interes-general/page.tsx
-
 import React from 'react';
 import { getCachedPostsPage } from '../lib/data-fetcher';
 import CategoryGrid from '../ui/categorias/CategoryGrid';
@@ -7,33 +6,40 @@ import CategoryPagination from '../ui/categorias/CategoryPagination';
 
 const PER_PAGE = 9;
 
-// ✅ Tipado correcto para Next 15
+type SearchParamsShape = { [key: string]: string | string[] | undefined };
 type Props = {
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+  // compatible con Next 14 (objeto) y Next 15 (Promise)
+  searchParams?: Promise<SearchParamsShape> | SearchParamsShape;
 };
 
-export default async function InteresGeneralPage(props: Props) {
-  const searchParams = await props.searchParams;
-  const page = Number(searchParams?.page ?? 1);
+const ErrorDisplay = ({ message }: { message: string }) => (
+  <div className="text-center py-10">
+    <h1 className="text-2xl font-bold mb-4">Error al Cargar Contenido</h1>
+    <p className="text-red-500">{message}</p>
+    <p className="mt-4">Puede haber un problema de conexión. Por favor, inténtelo más tarde.</p>
+  </div>
+);
 
-  const { posts, totalPages, error } = await getCachedPostsPage(null, page, PER_PAGE);
+const NoPostsDisplay = () => (
+  <div className="text-center py-10">
+    <h1 className="text-2xl font-semibold mb-3">No hay publicaciones</h1>
+    <p className="text-gray-500">Todavía no se ha publicado ningún artículo.</p>
+  </div>
+);
 
-  if (error) {
-    return (
-      <div className="text-center py-10">
-        <h1 className="text-2xl font-bold mb-4">Error al Cargar Contenido</h1>
-        <p className="text-red-500">{error}</p>
-      </div>
-    );
-  }
+export default async function InteresGeneralPage({ searchParams }: Props) {
+  // Resolvemos searchParams si viene como Promise (Next 15) o lo usamos directamente (Next 13/14)
+  const resolvedSearchParams: SearchParamsShape = searchParams
+    ? (typeof (searchParams as any)?.then === 'function' ? await searchParams : (searchParams as SearchParamsShape))
+    : {};
+
+  const page = Math.max(1, Number(resolvedSearchParams?.page ?? 1));
+
+  // getCachedPostsPage acepta solo 1 argumento (slug | null)
+  const { posts, totalPages } = await getCachedPostsPage(null);
 
   if (!posts || posts.length === 0) {
-    return (
-      <div className="text-center py-10">
-        <h1 className="text-2xl font-semibold mb-3">No hay publicaciones</h1>
-        <p className="text-gray-500">Todavía no se ha publicado ningún artículo.</p>
-      </div>
-    );
+    return <NoPostsDisplay />;
   }
 
   return (
