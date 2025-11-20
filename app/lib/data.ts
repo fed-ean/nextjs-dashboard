@@ -108,9 +108,10 @@ export async function fetchFilteredInvoices(
       posts = (data?.posts?.nodes ?? []).slice(offset, offset + ITEMS_PER_PAGE);
     }
 
-    // Adapt the post data to the InvoicesTable shape
-    return posts.map((post: any) => ({
+    // Adapt the post data to the InvoicesTable shape (agregamos customer_id requerido)
+    return posts.map((post: any): InvoicesTable => ({
       id: post.databaseId?.toString() ?? '',
+      customer_id: '1', // placeholder: ajustá si podés obtener un customer real del post
       amount: 10000, // Placeholder
       date: post.date,
       status: 'paid', // Placeholder
