@@ -1,61 +1,38 @@
-// app/Categorias/Noticias/[slug]/page.tsx
-
 import React from "react";
+import type { AsyncParams } from "@/types/next-async";
 
 type Props = {
-  params: Promise<{
-    slug: string;
-  }>;
+  params: AsyncParams<{ slug: string }>;
 };
 
 async function getPostData(slug: string) {
   try {
     const res = await fetch(
       `https://radioempresarial.com/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}`,
-      {
-        next: { revalidate: 60 },
-      }
+      { next: { revalidate: 60 } }
     );
 
     if (!res.ok) {
       return { post: null, error: `HTTP error: ${res.status}` };
     }
 
-    const json = await res.json();
-
-    if (!json || json.length === 0) {
-      return { post: null, error: "Post no encontrado" };
-    }
-
-    return { post: json[0], error: null };
+    const data = await res.json();
+    return { post: data?.[0] ?? null, error: null };
   } catch (err: any) {
-    return { post: null, error: err.message || "Error desconocido" };
+    return { post: null, error: err.message };
   }
 }
 
-export const dynamic = "force-dynamic";
-
 export default async function Page({ params }: Props) {
-  // 👇 Esta es la forma correcta en Next 15
   const { slug } = await params;
-
   const { post, error } = await getPostData(slug);
 
   if (error) {
-    return (
-      <div className="p-4">
-        <h2>Error al cargar el post</h2>
-        <p>{error}</p>
-      </div>
-    );
+    return <div className="p-4">Error: {error}</div>;
   }
 
   if (!post) {
-    return (
-      <div className="p-4">
-        <h2>Post no encontrado</h2>
-      </div>
-    );
+    return <div className="p-4">Post no encontrado</div>;
   }
 
   return (
