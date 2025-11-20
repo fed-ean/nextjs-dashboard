@@ -1,36 +1,45 @@
-// app/Categorias/[slug]/page.tsx
 import React from "react";
 import { getCachedPostsPage } from "../../lib/data-fetcher";
-import CategoryPagination from "../../ui/categorias/CategoryPagination";
 import CategoryGrid from "../../ui/categorias/CategoryGrid";
-import type { AsyncParams, AsyncSearchParams } from "@/types/next-async";
+import CategoryPagination from "../../ui/categorias/CategoryPagination";
 
 const PER_PAGE = 9;
+
+type PageProps = {
+  params: {
+    slug: string;
+  };
+  searchParams?: {
+    [key: string]: string | string[] | undefined;
+  };
+};
 
 export default async function CategoryPage({
   params,
   searchParams,
-}: {
-  params: AsyncParams<{ slug: string }>;
-  searchParams?: AsyncSearchParams;
-}) {
-  const { slug } = await params;
-  const resolvedSearchParams = searchParams ? await searchParams : {};
+}: PageProps) {
+  const { slug } = params;
+  const page = Number(searchParams?.page || 1);
 
-  const page = Number(resolvedSearchParams.page || 1);
+  // ✅ CORRECTO: solo 1 argumento
+  const { posts, totalPages, category, error } =
+    await getCachedPostsPage(slug);
 
-  const { posts, totalPages, category } = await getCachedPostsPage(
-    slug,
-    page,
-    PER_PAGE
-  );
+  if (error) {
+    return (
+      <div className="text-center py-10">
+        <h1 className="text-2xl font-bold mb-4">Error al cargar</h1>
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
 
   if (!posts || posts.length === 0) {
     return (
       <div className="text-center py-10">
         <h1 className="text-2xl font-semibold mb-3">No hay publicaciones</h1>
         <p className="text-gray-500">
-          Todavía no hay artículos en esta categoría.
+          Todavía no se ha publicado ningún artículo.
         </p>
       </div>
     );
@@ -38,11 +47,15 @@ export default async function CategoryPage({
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold capitalize mb-6">
-        {category?.name || slug}
+      <h1 className="text-3xl font-bold mb-6">
+        {category?.name ?? slug}
       </h1>
 
-      <CategoryGrid posts={posts} currentSectionSlug={slug} />
+      <CategoryGrid
+        posts={posts}
+        currentSectionSlug={slug}
+        showCategory={false}
+      />
 
       <div className="mt-8">
         <CategoryPagination
