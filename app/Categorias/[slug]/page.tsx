@@ -4,7 +4,6 @@ import CategoryGrid from "../../ui/categorias/CategoryGrid";
 
 export const revalidate = 60;
 
-// ✅ Tipado compatible con Next 15 (params viene como Promise)
 type Props = {
   params: Promise<{
     slug: string;
@@ -12,7 +11,6 @@ type Props = {
 };
 
 export default async function CategoriaPage({ params }: Props) {
-  // ✅ Esperamos el Promise
   const { slug } = await params;
 
   const { posts, category } = await getCachedPostsPage(slug);
@@ -36,10 +34,10 @@ export default async function CategoriaPage({ params }: Props) {
         {category?.name ?? slug}
       </h1>
 
+      {/* ❌ Eliminamos showCategory porque no existe en CategoryGrid */}
       <CategoryGrid
         posts={posts}
         currentSectionSlug={slug}
-        showCategory={false}
       />
     </div>
   );
