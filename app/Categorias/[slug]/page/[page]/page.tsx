@@ -1,18 +1,21 @@
 // app/Categorias/[slug]/page/[page]/page.tsx
 import React from 'react';
+import type { Metadata } from "next";
 import CategoryGrid from '../../../../ui/categorias/CategoryGrid';
 import CategoryPagination from '../../../../ui/categorias/CategoryPagination';
 import { getCachedPostsPage } from '../../../../lib/data-fetcher'; // <-- CAMBIO AQUÍ
 export const dynamic = 'force-dynamic';
 
-type Props = {
+
+
+export default async function CategoryPageNumbered({
+  params,
+}: {
   params: {
     slug: string;
     page: string;
   };
-};
-
-export default async function CategoryPageNumbered({ params }: Props) {
+}) {
   const { slug, page } = params;
   const pageNum = Math.max(1, Number(page || 1));
   const PER_PAGE = 9;
