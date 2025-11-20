@@ -4,19 +4,17 @@ import { getCachedPostsPage } from "../../lib/data-fetcher"; // <-- CAMBIO AQUÍ
 import CategoryPagination from "../../ui/categorias/CategoryPagination";
 import CategoryGrid from "../../ui/categorias/CategoryGrid";
 
-const PER_PAGE = 9;
+export default async function CategoryPage(
+  props: {
+    params: { slug: string };
+    searchParams?: { [key: string]: string | string[] | undefined };
+  }
+) {
+  const { params, searchParams } = props;
 
-export default async function CategoryPage({
-  params,
-  searchParams,
-}: {
-  params: { slug: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
-}) {
   const slug = params.slug;
   const page = Number(searchParams?.page || 1);
 
-  // La llamada a la función sigue siendo la misma
   const { posts, total, totalPages, category } = await getCachedPostsPage(
     slug,
     page,
@@ -36,7 +34,9 @@ export default async function CategoryPage({
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold capitalize mb-6">{category?.name || slug}</h1>
+      <h1 className="text-3xl font-bold capitalize mb-6">
+        {category?.name || slug}
+      </h1>
 
       <CategoryGrid posts={posts} currentSectionSlug={slug} />
 
