@@ -3,13 +3,17 @@ import React from 'react';
 import CategoryGrid from '../../../../ui/categorias/CategoryGrid';
 import CategoryPagination from '../../../../ui/categorias/CategoryPagination';
 import { getCachedPostsPage } from '../../../../lib/data-fetcher'; // <-- CAMBIO AQUÍ
-
-type Props = { params: { slug: string; page: string } };
-
 export const dynamic = 'force-dynamic';
 
+type Props = {
+  params: {
+    slug: string;
+    page: string;
+  };
+};
+
 export default async function CategoryPageNumbered({ params }: Props) {
-  const { slug, page } = (await params) as { slug: string; page: string };
+  const { slug, page } = params;
   const pageNum = Math.max(1, Number(page || 1));
   const PER_PAGE = 9;
 
