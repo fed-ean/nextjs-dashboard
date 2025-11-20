@@ -1,5 +1,7 @@
 import React from "react";
 
+type Props = { params: { slug: string; page: string } };
+
 async function getPostData(slug: string) {
   try {
     const res = await fetch(`https://radioempresarial.com/wp-json/wp/v2/posts?slug=${slug}`, {
@@ -22,8 +24,8 @@ async function getPostData(slug: string) {
   }
 }
 
-export default async function Page({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export default async function Page({ params }: Props) {
+  const { slug, page } = (await params) as { slug: string; page: string };
 
   const { post, error } = await getPostData(slug);
 
