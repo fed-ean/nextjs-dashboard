@@ -7,9 +7,10 @@ import CategoryPagination from '../ui/categorias/CategoryPagination';
 const PER_PAGE = 9;
 
 type SearchParamsShape = { [key: string]: string | string[] | undefined };
+
+// Tipado compatible con Next 15: searchParams es Promise<...>
 type Props = {
-  // compatible con Next 14 (objeto) y Next 15 (Promise)
-  searchParams?: Promise<SearchParamsShape> | SearchParamsShape;
+  searchParams?: Promise<SearchParamsShape>;
 };
 
 const ErrorDisplay = ({ message }: { message: string }) => (
@@ -28,14 +29,12 @@ const NoPostsDisplay = () => (
 );
 
 export default async function InteresGeneralPage({ searchParams }: Props) {
-  // Resolvemos searchParams si viene como Promise (Next 15) o lo usamos directamente (Next 13/14)
-  const resolvedSearchParams: SearchParamsShape = searchParams
-    ? (typeof (searchParams as any)?.then === 'function' ? await searchParams : (searchParams as SearchParamsShape))
-    : {};
+  // Si no viene searchParams, await a Promise.resolve({})
+  const resolvedSearchParams: SearchParamsShape = await (searchParams ?? Promise.resolve({}));
 
   const page = Math.max(1, Number(resolvedSearchParams?.page ?? 1));
 
-  // getCachedPostsPage acepta solo 1 argumento (slug | null)
+  // Tu data-fetcher actual acepta solo 1 argumento (slug | null)
   const { posts, totalPages } = await getCachedPostsPage(null);
 
   if (!posts || posts.length === 0) {
