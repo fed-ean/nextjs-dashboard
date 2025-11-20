@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 
-export default function AlAireRadio(): JSX.Element {
+export default function AlAireRadio(): React.ReactElement {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState<number>(70);
   const [isMuted, setIsMuted] = useState<boolean>(false);
