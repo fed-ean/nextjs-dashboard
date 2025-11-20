@@ -1,4 +1,4 @@
-// components/CategoryPostsListClient.tsx
+// app/component/CategoryPostsClient.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -6,44 +6,58 @@ import { getClient } from '../lib/cliente';
 import { GET_POSTS_BY_CATEGORY_SIMPLE, GET_ALL_POSTS } from '../lib/queries';
 import Link from 'next/link';
 
-export default function CategoryPostsListClient({ initialPosts = [], initialPageInfo = {}, slug }: any) {
-  const [posts, setPosts] = useState(initialPosts);
-  const [pageInfo, setPageInfo] = useState(initialPageInfo);
+type PageInfo = {
+  endCursor?: string | null;
+  hasNextPage?: boolean;
+};
+
+export default function CategoryPostsClient({
+  initialPosts = [],
+  initialPageInfo = {},
+  slug
+}: any) {
+  const [posts, setPosts] = useState<any[]>(initialPosts);
+  const [pageInfo, setPageInfo] = useState<PageInfo>(initialPageInfo);
   const [loading, setLoading] = useState(false);
 
   const isInteresGeneral = slug === 'interes-general';
 
   const loadMore = async () => {
+    if (loading) return;
     setLoading(true);
 
     try {
       const client = getClient();
 
       if (isInteresGeneral) {
-        // Trae todos los posts
-        const { data } = await client.query({
+        const { data }: any = await client.query({
           query: GET_ALL_POSTS,
-          variables: { first: 10, after: pageInfo?.endCursor },
+          variables: {
+            first: 10,
+            after: pageInfo?.endCursor || null
+          },
           fetchPolicy: 'network-only',
         });
 
-        const newNodes = data?.posts?.nodes ?? [];
-        const newPageInfo = data?.posts?.pageInfo ?? { endCursor: null, hasNextPage: false };
+        const newNodes = data?.posts?.nodes || [];
+        const newPageInfo = data?.posts?.pageInfo || {
+          endCursor: null,
+          hasNextPage: false
+        };
 
-        setPosts((prev: any) => [...prev, ...newNodes]);
+        setPosts(prev => [...prev, ...newNodes]);
         setPageInfo(newPageInfo);
 
       } else {
-        // Trae posts por categoría (sin paginación real)
-        const { data } = await client.query({
+        const { data }: any = await client.query({
           query: GET_POSTS_BY_CATEGORY_SIMPLE,
           variables: { categoryName: slug },
           fetchPolicy: 'network-only',
         });
 
-        const newNodes = data?.posts?.nodes ?? [];
+        const newNodes = data?.posts?.nodes || [];
 
-        setPosts((prev: any) => [...prev, ...newNodes]);
+        setPosts(prev => [...prev, ...newNodes]);
         setPageInfo({ endCursor: null, hasNextPage: false });
       }
 
