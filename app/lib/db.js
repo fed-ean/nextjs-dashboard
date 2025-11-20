@@ -2,52 +2,39 @@
 import { gql } from '@apollo/client';
 import { getServerSideClient } from './server-cliente.js';
 
-// --- Tipos ---
 /**
- * Parámetros generales para obtener noticias
+ * @typedef {Object} Categoria
+ * @property {string} [name]
+ * @property {string} [slug]
  */
-type ObtenerNoticiasParams = {
-  limit?: number;
-  offset?: number;
-  status?: string;
-  categoryName?: string;
-};
 
 /**
- * Tipo de categoría
+ * @typedef {Object} Noticia
+ * @property {number} [databaseId]
+ * @property {string} [slug]
+ * @property {string} [title]
+ * @property {string} [titulo]
+ * @property {string} [content]
+ * @property {string} [excerpt]
+ * @property {string|null} [imagenUrl]
+ * @property {any} [featuredImage]
+ * @property {{ nodes?: Categoria[] }} [categories]
+ * @property {string} [fechaPublicacion]
+ * @property {string} [date]
  */
-type Categoria = {
-  name?: string;
-  slug?: string;
-};
 
 /**
- * Tipo de noticia
+ * @typedef {Object} ObtenerNoticiasParams
+ * @property {number} [limit]
+ * @property {number} [offset]
+ * @property {string} [status]
+ * @property {string} [categoryName]
  */
-export type Noticia = {
-  databaseId?: number;
-  slug?: string;
-  title?: string;
-  titulo?: string;
-  content?: string;
-  excerpt?: string;
-  imagenUrl?: string | null;
-  featuredImage?: any;
-  categories?: {
-    nodes?: Categoria[];
-  };
-  fechaPublicacion?: string;
-  date?: string;
-  [k: string]: any;
-};
 
 // --- CONSULTAS ---
 const GET_NOTICIAS_QUERY = gql`
   query GetNoticias($first: Int, $status: PostStatusEnum) {
-    posts(
-      first: $first, 
-      where: { orderby: { field: DATE, order: DESC }, status: $status }
-    ) {
+    posts(first: $first, where: { orderby: { field: DATE, order: DESC }, status: $status }) {
       nodes {
         databaseId
         post_date: date
@@ -56,17 +43,8 @@ const GET_NOTICIAS_QUERY = gql`
         excerpt
         status
         slug
-        featuredImage {
-          node {
-            sourceUrl
-          }
-        }
-        categories {
-          nodes {
-            name
-            slug
-          }
-        }
+        featuredImage { node { sourceUrl } }
+        categories { nodes { name slug } }
       }
     }
   }
@@ -86,24 +64,15 @@ const GET_NOTICIAS_POR_CATEGORIA_QUERY = gql`
         excerpt
         status
         slug
-        featuredImage {
-          node {
-            sourceUrl
-          }
-        }
-        categories {
-          nodes {
-            name
-            slug
-          }
-        }
+        featuredImage { node { sourceUrl } }
+        categories { nodes { name slug } }
       }
     }
   }
 `;
 
 // --- Mappers ---
-const mapPostNode = (node: any): Noticia => ({
+const mapPostNode = (node) => ({
   databaseId: node.databaseId,
   slug: node.slug,
   title: node.title,
@@ -116,13 +85,13 @@ const mapPostNode = (node: any): Noticia => ({
   date: node.post_date,
 });
 
-const mapPostNodeForCarousel = (node: any): Noticia => ({
+const mapPostNodeForCarousel = (node) => ({
   ...mapPostNode(node),
   titulo: node.title,
 });
 
-// --- Funciones exportadas ---
-export async function obtenerNoticias({ limit = 10, offset = 0, status = 'PUBLISH' }: ObtenerNoticiasParams = {}): Promise<Noticia[]> {
+// --- Funciones ---
+export async function obtenerNoticias({ limit = 10, offset = 0, status = 'PUBLISH' } = {}) {
   try {
     const client = getServerSideClient();
     const { data } = await client.query({
@@ -140,7 +109,7 @@ export async function obtenerNoticias({ limit = 10, offset = 0, status = 'PUBLIS
   }
 }
 
-export async function obtenerNoticiasPorCategoria({ limit = 10, status = 'PUBLISH', categoryName }: ObtenerNoticiasParams = {}): Promise<Noticia[]> {
+export async function obtenerNoticiasPorCategoria({ limit = 10, status = 'PUBLISH', categoryName } = {}) {
   try {
     const client = getServerSideClient();
     const { data } = await client.query({
@@ -157,7 +126,7 @@ export async function obtenerNoticiasPorCategoria({ limit = 10, status = 'PUBLIS
   }
 }
 
-export async function obtenerNoticiasPorCategoriaParaCarrusel({ limit = 10, status = 'PUBLISH', categoryName }: ObtenerNoticiasParams = {}): Promise<Noticia[]> {
+export async function obtenerNoticiasPorCategoriaParaCarrusel({ limit = 10, status = 'PUBLISH', categoryName } = {}) {
   try {
     const client = getServerSideClient();
     const { data } = await client.query({
