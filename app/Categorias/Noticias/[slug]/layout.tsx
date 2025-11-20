@@ -1,9 +1,13 @@
-// app/(admin)/layout.tsx
+import React from "react";
 
-export default function SlugLayout({ children }) {
+type Props = {
+  children: React.ReactNode;
+};
+
+export default function SlugLayout({ children }: Props) {
   return (
-      <main>
-        {children}
-      </main>
+    <main>
+      {children}
+    </main>
   );
 }
