@@ -1,7 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import CarouselCard from './CarouselCard';
+
+// --- Tipos unificados ---
+type Categoria = {
+  name?: string;
+  slug?: string;
+};
 
 type Noticia = {
   slug?: string;
@@ -10,10 +15,37 @@ type Noticia = {
   imagenUrl?: string;
   excerpt?: string;
   fecha?: string;
-  categories?: { nodes?: any[] } | any[] | string[];
+  categories?: {
+    nodes?: Categoria[];
+  };
   [k: string]: any;
 };
 
+// --- CarouselCard interno para usar el mismo tipo ---
+function CarouselCard({ noticia }: { noticia: Noticia }) {
+  return (
+    <div className="border rounded-lg overflow-hidden shadow-md">
+      {noticia.imagenUrl && (
+        <img src={noticia.imagenUrl} alt={noticia.titulo || noticia.title} className="w-full h-40 object-cover" />
+      )}
+      <div className="p-2">
+        <h3 className="font-bold text-sm">{noticia.titulo || noticia.title}</h3>
+        {noticia.excerpt && <p className="text-xs text-gray-600">{noticia.excerpt}</p>}
+        {noticia.categories?.nodes && (
+          <div className="flex gap-1 mt-1">
+            {noticia.categories.nodes.map((cat, i) => (
+              <span key={i} className="text-xs text-blue-600">
+                {cat.name}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// --- Componente principal ---
 export default function CarouselNoticias({
   noticias,
   slidesPerView = 1,
