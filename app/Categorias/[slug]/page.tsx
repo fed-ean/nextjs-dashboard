@@ -1,15 +1,23 @@
 // app/Categorias/[slug]/page.tsx
 import React from "react";
-import { getCachedPostsPage } from "../../lib/data-fetcher"; // <-- CAMBIO AQUÍ
+import { getCachedPostsPage } from "../../lib/data-fetcher";
 import CategoryPagination from "../../ui/categorias/CategoryPagination";
 import CategoryGrid from "../../ui/categorias/CategoryGrid";
+import type { AsyncParams, AsyncSearchParams } from "@/types/next-async";
+
 const PER_PAGE = 9;
 
-export default async function CategoryPage(props: any) {
-  const { params, searchParams } = props;
+export default async function CategoryPage({
+  params,
+  searchParams,
+}: {
+  params: AsyncParams<{ slug: string }>;
+  searchParams?: AsyncSearchParams;
+}) {
+  const { slug } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : {};
 
-  const slug = params.slug;
-  const page = Number(searchParams?.page || 1);
+  const page = Number(resolvedSearchParams.page || 1);
 
   const { posts, totalPages, category } = await getCachedPostsPage(
     slug,
@@ -17,7 +25,7 @@ export default async function CategoryPage(props: any) {
     PER_PAGE
   );
 
-  if (!posts?.length) {
+  if (!posts || posts.length === 0) {
     return (
       <div className="text-center py-10">
         <h1 className="text-2xl font-semibold mb-3">No hay publicaciones</h1>
