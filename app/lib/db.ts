@@ -1,40 +1,42 @@
-// app/lib/db.js
+// app/lib/db.ts
 import { gql } from '@apollo/client';
 import { getServerSideClient } from './server-cliente.js';
 
-/**
- * @typedef {Object} Categoria
- * @property {string} [name]
- * @property {string} [slug]
- */
+// --- Tipos ---
+export type Categoria = {
+  name?: string;
+  slug?: string;
+};
 
-/**
- * @typedef {Object} Noticia
- * @property {number} [databaseId]
- * @property {string} [slug]
- * @property {string} [title]
- * @property {string} [titulo]
- * @property {string} [content]
- * @property {string} [excerpt]
- * @property {string|null} [imagenUrl]
- * @property {any} [featuredImage]
- * @property {{ nodes?: Categoria[] }} [categories]
- * @property {string} [fechaPublicacion]
- * @property {string} [date]
- */
+export type Noticia = {
+  databaseId?: number;
+  slug?: string;
+  title?: string;
+  titulo?: string;
+  content?: string;
+  excerpt?: string;
+  imagenUrl?: string | null;
+  featuredImage?: any;
+  categories?: { nodes?: Categoria[] };
+  fechaPublicacion?: string;
+  date?: string;
+  [k: string]: any;
+};
 
-/**
- * @typedef {Object} ObtenerNoticiasParams
- * @property {number} [limit]
- * @property {number} [offset]
- * @property {string} [status]
- * @property {string} [categoryName]
- */
+export type ObtenerNoticiasParams = {
+  limit?: number;
+  offset?: number;
+  status?: string;
+  categoryName?: string;
+};
 
 // --- CONSULTAS ---
 const GET_NOTICIAS_QUERY = gql`
   query GetNoticias($first: Int, $status: PostStatusEnum) {
-    posts(first: $first, where: { orderby: { field: DATE, order: DESC }, status: $status }) {
+    posts(
+      first: $first,
+      where: { orderby: { field: DATE, order: DESC }, status: $status }
+    ) {
       nodes {
         databaseId
         post_date: date
@@ -43,8 +45,12 @@ const GET_NOTICIAS_QUERY = gql`
         excerpt
         status
         slug
-        featuredImage { node { sourceUrl } }
-        categories { nodes { name slug } }
+        featuredImage {
+          node { sourceUrl }
+        }
+        categories {
+          nodes { name slug }
+        }
       }
     }
   }
@@ -64,15 +70,19 @@ const GET_NOTICIAS_POR_CATEGORIA_QUERY = gql`
         excerpt
         status
         slug
-        featuredImage { node { sourceUrl } }
-        categories { nodes { name slug } }
+        featuredImage {
+          node { sourceUrl }
+        }
+        categories {
+          nodes { name slug }
+        }
       }
     }
   }
 `;
 
 // --- Mappers ---
-const mapPostNode = (node) => ({
+const mapPostNode = (node: any): Noticia => ({
   databaseId: node.databaseId,
   slug: node.slug,
   title: node.title,
@@ -85,13 +95,13 @@ const mapPostNode = (node) => ({
   date: node.post_date,
 });
 
-const mapPostNodeForCarousel = (node) => ({
+const mapPostNodeForCarousel = (node: any): Noticia => ({
   ...mapPostNode(node),
   titulo: node.title,
 });
 
 // --- Funciones ---
-export async function obtenerNoticias({ limit = 10, offset = 0, status = 'PUBLISH' } = {}) {
+export async function obtenerNoticias({ limit = 10, offset = 0, status = 'PUBLISH' }: ObtenerNoticiasParams = {}): Promise<Noticia[]> {
   try {
     const client = getServerSideClient();
     const { data } = await client.query({
@@ -109,7 +119,7 @@ export async function obtenerNoticias({ limit = 10, offset = 0, status = 'PUBLIS
   }
 }
 
-export async function obtenerNoticiasPorCategoria({ limit = 10, status = 'PUBLISH', categoryName } = {}) {
+export async function obtenerNoticiasPorCategoria({ limit = 10, status = 'PUBLISH', categoryName }: ObtenerNoticiasParams = {}): Promise<Noticia[]> {
   try {
     const client = getServerSideClient();
     const { data } = await client.query({
@@ -126,7 +136,7 @@ export async function obtenerNoticiasPorCategoria({ limit = 10, status = 'PUBLIS
   }
 }
 
-export async function obtenerNoticiasPorCategoriaParaCarrusel({ limit = 10, status = 'PUBLISH', categoryName } = {}) {
+export async function obtenerNoticiasPorCategoriaParaCarrusel({ limit = 10, status = 'PUBLISH', categoryName }: ObtenerNoticiasParams = {}): Promise<Noticia[]> {
   try {
     const client = getServerSideClient();
     const { data } = await client.query({
