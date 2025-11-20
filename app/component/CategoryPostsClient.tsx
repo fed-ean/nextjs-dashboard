@@ -1,8 +1,9 @@
 // components/CategoryPostsListClient.tsx
 'use client';
+
 import React, { useState } from 'react';
 import { getClient } from '../lib/cliente';
-import { GET_CATEGORY_POSTS_BY_SLUG, GET_ALL_POSTS } from '../lib/queries';
+import { GET_POSTS_BY_CATEGORY_SIMPLE, GET_ALL_POSTS } from '../lib/queries';
 import Link from 'next/link';
 
 export default function CategoryPostsListClient({ initialPosts = [], initialPageInfo = {}, slug }: any) {
@@ -13,32 +14,41 @@ export default function CategoryPostsListClient({ initialPosts = [], initialPage
   const isInteresGeneral = slug === 'interes-general';
 
   const loadMore = async () => {
-    if (!pageInfo?.hasNextPage) return;
     setLoading(true);
+
     try {
       const client = getClient();
+
       if (isInteresGeneral) {
+        // Trae todos los posts
         const { data } = await client.query({
           query: GET_ALL_POSTS,
-          variables: { first: 10, after: pageInfo.endCursor },
+          variables: { first: 10, after: pageInfo?.endCursor },
           fetchPolicy: 'network-only',
         });
+
         const newNodes = data?.posts?.nodes ?? [];
-        setPosts(prev => [...prev, ...newNodes]);
-        setPageInfo(data?.posts?.pageInfo ?? { endCursor: null, hasNextPage: false });
+        const newPageInfo = data?.posts?.pageInfo ?? { endCursor: null, hasNextPage: false };
+
+        setPosts((prev: any) => [...prev, ...newNodes]);
+        setPageInfo(newPageInfo);
+
       } else {
+        // Trae posts por categoría (sin paginación real)
         const { data } = await client.query({
-          query: GET_CATEGORY_POSTS_BY_SLUG,
-          variables: { slug, first: 10, after: pageInfo.endCursor }, // <-- slug como String
+          query: GET_POSTS_BY_CATEGORY_SIMPLE,
+          variables: { categoryName: slug },
           fetchPolicy: 'network-only',
         });
-        const newNodes = data?.categories?.nodes?.[0]?.posts?.nodes ?? [];
-        const newPageInfo = data?.categories?.nodes?.[0]?.posts?.pageInfo ?? { endCursor: null, hasNextPage: false };
-        setPosts(prev => [...prev, ...newNodes]);
-        setPageInfo(newPageInfo);
+
+        const newNodes = data?.posts?.nodes ?? [];
+
+        setPosts((prev: any) => [...prev, ...newNodes]);
+        setPageInfo({ endCursor: null, hasNextPage: false });
       }
+
     } catch (err) {
-      console.error(err);
+      console.error('Error cargando más posts:', err);
     } finally {
       setLoading(false);
     }
@@ -49,10 +59,18 @@ export default function CategoryPostsListClient({ initialPosts = [], initialPage
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {posts.map((p: any) => (
           <li key={p.databaseId} style={{ marginBottom: 20 }}>
-            <h3><Link href={`/noticia/${p.slug}`}>{p.title}</Link></h3>
+            <h3>
+              <Link href={`/noticia/${p.slug}`}>{p.title}</Link>
+            </h3>
+
             <div dangerouslySetInnerHTML={{ __html: p.excerpt || '' }} />
+
             <div style={{ fontSize: 12, marginTop: 6 }}>
-              {p.categories?.nodes?.map((c: any) => (<span key={c.slug} style={{ marginRight: 8 }}>{c.name}</span>))}
+              {p.categories?.nodes?.map((c: any) => (
+                <span key={c.slug} style={{ marginRight: 8 }}>
+                  {c.name}
+                </span>
+              ))}
             </div>
           </li>
         ))}
@@ -60,7 +78,9 @@ export default function CategoryPostsListClient({ initialPosts = [], initialPage
 
       {pageInfo?.hasNextPage ? (
         <div style={{ textAlign: 'center', marginTop: 12 }}>
-          <button onClick={loadMore} disabled={loading}>{loading ? 'Cargando...' : 'Cargar más'}</button>
+          <button onClick={loadMore} disabled={loading}>
+            {loading ? 'Cargando...' : 'Cargar más'}
+          </button>
         </div>
       ) : (
         <p style={{ textAlign: 'center' }}>No hay más noticias.</p>
