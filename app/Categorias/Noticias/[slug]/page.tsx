@@ -1,13 +1,20 @@
 // app/Categorias/Noticias/[slug]/page.tsx
+
 import React from "react";
 
-type Props = { params: { slug: string } };
+type Props = {
+  params: Promise<{
+    slug: string;
+  }>;
+};
 
 async function getPostData(slug: string) {
   try {
     const res = await fetch(
       `https://radioempresarial.com/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}`,
-      { next: { revalidate: 60 } }
+      {
+        next: { revalidate: 60 },
+      }
     );
 
     if (!res.ok) {
@@ -22,14 +29,15 @@ async function getPostData(slug: string) {
 
     return { post: json[0], error: null };
   } catch (err: any) {
-    return { post: null, error: err?.message || "Error desconocido" };
+    return { post: null, error: err.message || "Error desconocido" };
   }
 }
 
 export const dynamic = "force-dynamic";
 
 export default async function Page({ params }: Props) {
-  const { slug } = params;
+  // 👇 Esta es la forma correcta en Next 15
+  const { slug } = await params;
 
   const { post, error } = await getPostData(slug);
 
@@ -52,10 +60,14 @@ export default async function Page({ params }: Props) {
 
   return (
     <main className="p-4">
-      <h1 className="text-3xl font-bold mb-4">{post.title?.rendered}</h1>
+      <h1 className="text-3xl font-bold mb-4">
+        {post.title?.rendered}
+      </h1>
       <article
         className="prose"
-        dangerouslySetInnerHTML={{ __html: post.content?.rendered || "" }}
+        dangerouslySetInnerHTML={{
+          __html: post.content?.rendered ?? "",
+        }}
       />
     </main>
   );
