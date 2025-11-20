@@ -3,25 +3,23 @@ import React from 'react';
 import type { Metadata } from "next";
 import CategoryGrid from '../../../../ui/categorias/CategoryGrid';
 import CategoryPagination from '../../../../ui/categorias/CategoryPagination';
-import { getCachedPostsPage } from '../../../../lib/data-fetcher'; // <-- CAMBIO AQUÍ
+import { getCachedPostsPage } from '../../../../lib/data-fetcher';
 export const dynamic = 'force-dynamic';
-
-
 
 export default async function CategoryPageNumbered({
   params,
 }: {
-  params: {
+  params: Promise<{
     slug: string;
     page: string;
-  };
+  }>;
 }) {
-  const { slug, page } = params;
+  // await params para cumplir el tipo y resolver el valor
+  const { slug, page } = await params;
   const pageNum = Math.max(1, Number(page || 1));
   const PER_PAGE = 9;
 
   try {
-    // La llamada a la función es compatible con la nueva implementación
     const { posts, total, totalPages, category } = await getCachedPostsPage(slug, pageNum, PER_PAGE);
 
     const computedTotalPages = totalPages && totalPages > 0 ? totalPages : Math.max(1, Math.ceil((total || posts.length) / PER_PAGE));

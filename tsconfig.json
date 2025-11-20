@@ -22,13 +22,9 @@
     "paths": {
       "@/*": ["./*"]
     }
-  },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "app/lib/placeholder-data.ts",
-    "scripts/seed.js"
-  ],
+  },"include": [
+  "next-env.d.ts",
+  "app/**/*"
+],
   "exclude": ["node_modules"]
 }
