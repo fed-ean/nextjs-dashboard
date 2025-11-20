@@ -1,12 +1,14 @@
+// app/Categorias/Noticias/[slug]/page.tsx
 import React from "react";
 
-type Props = { params: { slug: string; page: string } };
+type Props = { params: { slug: string } };
 
 async function getPostData(slug: string) {
   try {
-    const res = await fetch(`https://radioempresarial.com/wp-json/wp/v2/posts?slug=${slug}`, {
-      next: { revalidate: 60 },
-    });
+    const res = await fetch(
+      `https://radioempresarial.com/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}`,
+      { next: { revalidate: 60 } }
+    );
 
     if (!res.ok) {
       return { post: null, error: `HTTP error: ${res.status}` };
@@ -20,12 +22,14 @@ async function getPostData(slug: string) {
 
     return { post: json[0], error: null };
   } catch (err: any) {
-    return { post: null, error: err.message || "Error desconocido" };
+    return { post: null, error: err?.message || "Error desconocido" };
   }
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function Page({ params }: Props) {
-  const { slug, page } = (await params) as { slug: string; page: string };
+  const { slug } = params;
 
   const { post, error } = await getPostData(slug);
 
