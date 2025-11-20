@@ -1,4 +1,5 @@
 // app/programas/varias/page.tsx
+
 import React from "react";
 import { getCachedPostsPage } from "../../lib/data-fetcher";
 import CategoryPagination from "../../ui/categorias/CategoryPagination";
@@ -6,14 +7,15 @@ import CategoryGrid from "../../ui/categorias/CategoryGrid";
 
 const PER_PAGE = 9;
 
-export default async function VariasPage({
-  searchParams,
-}: {
-  searchParams?: { [key: string]: string | string[] | undefined };
-}) {
-  const page = Number(searchParams?.page || 1);
+// ✅ Tipado correcto para Next 15
+type Props = {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+};
 
-  // Use the corrected function and pass null to fetch all posts
+export default async function VariasPage(props: Props) {
+  const searchParams = await props.searchParams;
+  const page = Number(searchParams?.page ?? 1);
+
   const { posts, total, totalPages } = await getCachedPostsPage(
     null,
     page,
@@ -43,7 +45,7 @@ export default async function VariasPage({
 
       <div className="mt-8">
         <CategoryPagination
-          basePath={`/programas/varias`}
+          basePath="/programas/varias"
           current={page}
           totalPages={totalPages}
           perPage={PER_PAGE}
