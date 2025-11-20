@@ -16,13 +16,14 @@ export default async function VariasPage(props: Props) {
   const searchParams = await props.searchParams;
   const page = Number(searchParams?.page ?? 1);
 
-  // Llamada corregida: pasar 1 argumento (objeto) y forzar tipo any para evitar error de compilación
-  const { posts, total, totalPages } = await (getCachedPostsPage as any)({
-    // nombres de propiedades comunes; si en tu data-fetcher son otros, reemplazalos:
+  // Llamada corregida: un solo objeto y casteo para asegurar el tipo esperado
+  const result = (await (getCachedPostsPage as any)({
     slug: null,
     page,
     perPage: PER_PAGE,
-  });
+  })) as { posts: any[]; total: number; totalPages: number };
+
+  const { posts, total, totalPages } = result;
 
   if (!posts || posts.length === 0) {
     return (
@@ -42,7 +43,6 @@ export default async function VariasPage(props: Props) {
       <CategoryGrid
         posts={posts}
         currentSectionSlug="programas/varias"
-        showCategory={true}
       />
 
       <div className="mt-8">
@@ -56,3 +56,4 @@ export default async function VariasPage(props: Props) {
     </div>
   );
 }
+
