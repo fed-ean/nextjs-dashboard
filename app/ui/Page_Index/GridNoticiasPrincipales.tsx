@@ -1,9 +1,8 @@
 'use client';
 
-import { obtenerNoticias } from '@/app/lib/db';
+import { obtenerNoticias, Noticia } from '@/app/lib/db';
 import NoticiaPrincipalIzquierda from '@/app/ui/Page_Index/not-principal-izquierda';
 import NoticiaSecundariaCard from '@/app/ui/Page_Index/not-principal-derecha';
-import { Noticia } from '@/app/lib/types'; // Asegúrate de importar el tipo correcto
 
 export default async function GridNoticiasPrincipales() {
   const noticiasRaw: Noticia[] = await obtenerNoticias({ limit: 4 });
