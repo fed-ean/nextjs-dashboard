@@ -1,11 +1,7 @@
 "use client"
 import Link from 'next/link';
 import NavLinks from '@/app/ui/dashboard/side-nav';
-import AcmeLogo from '@/app/ui/acme-logo';
-import RadioPlayer from '../Reproductor';
-import { PowerIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
-import { IoHome } from "react-icons/io5";
 import { PiXLogo } from "react-icons/pi";
 
 // https://feathericons.dev/?search=youtube&iconset=brands&format=strict-jsx
