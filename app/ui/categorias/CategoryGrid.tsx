@@ -3,8 +3,7 @@ import React from 'react';
 import TarjetaNoticia from '../components/TarjetaNoticia';
 
 export default function CategoryGrid({
-  posts,
-  currentSectionSlug
+  posts
 }: {
   posts: any[];
   currentSectionSlug?: string;
@@ -20,7 +19,6 @@ export default function CategoryGrid({
           <TarjetaNoticia
             key={p.databaseId || p.id || p.slug}
             post={p}
-            currentCategorySlug={currentSectionSlug}
           />
         ))}
       </div>
