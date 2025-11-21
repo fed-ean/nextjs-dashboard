@@ -15,7 +15,7 @@ export default async function GridNoticiasPrincipales() {
       <div className="w-full md:w-5/12 p-4 flex flex-col flex-1 gap-4">
         {noticiasSecundarias[0] && (
           <NoticiaSecundariaCard
-            key={noticiasSecundarias[0].id}
+            key={noticiasSecundarias[0].databaseId} // <-- corrección
             noticia={noticiasSecundarias[0]}
             priority={true}
           />
@@ -23,7 +23,7 @@ export default async function GridNoticiasPrincipales() {
         {noticiasSecundarias[2] && (
           <div className="hidden fhd:block my-auto">
             <NoticiaSecundariaCard
-              key={noticiasSecundarias[2].id}
+              key={noticiasSecundarias[2].databaseId} // <-- corrección
               noticia={noticiasSecundarias[2]}
             />
           </div>
@@ -31,7 +31,7 @@ export default async function GridNoticiasPrincipales() {
         {noticiasSecundarias[1] && (
           <div className="mt-auto">
             <NoticiaSecundariaCard
-              key={noticiasSecundarias[1].id}
+              key={noticiasSecundarias[1].databaseId} // <-- corrección
               noticia={noticiasSecundarias[1]}
             />
           </div>
