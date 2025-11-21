@@ -15,7 +15,7 @@ export type Noticia = {
   titulo?: string;
   content?: string;
   excerpt?: string;
-  imagenUrl?: string | null;
+  imagenUrl?: string; // <- unificado: string | undefined
   featuredImage?: any;
   categories?: { nodes?: Categoria[] };
   fechaPublicacion?: string;
@@ -88,8 +88,7 @@ const mapPostNode = (node: any): Noticia => ({
   title: node?.title,
   content: node?.content,
   excerpt: node?.excerpt,
-  // keep null if no image (caller can handle null), previously caused type mismatch in some components
-  imagenUrl: node?.featuredImage?.node?.sourceUrl ?? null,
+  imagenUrl: node?.featuredImage?.node?.sourceUrl ?? undefined, // <- string | undefined
   featuredImage: node?.featuredImage,
   categories: node?.categories ?? { nodes: [] },
   fechaPublicacion: node?.post_date,
