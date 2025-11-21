@@ -1,4 +1,6 @@
-export function Youtube(props) {
+import React from "react";
+
+export function Youtube(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className="main-grid-item-icon" fill="none" {...props}>
       <path clipRule="evenodd" d="M22.747 4.834c.372.375.64.84.775 1.351.502 1.885.502 5.815.502 5.815s0 3.93-.502 5.815A3.017 3.017 0 0 1 21.4 19.95c-1.876.505-9.376.505-9.376.505s-7.5 0-9.376-.505a3.016 3.016 0 0 1-2.122-2.135C.024 15.93.024 12 .024 12s0-3.93.502-5.815A3.016 3.016 0 0 1 2.648 4.05c1.876-.505 9.376-.505 9.376-.505s7.5 0 9.376.505c.51.139.974.41 1.347.784ZM15.842 12 9.57 8.431v7.138L15.842 12Z" fill="#FF0302" fillRule="evenodd" />
@@ -6,9 +8,7 @@ export function Youtube(props) {
   );
 }
 
-
-// https://feathericons.dev/?search=linkedin&iconset=brands&format=strict-jsx
-export function Linkedin(props) {
+export function Linkedin(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className="main-grid-item-icon" fill="none" {...props}>
       <path d="M5.372 24H.396V7.976h4.976V24ZM2.882 5.79C1.29 5.79 0 4.474 0 2.883a2.882 2.882 0 1 1 5.763 0c0 1.59-1.29 2.909-2.881 2.909ZM23.995 24H19.03v-7.8c0-1.86-.038-4.243-2.587-4.243-2.587 0-2.984 2.02-2.984 4.109V24H8.49V7.976h4.772v2.186h.07c.664-1.259 2.287-2.587 4.708-2.587 5.035 0 5.961 3.316 5.961 7.623V24h-.005Z" fill="#0A66C2" />
@@ -16,8 +16,7 @@ export function Linkedin(props) {
   );
 }
 
-// https://feathericons.dev/?search=instagram&iconset=brands&format=strict-jsx
-export function Instagram(props) {
+export function Instagram(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className="main-grid-item-icon" fill="none" {...props}>
       <path clipRule="evenodd" d="M12 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324ZM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z" fill="url(#instagram__a)" fillRule="evenodd" />
@@ -46,7 +45,6 @@ export function Instagram(props) {
     </svg>
   );
 }
-
 
 // https://feathericons.dev/?search=facebook&iconset=brands&format=strict-jsx
 export function Facebook(props) {
