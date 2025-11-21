@@ -2,7 +2,7 @@
 'use client';
 
 import CarouselNoticias from '@/app/ui/Page_Index/CarouselNoticias';
-import { obtenerNoticiasPorCategoriaParaCarrusel } from '@/app/lib/db.ts';
+import { obtenerNoticiasPorCategoriaParaCarrusel } from '@/app/lib/db';
 
 // Tipado de la noticia (igual que en CarouselNoticias)
 type Categoria = {
