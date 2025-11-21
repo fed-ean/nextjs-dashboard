@@ -1,6 +1,6 @@
-import { obtenerNoticias } from '@/app/lib/db.ts';
+import { obtenerNoticias } from '@/app/lib/db';
 // Se importa el nuevo componente unificado desde su nueva ubicación
-import TarjetaNoticia from '@/app/ui/components/TarjetaNoticia.tsx';
+import TarjetaNoticia from '@/app/ui/components/TarjetaNoticia';
 
 export default async function SeccionNoticiasVarias() {
   // Se obtienen las noticias de la misma forma
