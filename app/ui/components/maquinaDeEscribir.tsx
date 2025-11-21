@@ -1,19 +1,29 @@
 "use client";
 import React, { useEffect, useState } from "react";
+
+type TypewriterProps = {
+  phrases?: string[];
+  typeSpeed?: number;
+  deleteSpeed?: number;
+  pause?: number;
+  className?: string;
+};
+
 export default function Typewriter({
   phrases = ["Desarrollador Web", "Diseñador UX/UI", "Freelancer"],
   typeSpeed = 80,
   deleteSpeed = 40,
   pause = 1200,
   className = "",
-}) {
-  const [display, setDisplay] = useState("");
-  const [phraseIndex, setPhraseIndex] = useState(0);
-  const [charIndex, setCharIndex] = useState(0);
-  const [deleting, setDeleting] = useState(false);
+}: TypewriterProps) {
+  const [display, setDisplay] = useState<string>("");
+  const [phraseIndex, setPhraseIndex] = useState<number>(0);
+  const [charIndex, setCharIndex] = useState<number>(0);
+  const [deleting, setDeleting] = useState<boolean>(false);
 
   useEffect(() => {
-    let timeout;
+    let timeout: ReturnType<typeof setTimeout>;
+
     const current = phrases[phraseIndex % phrases.length];
 
     if (!deleting && charIndex <= current.length) {
@@ -55,18 +65,12 @@ export default function Typewriter({
       <style jsx>{`
         .animate-blink {
           animation: blink 1s steps(2, start) infinite;
-          background-color: #0f172a; /* text color fallback for cursor */
+          background-color: #0f172a;
         }
         @keyframes blink {
-          0% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0;
-          }
-          100% {
-            opacity: 1;
-          }
+          0% { opacity: 1; }
+          50% { opacity: 0; }
+          100% { opacity: 1; }
         }
       `}</style>
     </span>
