@@ -30,7 +30,7 @@ export type ObtenerNoticiasParams = {
   categoryName?: string;
 };
 
-// --- CONSULTAS ---
+// --- GraphQL queries ---
 const GET_NOTICIAS_QUERY = gql`
   query GetNoticias($first: Int, $status: PostStatusEnum) {
     posts(
@@ -83,72 +83,110 @@ const GET_NOTICIAS_POR_CATEGORIA_QUERY = gql`
 
 // --- Mappers ---
 const mapPostNode = (node: any): Noticia => ({
-  databaseId: node.databaseId,
-  slug: node.slug,
-  title: node.title,
-  content: node.content,
-  excerpt: node.excerpt,
-  imagenUrl: node.featuredImage?.node?.sourceUrl || null,
-  featuredImage: node.featuredImage,
-  categories: node.categories || { nodes: [] },
-  fechaPublicacion: node.post_date,
-  date: node.post_date,
+  databaseId: node?.databaseId,
+  slug: node?.slug,
+  title: node?.title,
+  content: node?.content,
+  excerpt: node?.excerpt,
+  // keep null if no image (caller can handle null), previously caused type mismatch in some components
+  imagenUrl: node?.featuredImage?.node?.sourceUrl ?? null,
+  featuredImage: node?.featuredImage,
+  categories: node?.categories ?? { nodes: [] },
+  fechaPublicacion: node?.post_date,
+  date: node?.post_date,
 });
 
 const mapPostNodeForCarousel = (node: any): Noticia => ({
   ...mapPostNode(node),
-  titulo: node.title,
+  titulo: node?.title,
 });
 
-// --- Funciones ---
-export async function obtenerNoticias({ limit = 10, offset = 0, status = 'PUBLISH' }: ObtenerNoticiasParams = {}): Promise<Noticia[]> {
+// --- Helper type for query result ---
+type PostsQueryResult = {
+  posts?: {
+    nodes?: any[];
+  };
+};
+
+// --- Functions ---
+export async function obtenerNoticias(
+  { limit = 10, offset = 0, status = 'PUBLISH' }: ObtenerNoticiasParams = {}
+): Promise<Noticia[]> {
   try {
     const client = getServerSideClient();
-    const { data } = await client.query({
+    const totalToFetch = limit + offset;
+
+    const { data } = await client.query<PostsQueryResult>({
       query: GET_NOTICIAS_QUERY,
-      variables: { first: limit + offset, status },
+      variables: {
+        first: totalToFetch,
+        status,
+      },
       fetchPolicy: 'no-cache',
     });
 
-    if (!data || !data.posts) return [];
+    if (!data || !data.posts) {
+      return [];
+    }
+
     const nodesAfterOffset = (data.posts.nodes || []).slice(offset);
     return nodesAfterOffset.map(mapPostNode);
   } catch (error) {
-    console.error('Error al obtener noticias de GraphQL:', error);
+    console.error('Error fetching noticias:', error);
     return [];
   }
 }
 
-export async function obtenerNoticiasPorCategoria({ limit = 10, status = 'PUBLISH', categoryName }: ObtenerNoticiasParams = {}): Promise<Noticia[]> {
+export async function obtenerNoticiasPorCategoria(
+  { limit = 10, status = 'PUBLISH', categoryName }: ObtenerNoticiasParams = {}
+): Promise<Noticia[]> {
   try {
     const client = getServerSideClient();
-    const { data } = await client.query({
+
+    const { data } = await client.query<PostsQueryResult>({
       query: GET_NOTICIAS_POR_CATEGORIA_QUERY,
-      variables: { first: limit, status, categoryName },
+      variables: {
+        first: limit,
+        status,
+        categoryName,
+      },
       fetchPolicy: 'no-cache',
     });
 
-    if (!data || !data.posts) return [];
+    if (!data || !data.posts) {
+      return [];
+    }
+
     return (data.posts.nodes || []).map(mapPostNode);
   } catch (error) {
-    console.error(`Error al obtener noticias de la categoría ${categoryName} de GraphQL:`, error);
+    console.error(`Error fetching noticias for category "${categoryName}":`, error);
     return [];
   }
 }
 
-export async function obtenerNoticiasPorCategoriaParaCarrusel({ limit = 10, status = 'PUBLISH', categoryName }: ObtenerNoticiasParams = {}): Promise<Noticia[]> {
+export async function obtenerNoticiasPorCategoriaParaCarrusel(
+  { limit = 10, status = 'PUBLISH', categoryName }: ObtenerNoticiasParams = {}
+): Promise<Noticia[]> {
   try {
     const client = getServerSideClient();
-    const { data } = await client.query({
+
+    const { data } = await client.query<PostsQueryResult>({
       query: GET_NOTICIAS_POR_CATEGORIA_QUERY,
-      variables: { first: limit, status, categoryName },
+      variables: {
+        first: limit,
+        status,
+        categoryName,
+      },
       fetchPolicy: 'no-cache',
     });
 
-    if (!data || !data.posts) return [];
+    if (!data || !data.posts) {
+      return [];
+    }
+
     return (data.posts.nodes || []).map(mapPostNodeForCarousel);
   } catch (error) {
-    console.error(`Error al obtener noticias de la categoría ${categoryName} para el carrusel de GraphQL:`, error);
+    console.error(`Error fetching carousel noticias for category "${categoryName}":`, error);
     return [];
   }
 }
