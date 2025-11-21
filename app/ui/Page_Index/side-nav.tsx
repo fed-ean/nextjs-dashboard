@@ -1,7 +1,10 @@
+// app/ui/Page_Index/side-nav.tsx
+'use client';
+
 import Link from 'next/link';
 import React from 'react';
 
-// Iconos SVG...
+// Iconos SVG tipados correctamente
 const IconHome = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -12,7 +15,11 @@ const IconHome = (props: React.SVGProps<SVGSVGElement>) => (
     stroke="currentColor"
     {...props}
   >
-    <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
+    />
   </svg>
 );
 
@@ -36,18 +43,68 @@ const IconScale = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-// Haz lo mismo con todos los iconos restantes
 const IconChart = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg xmlns="http://www.w3.org/2000/svg" {...props}> {/* resto del SVG */} </svg>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="w-7 h-7 mr-11"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M12 16v5" />
+    <path d="M16 14v7" />
+    <path d="M20 10v11" />
+    <path d="m22 3-8.646 8.646a.5.5 0 0 1-.708 0L9.354 8.354a.5.5 0 0 0-.707 0L2 15" />
+    <path d="M4 18v3" />
+    <path d="M8 14v7" />
+  </svg>
 );
 
-const IconBriefcase = (props: React.SVGProps<SVGSVGElement>) => (/* ... */);
-const IconWorld = (props: React.SVGProps<SVGSVGElement>) => (/* ... */);
+const IconBriefcase = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="w-7 h-7 mr-11"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M12 12h.01" />
+    <path d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+    <path d="M22 13a18.15 18.15 0 0 1-20 0" />
+    <rect width="20" height="14" x="2" y="6" rx="2" />
+  </svg>
+);
 
-// Links y componente NavLinks se mantienen igual
+const IconWorld = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="w-7 h-7 mr-11"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <circle cx="12" cy="12" r="10" />
+    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+    <path d="M2 12h20" />
+  </svg>
+);
+
+// Enlaces de navegación
 const links = [
   { name: 'Inicio', href: '/', Icon: IconHome },
-  { name: 'Política', href: "/Categorias/politica", Icon: IconScale },
+  { name: 'Política', href: '/Categorias/politica', Icon: IconScale },
   { name: 'Economía', href: '/Categorias/economia', Icon: IconChart },
   { name: 'PYMES', href: '/Categorias/pymes', Icon: IconBriefcase },
   { name: 'Interés general', href: '/interes-general', Icon: IconWorld },
