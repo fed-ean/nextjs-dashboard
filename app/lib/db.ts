@@ -2,32 +2,31 @@
 import { gql } from '@apollo/client';
 import { getServerSideClient } from './server-cliente';
 
-export type Categoria = {
-  name: string;
-  slug: string;
-};
+// --- TIPOS ---
+export interface Categoria {
+  name?: string;
+  slug?: string;
+}
 
-export type FeaturedImage = {
-  node?: {
-    sourceUrl: string;
-  };
-};
-
-export type Noticia = {
+export interface Noticia {
   databaseId: string | number;
   slug?: string;
   title?: string;
-  titulo?: string; // para carrusel
   content?: string;
   excerpt?: string;
-  featuredImage?: FeaturedImage;
-  imagenUrl?: string; // nunca null, puede ser undefined
+  imagenUrl?: string;
+  featuredImage?: {
+    node?: {
+      sourceUrl?: string;
+    };
+  };
   categories?: { nodes?: Categoria[] };
   fechaPublicacion?: string;
   date?: string;
-};
+  titulo?: string; // usado para carrusel
+}
 
-// --- CONSULTAS GraphQL ---
+// --- CONSULTAS ---
 const GET_NOTICIAS_QUERY = gql`
   query GetNoticias($first: Int, $status: PostStatusEnum) {
     posts(
@@ -59,18 +58,10 @@ const GET_NOTICIAS_QUERY = gql`
 `;
 
 const GET_NOTICIAS_POR_CATEGORIA_QUERY = gql`
-  query GetNoticiasPorCategoria(
-    $first: Int
-    $status: PostStatusEnum
-    $categoryName: String
-  ) {
+  query GetNoticiasPorCategoria($first: Int, $status: PostStatusEnum, $categoryName: String) {
     posts(
       first: $first
-      where: {
-        orderby: { field: DATE, order: DESC }
-        status: $status
-        categoryName: $categoryName
-      }
+      where: { orderby: { field: DATE, order: DESC }, status: $status, categoryName: $categoryName }
     ) {
       nodes {
         databaseId
@@ -96,15 +87,15 @@ const GET_NOTICIAS_POR_CATEGORIA_QUERY = gql`
   }
 `;
 
-// --- Mappers ---
+// --- FUNCIONES DE MAPEO ---
 const mapPostNode = (node: any): Noticia => ({
-  databaseId: node.databaseId ?? 0, // nunca undefined
+  databaseId: node.databaseId,
   slug: node.slug,
   title: node.title,
   content: node.content,
   excerpt: node.excerpt,
-  featuredImage: node.featuredImage,
   imagenUrl: node.featuredImage?.node?.sourceUrl || undefined,
+  featuredImage: node.featuredImage,
   categories: node.categories || { nodes: [] },
   fechaPublicacion: node.post_date,
   date: node.post_date,
@@ -112,22 +103,14 @@ const mapPostNode = (node: any): Noticia => ({
 
 const mapPostNodeForCarousel = (node: any): Noticia => ({
   ...mapPostNode(node),
-  titulo: node.title, // para carrusel
+  titulo: node.title,
 });
 
-// --- Funciones ---
-export async function obtenerNoticias({
-  limit = 10,
-  offset = 0,
-  status = 'PUBLISH',
-}: {
-  limit?: number;
-  offset?: number;
-  status?: string;
-} = {}): Promise<Noticia[]> {
+// --- FUNCIONES DE OBTENCIÓN ---
+export async function obtenerNoticias({ limit = 10, offset = 0, status = 'PUBLISH' } = {}): Promise<Noticia[]> {
   try {
     const client = getServerSideClient();
-    const { data } = await client.query({
+    const { data } = await client.query<{ posts: { nodes: any[] } }>({
       query: GET_NOTICIAS_QUERY,
       variables: { first: limit + offset, status },
       fetchPolicy: 'no-cache',
@@ -135,66 +118,44 @@ export async function obtenerNoticias({
 
     if (!data?.posts?.nodes) return [];
 
-    return (data.posts.nodes as any[])
-      .slice(offset)
-      .map(mapPostNode);
+    const nodesAfterOffset = data.posts.nodes.slice(offset);
+    return nodesAfterOffset.map(mapPostNode);
   } catch (error) {
     console.error('Error al obtener noticias:', error);
     return [];
   }
 }
 
-export async function obtenerNoticiasPorCategoria({
-  limit = 10,
-  status = 'PUBLISH',
-  categoryName,
-}: {
-  limit?: number;
-  status?: string;
-  categoryName?: string;
-}): Promise<Noticia[]> {
+export async function obtenerNoticiasPorCategoria({ limit = 10, status = 'PUBLISH', categoryName }: { limit?: number; status?: string; categoryName: string }): Promise<Noticia[]> {
   try {
     const client = getServerSideClient();
-    const { data } = await client.query({
+    const { data } = await client.query<{ posts: { nodes: any[] } }>({
       query: GET_NOTICIAS_POR_CATEGORIA_QUERY,
       variables: { first: limit, status, categoryName },
       fetchPolicy: 'no-cache',
     });
 
     if (!data?.posts?.nodes) return [];
-
-    return (data.posts.nodes as any[]).map(mapPostNode);
+    return data.posts.nodes.map(mapPostNode);
   } catch (error) {
-    console.error(`Error al obtener noticias de categoría ${categoryName}:`, error);
+    console.error(`Error al obtener noticias de la categoría ${categoryName}:`, error);
     return [];
   }
 }
 
-export async function obtenerNoticiasPorCategoriaParaCarrusel({
-  limit = 10,
-  status = 'PUBLISH',
-  categoryName,
-}: {
-  limit?: number;
-  status?: string;
-  categoryName?: string;
-}): Promise<Noticia[]> {
+export async function obtenerNoticiasPorCategoriaParaCarrusel({ limit = 10, status = 'PUBLISH', categoryName }: { limit?: number; status?: string; categoryName: string }): Promise<Noticia[]> {
   try {
     const client = getServerSideClient();
-    const { data } = await client.query({
+    const { data } = await client.query<{ posts: { nodes: any[] } }>({
       query: GET_NOTICIAS_POR_CATEGORIA_QUERY,
       variables: { first: limit, status, categoryName },
       fetchPolicy: 'no-cache',
     });
 
     if (!data?.posts?.nodes) return [];
-
-    return (data.posts.nodes as any[]).map(mapPostNodeForCarousel);
+    return data.posts.nodes.map(mapPostNodeForCarousel);
   } catch (error) {
-    console.error(
-      `Error al obtener noticias para carrusel de categoría ${categoryName}:`,
-      error
-    );
+    console.error(`Error al obtener noticias de la categoría ${categoryName} para el carrusel:`, error);
     return [];
   }
 }
