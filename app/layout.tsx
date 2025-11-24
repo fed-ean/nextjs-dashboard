@@ -1,48 +1,30 @@
-import './global.css';
-import './fonts.css';
-import { Suspense } from 'react';
-import ScrollToTopButton from './ui/scrollBoton';
-import NavBar from './ui/Page_Index/navbar';
-import Footer from './ui/Page_Index/footer';
-import UltimasNoticiasLoader from './ui/Page_Index/ultimas-noticias-loader';
-import ReproductorMovil from './ui/ReproductorMovil';
-import { headers } from 'next/headers';
+// app/layout.tsx
+import type { Metadata } from "next";
+import { Alegreya_Sans } from "next/font/google";
+import "./global.css";
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const headersList = await headers();
-  const pathname = headersList.get('x-pathname') || '';
+// Importamos la fuente con los pesos y subconjuntos que necesitamos
+const alegreyaSans = Alegreya_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "700", "800", "900"], // Añadimos todos los grosores que podríamos necesitar
+  variable: "--font-alegreya-sans", // La definimos como una variable CSS
+});
 
-  const isNotFound = pathname.includes('/_not-found');
+export const metadata: Metadata = {
+  title: "Radio Empresaria",
+  description: "La voz del empresario y el emprendedor",
+};
 
-  const newsComponent = (
-    <Suspense fallback={<div className="p-4 text-gray-400">Cargando noticias...</div>}>
-      <UltimasNoticiasLoader />
-    </Suspense>
-  );
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
-      <body>
-
-        {!isNotFound && <ReproductorMovil />}
-
-        {!isNotFound && (
-          <header>
-            <NavBar newsComponent={newsComponent} />
-          </header>
-        )}
-
-        <div className="pt-32 lg:pt-52">
-          {children}
-        </div>
-
-        {!isNotFound && <ScrollToTopButton />}
-        {!isNotFound && <Footer />}
-
+      {/* 
+        Aplicamos la clase de la variable de la fuente al body.
+        Esto, junto con la configuración de tailwind.config.ts, 
+        hará que 'Alegreya Sans' sea la fuente por defecto en toda la web.
+      */}
+      <body className={`${alegreyaSans.variable} font-sans antialiased`}>
+        {children}
       </body>
     </html>
   );
