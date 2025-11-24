@@ -25,11 +25,9 @@ const GET_POST_BY_SLUG = gql`
   }
 `;
 
-type PageProps = {
-    params: {
-        slug: string;
-    };
-};
+// HACK: Using 'any' to bypass a suspected Next.js bug with props typing
+// This is not a proper solution and removes type safety.
+type PageProps = any;
 
 type PostData = {
     post: {
