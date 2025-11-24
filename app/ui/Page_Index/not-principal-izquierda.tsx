@@ -11,9 +11,9 @@ export default function NoticiaPrincipalIzquierda({ noticia }: { noticia: Notici
     if (!noticia) return null;
 
     const urlNoticia = `/Categorias/Noticias/${noticia.slug}`;
-    // CORRECCIÓN: Accedemos directamente a `sourceUrl` según la nueva interfaz `Noticia`
     const imageUrl = noticia.sourceUrl;
     const title = noticia.title || 'Título no disponible';
+    const category = noticia.categories?.nodes?.[0]; // Obtenemos la categoría de forma segura
 
     return (
         <div className="w-full md:w-7/12 p-4">
@@ -39,6 +39,13 @@ export default function NoticiaPrincipalIzquierda({ noticia }: { noticia: Notici
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
 
                     <div className="absolute bottom-0 left-0 z-20 text-container">
+                        {/* Etiqueta de la categoría */}
+                        {category?.name && (
+                           <span className="mb-2 inline-block bg-indigo-600 text-white text-xs font-semibold px-3 py-1 rounded-md shadow-md">
+                               {category.name}
+                           </span>
+                        )}
+
                         <h2 className="text-3xl md:text-4xl font-alegreya-extrabold text-white">
                             {title}
                         </h2>

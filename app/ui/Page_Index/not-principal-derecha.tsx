@@ -15,9 +15,8 @@ export default function NoticiaSecundariaCard({ noticia, priority = false }: Pro
 
   const urlNoticia = `/Categorias/Noticias/${noticia.slug || ''}`;
   const tituloCorto = noticia.title.length > 80 ? noticia.title.substring(0, 80) + '...' : noticia.title;
-
-  // CORRECCIÓN: Usamos `noticia.sourceUrl` para alinear con la nueva interfaz `Noticia`.
   const imageUrl: string | undefined = noticia.sourceUrl;
+  const category = noticia.categories?.nodes?.[0]; // Obtenemos la categoría de forma segura
 
   return (
     <Link href={urlNoticia} passHref>
@@ -41,6 +40,12 @@ export default function NoticiaSecundariaCard({ noticia, priority = false }: Pro
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-10"></div>
 
         <div className="absolute bottom-0 left-0 p-4 z-20 text-container">
+          {/* Etiqueta de la categoría */}
+          {category?.name && (
+            <span className="mb-1 inline-block bg-indigo-600 text-white text-xs font-semibold px-2 py-1 rounded-md shadow">
+              {category.name}
+            </span>
+          )}
           <h3 className="text-xl font-alegreya-extrabold leading-snug">{tituloCorto}</h3>
         </div>
       </div>

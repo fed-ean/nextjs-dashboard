@@ -38,7 +38,7 @@ export default function Page() {
             />
           </h1>
         </header>
-        <h2 className="titullium-web-semibold">Noticias Principales</h2>
+        <h2 className="titullium-web-semibold uppercase text-xl">Noticias Principales</h2>
         
         {/* --- CARGA DEL GRID DE NOTICIAS PRINCIPALES --- */}
         <Suspense fallback={<GridNoticiasPrincipalesSkeleton />}>

@@ -3,12 +3,11 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-// Importamos la interfaz Noticia centralizada, eliminando las locales.
-import { Noticia } from '@/app/lib/db';
+import { Noticia } from '@/app/lib/db'; // Usa la interfaz centralizada
 
 /**
  * Componente interno para renderizar cada tarjeta del carrusel.
- * Ahora usa `next/image` y la propiedad `sourceUrl`.
+ * MODIFICADO: Se ha eliminado la sección del excerpt para un diseño más limpio.
  */
 function CarouselCard({ noticia }: { noticia: Noticia }) {
   const urlNoticia = `/Categorias/Noticias/${noticia.slug || ''}`;
@@ -32,16 +31,12 @@ function CarouselCard({ noticia }: { noticia: Noticia }) {
           )}
         </div>
         <div className="p-3 flex flex-col flex-grow">
-          <h3 className="font-bold text-md leading-tight mb-2">{noticia.title}</h3>
-          {noticia.excerpt && (
-            // Usamos `dangerouslySetInnerHTML` para interpretar el HTML del excerpt
-            <div
-              className="text-sm text-gray-700 flex-grow"
-              dangerouslySetInnerHTML={{ __html: noticia.excerpt }}
-            />
-          )}
+          <h3 className="font-bold text-md leading-tight mb-2 flex-grow">{noticia.title}</h3>
+          {/* El excerpt ha sido eliminado según lo solicitado */}
+          
+          {/* Las etiquetas de categoría se mantienen */}
           {noticia.categories?.nodes && noticia.categories.nodes.length > 0 && (
-            <div className="flex gap-2 mt-2 pt-2 border-t border-gray-200">
+            <div className="flex gap-2 mt-auto pt-2 border-t border-gray-200">
               {noticia.categories.nodes.map((cat, i) => (
                 <span key={i} className="text-xs font-semibold text-blue-700 bg-blue-100 px-2 py-1 rounded-full">
                   {cat.name}
@@ -55,14 +50,14 @@ function CarouselCard({ noticia }: { noticia: Noticia }) {
   );
 }
 
-// --- Componente principal del carrusel ---
+// --- Componente principal del carrusel (sin cambios) ---
 export default function CarouselNoticias({
   noticias,
   slidesPerView = 1,
   autoPlay = true,
   autoPlayInterval = 5000,
 }: {
-  noticias: Noticia[]; // Usa la Noticia importada
+  noticias: Noticia[]; 
   slidesPerView?: number;
   autoPlay?: boolean;
   autoPlayInterval?: number;
@@ -122,7 +117,7 @@ export default function CarouselNoticias({
         >
           {noticias.map((noticia, index) => (
             <div
-              key={noticia.databaseId || index} // Usar un ID único como databaseId
+              key={noticia.databaseId || index}
               style={{ width: `${100 / noticias.length}%` }}
               className="flex-shrink-0 p-2 md:p-4"
             >
