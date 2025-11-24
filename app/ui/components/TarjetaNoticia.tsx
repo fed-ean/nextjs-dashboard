@@ -15,20 +15,19 @@ function stripHtml(html: string = ''): string {
 
 // Usamos la interfaz Noticia en lugar de `any` para tipar las props.
 export default function TarjetaNoticia({ post }: { post: Noticia }) {
-  // --- Paso 1: Verificación de seguridad (aunque con TS es menos probable que falle) ---
+  // --- Paso 1: Verificación de seguridad ---
   if (!post || !post.slug) {
     return null;
   }
 
   // --- Paso 2: Extracción de datos usando la nueva estructura ---
-  const { title, slug, categories, sourceUrl, excerpt, databaseId } = post;
+  const { title, slug, categories, sourceUrl, excerpt } = post;
   const urlNoticia = `/Categorias/Noticias/${slug}`;
 
   // Se obtiene la primera categoría para mostrarla como etiqueta.
   const category = categories?.nodes?.[0];
 
-  // CORRECCIÓN: Accedemos directamente a `sourceUrl`. La lógica de fallback ya no es necesaria
-  // porque la capa de datos (`db.ts`) ahora garantiza que `sourceUrl` siempre exista.
+  // La variable `imageUrl` puede ser string o undefined, según la interfaz Noticia.
   const imageUrl = sourceUrl;
 
   // Limpiamos el excerpt para asegurar que no se cuele HTML y lo recortamos.
@@ -44,14 +43,20 @@ export default function TarjetaNoticia({ post }: { post: Noticia }) {
         {/* SECCIÓN DE LA IMAGEN */}
         <div className="relative">
           <div className="w-full h-56 relative bg-gray-100">
-            {/* `imageUrl` ahora está garantizado que es un string */}
-            <Image
-              src={imageUrl}
-              alt={title}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover"
-            />
+            {/* CORRECCIÓN: Renderizado condicional para manejar el caso de `imageUrl` undefined. */}
+            {imageUrl ? (
+              <Image
+                src={imageUrl}
+                alt={title || 'Imagen de la noticia'}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                <span className="text-gray-500 text-sm">Sin Imagen</span>
+              </div>
+            )}
           </div>
 
           {/* Etiqueta de la categoría sobre la imagen */}
