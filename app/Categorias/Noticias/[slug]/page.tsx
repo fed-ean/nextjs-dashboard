@@ -9,8 +9,9 @@ type Post = {
 
 async function getPostData(slug: string) {
   try {
+    // CORREGIDO: Se ha actualizado el dominio a .com.ar
     const res = await fetch(
-      `https://radioempresarial.com/wp-json/wp/v2/posts?slug=${slug}`,
+      `https://radioempresaria.com.ar/wp-json/wp/v2/posts?slug=${slug}`,
       { next: { revalidate: 60 } }
     );
 
@@ -33,7 +34,7 @@ async function getPostData(slug: string) {
 export default async function Page({
   params,
 }: {
-  params: AsyncParams<{ slug: string }>;
+  params: AsyncParams<{ slug:string }>;
 }) {
   const { slug } = await params;
 

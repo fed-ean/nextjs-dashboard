@@ -3,16 +3,20 @@ como también importar otros archivos de estilos.
 Para más información sobre Estilos Globales, visita:
 https://nextjs.org/docs/app/building-your-application/styling/css-modules*/
 
-/* Importación de la fuente Titillium Web */
-@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700&display=swap');
+/* MODIFICADO: Importación de la fuente Alegreya Sans con los pesos necesarios */
+@import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@300;500;800&display=swap');
 
 /* Tailwind CSS Directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* MODIFICADO: Aplicada la tipografía base a toda la página */
 .root-layout {
-    background-color: var(--color-fondo-claro);
+    font-family: 'Alegreya Sans', sans-serif;
+    font-weight: 300; /* Light 300 para textos normales */
+    background-color: var(--color-fondo-claro); /* Mantenemos el fondo "Blanco Tiza" */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%230047ab' fill-opacity='0.04' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     color: var(--color-texto-claro);
     transition: background-color 0.3s, color 0.3s;
 }
@@ -36,15 +40,15 @@ https://nextjs.org/docs/app/building-your-application/styling/css-modules*/
     --borde-negro: #00000050;
     --marcado: rgb(127, 195, 255);
   /* Tipografía */
-    --tipo-principal: Helvetica, Arial, sans-serif;
+    --tipo-principal: 'Alegreya Sans', sans-serif; /* MODIFICADO */
 }
 :root {
     /* Colores para el tema CLARO */
-    --color-fondo-claro: #fffbf0; /* Color de fondo principal de la sección */
+    --color-fondo-claro: #F5F5F5; /* Color de fondo principal "Blanco Tiza" */
     --color-texto-claro: #000000; /* Color de texto general */
-    --color-barra-navegacion-claro: #FAF9F6; /* MODIFICADO: Color de la barra de navegación a blanco pastel */
+    --color-barra-navegacion-claro: #F5F5F5; /* Tono "Blanco Tiza" (White Smoke) */
     --color-footer-claro: #222; /* Color del pie de página */
-    --color-box-claro: #1e3e62; /* Color de las cajas de noticias */
+    --color-box-claro: #FFFFFF; /* Color de las cajas de noticias a Blanco Puro */
     --color-sombra-ppal-claro: #c9c9c9; /* Sombra principal */
     --color-sombra-sec-claro: #ffffff; /* Sombra secundaria */
     --color-borde-negro-claro: #00000050; /* Borde oscuro */
@@ -67,11 +71,7 @@ https://nextjs.org/docs/app/building-your-application/styling/css-modules*/
     --color-noticia-varias-hover-claro: #e0e0e0; /* Color del texto al hacer hover en noticias varias para oscuro */
 }}
 
-
-
-
-
-
+/* Clases de Titillium Web (se dejan por si hay usos específicos, pero el default ha cambiado) */
 .titillium-web-regular {
     font-family: "Titillium Web", sans-serif;
     font-weight: 400;
@@ -90,16 +90,16 @@ https://nextjs.org/docs/app/building-your-application/styling/css-modules*/
     font-style: normal;
 }
 
+/* MODIFICADO: Títulos muy importantes (ExtraBold 800) */
 .font-alegreya-extrabold {
-    font-family: 'Alegreya', serif;
-    font-weight: 800; /* Extra-bold */
+    font-family: 'Alegreya Sans', sans-serif;
+    font-weight: 800;
     font-style: normal;
 }
 
-
+/* MODIFICADO: Títulos normales (Medium 500) */
 .font-alegreya-regular{
-    font-family: 'Alegreya', serif;
+    font-family: 'Alegreya Sans', sans-serif;
+    font-weight: 500;
     font-style: normal;
-
 }
-
