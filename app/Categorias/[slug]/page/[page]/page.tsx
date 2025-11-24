@@ -13,7 +13,7 @@ type Props = {
 };
 
 export default async function CategoriaPagePaginada({ params }: Props) {
-  const { slug, page } = params;
+  const { slug, page } = await params;
   const pageNum = Number(page) || 1;
 
   const { posts, totalPages, category } =
@@ -45,7 +45,7 @@ export default async function CategoriaPagePaginada({ params }: Props) {
           basePath={`/Categorias/${slug}`}
           current={pageNum}
           totalPages={totalPages}
-          perPage={9}
+          perPage={PER_PAGE}
         />
       </div>
     </div>
