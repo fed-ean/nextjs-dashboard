@@ -13,14 +13,11 @@ type Props = {
 };
 
 export default async function CategoriaPagePaginada({ params }: Props) {
-  const { slug, page } = await params;
+  const { slug, page } = params;
   const pageNum = Number(page) || 1;
 
-  const { posts, totalPages, category } = await getCachedPostsPage({
-    slug,
-    page: pageNum,
-    perPage: PER_PAGE,
-  });
+  const { posts, totalPages, category } =
+    await getCachedPostsPage(slug);
 
   if (!posts || posts.length === 0) {
     return (
@@ -48,7 +45,7 @@ export default async function CategoriaPagePaginada({ params }: Props) {
           basePath={`/Categorias/${slug}`}
           current={pageNum}
           totalPages={totalPages}
-          perPage={PER_PAGE}
+          perPage={9}
         />
       </div>
     </div>
