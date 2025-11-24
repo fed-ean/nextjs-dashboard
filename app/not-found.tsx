@@ -1,19 +1,20 @@
 export default function NotFound() {
-    return (
-      <main
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          textAlign: "center",
-          padding: "20px",
-        }}
+  return (
+    <main className="min-h-screen flex flex-col items-center justify-center text-center px-4">
+      <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        Página no encontrada
+      </h1>
+
+      <p className="text-gray-600 mb-6">
+        La página que estás buscando no existe.
+      </p>
+
+      <a
+        href="/"
+        className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition"
       >
-        <h1 style={{ fontSize: "3rem", marginBottom: "10px" }}>404</h1>
-        <p style={{ fontSize: "1.2rem" }}>Página no encontrada</p>
-      </main>
-    );
-  }
-  
+        Volver al inicio
+      </a>
+    </main>
+  );
+}
