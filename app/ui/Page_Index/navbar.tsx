@@ -25,13 +25,13 @@ export default function NavBar({ newsComponent }: { newsComponent?: ReactNode })
 
   return (
     <>
-      <nav className="fixed top-14 lg:top-0 left-0 right-0 z-50 bg-blue-900 border-b border-gray-200 shadow-md">
+      <nav className="fixed top-14 lg:top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-md">
         
         {/* --- VISTA MÓVIL --- */}
         <div className="lg:hidden grid grid-cols-3 items-center p-4">
           <div className="flex justify-start">
             <button
-              className="text-white rounded-sm transition duration-300 ease-in-out hover:bg-gray-800 focus:outline-none"
+              className="text-black rounded-sm transition duration-300 ease-in-out hover:bg-gray-100 focus:outline-none"
               onClick={toggleMenu}
               aria-controls="offcanvas-menu"
               aria-expanded={isMenuOpen}
@@ -52,30 +52,33 @@ export default function NavBar({ newsComponent }: { newsComponent?: ReactNode })
             </Link>
           </div>
           <div className="flex justify-end items-center">
-            <Link href="/Login" className="flex items-center gap-2 text-white">
-              <HiOutlineMail className="h-8 w-8 text-white" />
+            <Link href="/Login" className="flex items-center gap-2 text-black">
+              <HiOutlineMail className="h-8 w-8 text-black" />
             </Link>
           </div>
         </div>
 
         {/* --- VISTA ESCRITORIO --- */}
         <div className="hidden lg:block">
-          <div className="flex items-center justify-between p-2 md:px-6">
+          {/* --- Parte superior (Ahora blanca) --- */}
+          <div className="flex items-center justify-between md:px-6">
               <div className='w-1/4'></div>
               <div className="flex justify-center">
                   <AlAireRadio />
               </div>
               <div className="flex justify-end w-1/4">
-                <Link href="/Login" className="flex items-center gap-2 text-white transition-transform duration-300 ease-in-out hover:scale-105">
-                  <HiOutlineMail className="h-8 w-8 text-white" />
+                <Link href="/Login" className="flex items-center gap-2 text-black transition-transform duration-300 ease-in-out hover:scale-105">
+                  <HiOutlineMail className="h-8 w-8 text-black" />
                   <span className="text-lg font-semibold bg-gradient-to-r from-orange-400 to-rose-500 text-transparent bg-clip-text">
                     Suscribite
                   </span>
                 </Link>
               </div>
           </div>
+          {/* --- Parte inferior (Se mantiene azul y ahora más delgada) --- */}
           <div className="border-t border-blue-800 bg-blue-900">
-            <div className="px-6 py-3">
+            {/* MODIFICADO: Padding vertical reducido de 'py-3' a 'py-1' para achicar la barra */}
+            <div className="px-6 py-1">
               <div className="flex justify-center items-center gap-4">
                 <LinksNav />
                 <div className="w-1/4">
