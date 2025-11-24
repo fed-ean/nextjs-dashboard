@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
-const GQL_ENDPOINT = "/graphql";
+// CORRECCIÓN: Usar la variable de entorno para el endpoint de GraphQL.
+const GQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT_URL || '';
 
 // Las consultas GraphQL como cadenas de texto
 const GET_ALL_CATEGORIES_QUERY = `
@@ -35,6 +36,12 @@ interface Post {
 
 // Función auxiliar para realizar una única petición GraphQL
 async function fetchGraphQL(query: string, variables?: Record<string, any>) {
+    // Si la variable de entorno no está, no podemos continuar.
+    if (!GQL_ENDPOINT) {
+        console.error("Error Crítico: La variable de entorno GRAPHQL_ENDPOINT_URL no está configurada.");
+        return null;
+    }
+
     try {
         const response = await fetch(GQL_ENDPOINT, {
             method: 'POST',

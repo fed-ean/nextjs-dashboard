@@ -1,8 +1,10 @@
 // app/ui/Page_Index/ultimas-noticias-loader.tsx
 import NoticiasVarias from "../dashboard/noticias-varias";
 
-// CORRECCIÓN: Usar la URL absoluta y completa para el endpoint de GraphQL.
-const GQL_ENDPOINT = "https://radioempresaria.com.ar/graphql";
+// CORRECCIÓN: Usar la variable de entorno para el endpoint de GraphQL.
+// Esto es más seguro y flexible. El proceso de build de Vercel reemplazará esto
+// con el valor que configuraste en el dashboard.
+const GQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT_URL || '';
 
 const GET_LATEST_POSTS_QUERY = `
   query GetLatestPosts {
@@ -29,8 +31,13 @@ interface Post {
 }
 
 async function fetchLatestPosts(): Promise<{ posts: Post[]; error: string | null }> {
+    // Si GQL_ENDPOINT está vacío, no se puede hacer la petición. Es un error de configuración.
+    if (!GQL_ENDPOINT) {
+        console.error("Error Crítico: La variable de entorno GRAPHQL_ENDPOINT_URL no está configurada.");
+        return { posts: [], error: "El servidor no está configurado para obtener noticias." };
+    }
+
     try {
-        // El fetch ahora usará la URL completa y funcionará en el servidor.
         const response = await fetch(GQL_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
