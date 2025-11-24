@@ -16,11 +16,11 @@ export default async function CategoriaPagePaginada({ params }: Props) {
   const { slug, page } = await params;
   const pageNum = Number(page) || 1;
 
-  const { posts, totalPages, category } = await getCachedPostsPage(
+  const { posts, totalPages, category } = await getCachedPostsPage({
     slug,
-    pageNum,
-    PER_PAGE
-  );
+    page: pageNum,
+    perPage: PER_PAGE,
+  });
 
   if (!posts || posts.length === 0) {
     return (
