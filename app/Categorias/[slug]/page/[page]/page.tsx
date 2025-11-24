@@ -6,18 +6,21 @@ import CategoryPagination from "../../../../ui/categorias/CategoryPagination";
 
 const PER_PAGE = 9;
 
+// CORRECTED: The 'params' object is a plain object, not a Promise.
 type Props = {
-  params: Promise<{
+  params: {
     slug: string;
     page: string;
-  }>;
+  };
 };
 
 export default async function CategoriaPagePaginada({ params }: Props) {
-  const { slug, page } = await params;
+  // CORRECTED: 'params' is not a promise, so we destructure it directly.
+  const { slug, page } = params;
   const pageNum = Number(page) || 1;
 
-  const { posts, totalPages, category } = await getCachedPostsPage(slug);
+  // The rest of the logic remains the same.
+  const { posts, totalPages, category } = await getCachedPostsPage(slug, pageNum, PER_PAGE);
 
   if (!posts || posts.length === 0) {
     return (

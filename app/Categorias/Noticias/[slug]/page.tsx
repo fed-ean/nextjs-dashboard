@@ -25,8 +25,11 @@ const GET_POST_BY_SLUG = gql`
   }
 `;
 
-// NOTE: The type for props is now defined inline within the function signature
-// This is a workaround attempt for a suspected bug in the Next.js compiler.
+type PageProps = {
+    params: {
+        slug: string;
+    };
+};
 
 type PostData = {
     post: {
@@ -55,18 +58,18 @@ async function getPost(slug: string) {
             variables: { id: slug },
             context: {
                 fetchOptions: {
-                    next: { revalidate: 3600 },
+                    next: { revalidate: 3600 }, 
                 },
             },
         });
         return data.post;
     } catch (error) {
         console.error("Error fetching post:", error);
-        return null;
+        return null; 
     }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const post = await getPost(params.slug);
 
   if (!post) {
@@ -80,7 +83,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function Page({ params }: { params: { slug: string } }) {
+
+export default async function Page({ params }: PageProps) {
   const post = await getPost(params.slug);
 
   if (!post) {
