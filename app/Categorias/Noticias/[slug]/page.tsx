@@ -25,9 +25,8 @@ const GET_POST_BY_SLUG = gql`
   }
 `;
 
-// HACK: Using 'any' to bypass a suspected Next.js bug with props typing
-// This is not a proper solution and removes type safety.
-type PageProps = any;
+// NOTE: The type for props is now defined inline within the function signature
+// This is a workaround attempt for a suspected bug in the Next.js compiler.
 
 type PostData = {
     post: {
@@ -67,7 +66,7 @@ async function getPost(slug: string) {
     }
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const post = await getPost(params.slug);
 
   if (!post) {
@@ -81,7 +80,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function Page({ params }: PageProps) {
+export default async function Page({ params }: { params: { slug: string } }) {
   const post = await getPost(params.slug);
 
   if (!post) {
