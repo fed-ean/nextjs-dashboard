@@ -8,15 +8,14 @@ import UltimasNoticiasLoader from './ui/Page_Index/ultimas-noticias-loader';
 import ReproductorMovil from './ui/ReproductorMovil';
 import { headers } from 'next/headers';
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const headersList = headers();
+  const headersList = await headers();
   const pathname = headersList.get('x-pathname') || '';
 
-  // Cuando es /_not-found, no renderizamos componentes problemáticos
   const isNotFound = pathname.includes('/_not-found');
 
   const newsComponent = (
