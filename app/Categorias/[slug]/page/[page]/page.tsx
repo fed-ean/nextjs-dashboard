@@ -1,4 +1,3 @@
-// app/Categorias/[slug]/page/[page]/page.tsx
 import React from "react";
 import { getCachedPostsPage } from "../../../../lib/data-fetcher";
 import CategoryGrid from "../../../../ui/categorias/CategoryGrid";
@@ -6,7 +5,6 @@ import CategoryPagination from "../../../../ui/categorias/CategoryPagination";
 
 const PER_PAGE = 9;
 
-// ✅ NEXT.JS CORRECT STRUCTURE (params is Promise)
 type Props = {
   params: Promise<{
     slug: string;
@@ -15,15 +13,14 @@ type Props = {
 };
 
 export default async function CategoriaPagePaginada({ params }: Props) {
-  // ✅ Await params FIRST
   const { slug, page } = await params;
   const pageNum = Number(page) || 1;
 
-  const { posts, totalPages, category } = await getCachedPostsPage(
+  const { posts, totalPages, category } = await getCachedPostsPage({
     slug,
-    pageNum,
-    PER_PAGE
-  );
+    page: pageNum,
+    perPage: PER_PAGE,
+  });
 
   if (!posts || posts.length === 0) {
     return (
