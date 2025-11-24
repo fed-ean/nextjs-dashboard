@@ -6,21 +6,24 @@ import CategoryPagination from "../../../../ui/categorias/CategoryPagination";
 
 const PER_PAGE = 9;
 
-// CORRECTED: The 'params' object is a plain object, not a Promise.
+// ✅ NEXT.JS CORRECT STRUCTURE (params is Promise)
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
     page: string;
-  };
+  }>;
 };
 
 export default async function CategoriaPagePaginada({ params }: Props) {
-  // CORRECTED: 'params' is not a promise, so we destructure it directly.
-  const { slug, page } = params;
+  // ✅ Await params FIRST
+  const { slug, page } = await params;
   const pageNum = Number(page) || 1;
 
-  // The rest of the logic remains the same.
-  const { posts, totalPages, category } = await getCachedPostsPage(slug, pageNum, PER_PAGE);
+  const { posts, totalPages, category } = await getCachedPostsPage(
+    slug,
+    pageNum,
+    PER_PAGE
+  );
 
   if (!posts || posts.length === 0) {
     return (
