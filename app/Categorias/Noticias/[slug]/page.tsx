@@ -1,91 +1,121 @@
-// app/Categorias/Noticias/[slug]/page.tsx
-import React from "react";
-import type { AsyncParams } from "@/types/next-async";
-import { gql } from '@apollo/client';
-import { getServerSideClient } from '../../../lib/server-cliente';
 
-// --- TIPOS ---
-type Post = {
-  title?: string;
-  content?: string;
-};
+import { getServerSideClient } from \'@/app/lib/server-cliente\';
+import { gql } from \'@apollo/client\';
+import { Metadata } from \'next\';
+import Image from \'next/image\';
+import React from \'react\';
 
-type QueryResult = {
-  post: Post | null;
-};
-
-// --- CONSULTA GRAPHQL ---
-const GET_POST_BY_SLUG_QUERY = gql`
+// Define the GraphQL query to fetch a post by its slug
+const GET_POST_BY_SLUG = gql`
   query GetPostBySlug($id: ID!) {
     post(id: $id, idType: SLUG) {
       title
       content
+      date
+      author {
+        node {
+          name
+        }
+      }
+      featuredImage {
+        node {
+          sourceUrl
+          altText
+        }
+      }
     }
   }
-`;
+\`;
 
-// --- FUNCIÓN DE OBTENCIÓN DE DATOS ---
-async function getPostData(slug: string): Promise<{ post: Post | null; error: string | null }> {
-  try {
+// Define the expected shape of the component's props
+type PageProps = {
+    params: {
+        slug: string;
+    };
+};
+
+// Define the shape of the data returned by the GraphQL query
+type PostData = {
+    post: {
+        title: string;
+        content: string;
+        date: string;
+        author: {
+            node: {
+                name: string;
+            };
+        };
+        featuredImage: {
+            node: {
+                sourceUrl: string;
+                altText: string;
+            };
+        };
+    };
+};
+
+// Function to fetch post data
+async function getPost(slug: string) {
     const client = getServerSideClient();
-    const { data, error, errors } = await client.query<QueryResult>({
-      query: GET_POST_BY_SLUG_QUERY,
-      variables: { id: slug },
-    });
-
-    if (error) {
-      console.error('Apollo Client Error:', error);
-      return { post: null, error: `GraphQL Error: ${error.message}` };
+    try {
+        const { data } = await client.query<PostData>({
+            query: GET_POST_BY_SLUG,
+            variables: { id: slug },
+            context: {
+                fetchOptions: {
+                    next: { revalidate: 3600 }, // Revalidate every hour
+                },
+            },
+        });
+        return data.post;
+    } catch (error) {
+        console.error("Error fetching post:", error);
+        return null; // Handle error case
     }
-
-    if (errors && errors.length > 0) {
-        console.error('GraphQL Query Errors:', errors);
-        return { post: null, error: `GraphQL Query Error: ${errors.map(e => e.message).join(', ')}` };
-    }
-
-    if (!data || !data.post) {
-      return { post: null, error: "Post no encontrado." };
-    }
-
-    return { post: data.post, error: null };
-
-  } catch (err: any) {
-    console.error('Error fetching post data:', err);
-    return { post: null, error: err.message || "Error desconocido al intentar obtener el post." };
-  }
 }
 
-// --- COMPONENTE DE PÁGINA ---
-export default async function Page({ params }: { params: AsyncParams<{ slug: string }> }) {
-  const { slug } = await params;
-  const { post, error } = await getPostData(slug);
-
-  if (error) {
-    return (
-      <div className="p-4 text-center">
-        <h2 className="text-xl font-bold text-red-600">Error al cargar el post</h2>
-        <p className="text-gray-500 mt-2">{error}</p>
-      </div>
-    );
-  }
+// Generate metadata for the page (for SEO)
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const post = await getPost(params.slug);
 
   if (!post) {
-    return (
-      <div className="p-4 text-center">
-        <h2 className="text-xl font-bold">Post no encontrado</h2>
-      </div>
-    );
+    return {
+      title: \'Post Not Found\',
+    };
+  }
+
+  return {
+    title: post.title,
+    // You can add more metadata here, like description, openGraph images, etc.
+  };
+}
+
+
+// The main page component
+export default async function Page({ params }: PageProps) {
+  const post = await getPost(params.slug);
+
+  if (!post) {
+    return <div>Post not found.</div>;
   }
 
   return (
-    <main className="p-4">
-      <h1 className="text-3xl font-bold mb-4" dangerouslySetInnerHTML={{ __html: post.title || '' }} />
-      <article
-        className="prose lg:prose-xl max-w-full"
-        dangerouslySetInnerHTML={{
-          __html: post.content || "Contenido no disponible.",
-        }}
-      />
-    </main>
+    <article className="prose lg:prose-xl mx-auto p-4">
+      <h1>{post.title}</h1>
+      {post.featuredImage?.node?.sourceUrl && (
+        <Image
+          src={post.featuredImage.node.sourceUrl}
+          alt={post.featuredImage.node.altText || post.title}
+          width={800}
+          height={400}
+          className="w-full h-auto object-cover rounded-lg"
+          priority
+        />
+      )}
+      <div className="text-sm text-gray-500 mt-2 mb-4">
+        By {post.author.node.name} on {new Date(post.date).toLocaleDateString()}
+      </div>
+      <div dangerouslySetInnerHTML={{ __html: post.content }} />
+    </article>
   );
 }
