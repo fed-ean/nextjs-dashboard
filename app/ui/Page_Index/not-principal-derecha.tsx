@@ -16,8 +16,8 @@ export default function NoticiaSecundariaCard({ noticia, priority = false }: Pro
   const urlNoticia = `/Categorias/Noticias/${noticia.slug || ''}`;
   const tituloCorto = noticia.title.length > 80 ? noticia.title.substring(0, 80) + '...' : noticia.title;
 
-  // Aseguramos que imageUrl siempre sea string o undefined
-  const imageUrl: string | undefined = noticia.featuredImage?.node?.sourceUrl;
+  // CORRECCIÓN: Usamos `noticia.sourceUrl` para alinear con la nueva interfaz `Noticia`.
+  const imageUrl: string | undefined = noticia.sourceUrl;
 
   return (
     <Link href={urlNoticia} passHref>

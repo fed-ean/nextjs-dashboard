@@ -1,58 +1,68 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+// Importamos la interfaz Noticia centralizada, eliminando las locales.
+import { Noticia } from '@/app/lib/db';
 
-// --- Tipos unificados ---
-type Categoria = {
-  name?: string;
-  slug?: string;
-};
-
-type Noticia = {
-  slug?: string;
-  titulo?: string;
-  title?: string;
-  imagenUrl?: string;
-  excerpt?: string;
-  fecha?: string;
-  categories?: {
-    nodes?: Categoria[];
-  };
-  [k: string]: any;
-};
-
-// --- CarouselCard interno para usar el mismo tipo ---
+/**
+ * Componente interno para renderizar cada tarjeta del carrusel.
+ * Ahora usa `next/image` y la propiedad `sourceUrl`.
+ */
 function CarouselCard({ noticia }: { noticia: Noticia }) {
+  const urlNoticia = `/Categorias/Noticias/${noticia.slug || ''}`;
+
   return (
-    <div className="border rounded-lg overflow-hidden shadow-md">
-      {noticia.imagenUrl && (
-        <img src={noticia.imagenUrl} alt={noticia.titulo || noticia.title} className="w-full h-40 object-cover" />
-      )}
-      <div className="p-2">
-        <h3 className="font-bold text-sm">{noticia.titulo || noticia.title}</h3>
-        {noticia.excerpt && <p className="text-xs text-gray-600">{noticia.excerpt}</p>}
-        {noticia.categories?.nodes && (
-          <div className="flex gap-1 mt-1">
-            {noticia.categories.nodes.map((cat, i) => (
-              <span key={i} className="text-xs text-blue-600">
-                {cat.name}
-              </span>
-            ))}
-          </div>
-        )}
+    <Link href={urlNoticia} passHref>
+      <div className="border rounded-lg overflow-hidden shadow-md group h-full flex flex-col">
+        <div className="relative w-full h-40">
+          {noticia.sourceUrl ? (
+            <Image
+              src={noticia.sourceUrl}
+              alt={noticia.title || 'Imagen de la noticia'}
+              fill
+              style={{ objectFit: 'cover' }}
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gray-200">
+              <span className="text-gray-500 text-sm">Sin Imagen</span>
+            </div>
+          )}
+        </div>
+        <div className="p-3 flex flex-col flex-grow">
+          <h3 className="font-bold text-md leading-tight mb-2">{noticia.title}</h3>
+          {noticia.excerpt && (
+            // Usamos `dangerouslySetInnerHTML` para interpretar el HTML del excerpt
+            <div
+              className="text-sm text-gray-700 flex-grow"
+              dangerouslySetInnerHTML={{ __html: noticia.excerpt }}
+            />
+          )}
+          {noticia.categories?.nodes && noticia.categories.nodes.length > 0 && (
+            <div className="flex gap-2 mt-2 pt-2 border-t border-gray-200">
+              {noticia.categories.nodes.map((cat, i) => (
+                <span key={i} className="text-xs font-semibold text-blue-700 bg-blue-100 px-2 py-1 rounded-full">
+                  {cat.name}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
-// --- Componente principal ---
+// --- Componente principal del carrusel ---
 export default function CarouselNoticias({
   noticias,
   slidesPerView = 1,
   autoPlay = true,
   autoPlayInterval = 5000,
 }: {
-  noticias: Noticia[];
+  noticias: Noticia[]; // Usa la Noticia importada
   slidesPerView?: number;
   autoPlay?: boolean;
   autoPlayInterval?: number;
@@ -64,7 +74,6 @@ export default function CarouselNoticias({
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  // --- Carousel Movement ---
   useEffect(() => {
     const grande = grandeRef.current;
     if (!grande) return;
@@ -74,7 +83,6 @@ export default function CarouselNoticias({
     grande.style.transform = `translateX(${operacion}%)`;
   }, [currentSlide, noticias.length, slidesPerView]);
 
-  // --- Controlled AutoPlay ---
   useEffect(() => {
     if (!autoPlay || isPaused) {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -90,7 +98,6 @@ export default function CarouselNoticias({
     };
   }, [autoPlay, autoPlayInterval, isPaused, totalSlides]);
 
-  // --- Cyclic Navigation ---
   const handleNext = () => {
     setCurrentSlide((prev) => (prev + 1) % totalSlides);
   };
@@ -99,28 +106,25 @@ export default function CarouselNoticias({
     setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
   };
 
+  if (noticias.length === 0) return null;
+
   return (
     <div
       className="relative w-full max-w-7xl mx-auto group"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* --- Main Carousel --- */}
       <div className="overflow-hidden">
         <div
           ref={grandeRef}
           className="flex transition-transform duration-700 ease-in-out"
-          style={{
-            width: `${(noticias.length / slidesPerView) * 100}%`,
-          }}
+          style={{ width: `${(noticias.length / slidesPerView) * 100}%` }}
         >
           {noticias.map((noticia, index) => (
             <div
-              key={noticia.slug || index}
-              style={{
-                width: `${100 / noticias.length}%`,
-              }}
-              className="flex-shrink-0 p-4"
+              key={noticia.databaseId || index} // Usar un ID único como databaseId
+              style={{ width: `${100 / noticias.length}%` }}
+              className="flex-shrink-0 p-2 md:p-4"
             >
               <CarouselCard noticia={noticia} />
             </div>
@@ -128,10 +132,10 @@ export default function CarouselNoticias({
         </div>
       </div>
 
-      {/* --- Navigation Buttons --- */}
+      {/* --- Botones de Navegación --- */}
       <button
         onClick={handlePrev}
-        className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-white/50 text-black p-3 rounded-full shadow-lg hover:bg-white/80 transition-all duration-300 opacity-0 group-hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-blue-500 z-10"
+        className="absolute top-1/2 -left-2 transform -translate-y-1/2 bg-white/60 text-black p-3 rounded-full shadow-lg hover:bg-white transition-opacity duration-300 opacity-0 group-hover:opacity-100 focus:outline-none z-10"
         aria-label="Anterior"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -141,7 +145,7 @@ export default function CarouselNoticias({
 
       <button
         onClick={handleNext}
-        className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-white/50 text-black p-3 rounded-full shadow-lg hover:bg-white/80 transition-all duration-300 opacity-0 group-hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-blue-500 z-10"
+        className="absolute top-1/2 -right-2 transform -translate-y-1/2 bg-white/60 text-black p-3 rounded-full shadow-lg hover:bg-white transition-opacity duration-300 opacity-0 group-hover:opacity-100 focus:outline-none z-10"
         aria-label="Siguiente"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -149,15 +153,13 @@ export default function CarouselNoticias({
         </svg>
       </button>
 
-      {/* --- Navigation Dots --- */}
-      <ul className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+      {/* --- Puntos de Navegación --- */}
+      <ul className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
         {Array.from({ length: totalSlides }).map((_, i) => (
           <li
             key={i}
             onClick={() => setCurrentSlide(i)}
-            className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 ${
-              i === currentSlide ? 'bg-blue-600 scale-125' : 'bg-gray-400/50 hover:bg-gray-400'
-            }`}
+            className={`w-2.5 h-2.5 rounded-full cursor-pointer transition-all duration-300 ${i === currentSlide ? 'bg-blue-600' : 'bg-gray-300 hover:bg-gray-400'}`}
           ></li>
         ))}
       </ul>

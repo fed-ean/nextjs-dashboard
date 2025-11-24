@@ -3,27 +3,53 @@ import { gql } from '@apollo/client';
 import { getServerSideClient } from './server-cliente';
 
 // --- TIPOS ---
+
+/**
+ * Representa la estructura de un nodo de "post" tal como viene
+ * directamente de la consulta GraphQL. Usar esto evita el uso de `any`.
+ */
+interface PostNodeFromQuery {
+  databaseId: string | number;
+  post_date: string;
+  content: string | null;
+  title: string;
+  excerpt: string | null;
+  status: string;
+  slug: string;
+  featuredImage: {
+    node: {
+      sourceUrl: string;
+    } | null;
+  } | null;
+  categories: {
+    nodes: {
+      name: string;
+      slug: string;
+    }[];
+  };
+}
+
+/**
+ * Representa la estructura de una categoría.
+ */
 export interface Categoria {
   name?: string;
   slug?: string;
 }
 
+/**
+ * Representa la estructura de una noticia normalizada y limpia,
+ * lista para ser usada en los componentes de la aplicación.
+ */
 export interface Noticia {
   databaseId: string | number;
   slug?: string;
   title?: string;
   content?: string;
   excerpt?: string;
-  imagenUrl?: string;
-  featuredImage?: {
-    node?: {
-      sourceUrl?: string;
-    };
-  };
+  sourceUrl?: string; // Simplificado desde featuredImage.node.sourceUrl
   categories?: { nodes?: Categoria[] };
-  fechaPublicacion?: string;
-  date?: string;
-  titulo?: string; // usado para carrusel
+  date?: string; // Unificado desde fechaPublicacion y post_date
 }
 
 // --- CONSULTAS ---
@@ -88,29 +114,32 @@ const GET_NOTICIAS_POR_CATEGORIA_QUERY = gql`
 `;
 
 // --- FUNCIONES DE MAPEO ---
-const mapPostNode = (node: any): Noticia => ({
+
+/**
+ * Transforma un nodo de la API a la estructura limpia `Noticia`.
+ * Ahora recibe un tipo específico `PostNodeFromQuery`, no `any`.
+ */
+const mapPostNode = (node: PostNodeFromQuery): Noticia => ({
   databaseId: node.databaseId,
   slug: node.slug,
   title: node.title,
-  content: node.content,
-  excerpt: node.excerpt,
-  imagenUrl: node.featuredImage?.node?.sourceUrl || undefined,
-  featuredImage: node.featuredImage,
+  content: node.content || undefined,
+  excerpt: node.excerpt || undefined,
+  sourceUrl: node.featuredImage?.node?.sourceUrl,
   categories: node.categories || { nodes: [] },
-  fechaPublicacion: node.post_date,
   date: node.post_date,
 });
 
-const mapPostNodeForCarousel = (node: any): Noticia => ({
-  ...mapPostNode(node),
-  titulo: node.title,
-});
-
 // --- FUNCIONES DE OBTENCIÓN ---
+
+// Define el tipo esperado de la respuesta de la query para reutilizarlo.
+type GraphQLPostsResponse = { posts: { nodes: PostNodeFromQuery[] } };
+
 export async function obtenerNoticias({ limit = 10, offset = 0, status = 'PUBLISH' } = {}): Promise<Noticia[]> {
   try {
     const client = getServerSideClient();
-    const { data } = await client.query<{ posts: { nodes: any[] } }>({
+    // Usamos el tipo `GraphQLPostsResponse` para una query con tipado seguro.
+    const { data } = await client.query<GraphQLPostsResponse>({
       query: GET_NOTICIAS_QUERY,
       variables: { first: limit + offset, status },
       fetchPolicy: 'no-cache',
@@ -129,7 +158,7 @@ export async function obtenerNoticias({ limit = 10, offset = 0, status = 'PUBLIS
 export async function obtenerNoticiasPorCategoria({ limit = 10, status = 'PUBLISH', categoryName }: { limit?: number; status?: string; categoryName: string }): Promise<Noticia[]> {
   try {
     const client = getServerSideClient();
-    const { data } = await client.query<{ posts: { nodes: any[] } }>({
+    const { data } = await client.query<GraphQLPostsResponse>({
       query: GET_NOTICIAS_POR_CATEGORIA_QUERY,
       variables: { first: limit, status, categoryName },
       fetchPolicy: 'no-cache',
@@ -143,17 +172,20 @@ export async function obtenerNoticiasPorCategoria({ limit = 10, status = 'PUBLIS
   }
 }
 
+// Ya no es necesaria una función de mapeo separada para el carrusel,
+// la estructura de `Noticia` es ahora consistente.
 export async function obtenerNoticiasPorCategoriaParaCarrusel({ limit = 10, status = 'PUBLISH', categoryName }: { limit?: number; status?: string; categoryName: string }): Promise<Noticia[]> {
   try {
     const client = getServerSideClient();
-    const { data } = await client.query<{ posts: { nodes: any[] } }>({
+    const { data } = await client.query<GraphQLPostsResponse>({
       query: GET_NOTICIAS_POR_CATEGORIA_QUERY,
       variables: { first: limit, status, categoryName },
       fetchPolicy: 'no-cache',
     });
 
     if (!data?.posts?.nodes) return [];
-    return data.posts.nodes.map(mapPostNodeForCarousel);
+    // Usamos la misma función de mapeo estándar
+    return data.posts.nodes.map(mapPostNode);
   } catch (error) {
     console.error(`Error al obtener noticias de la categoría ${categoryName} para el carrusel:`, error);
     return [];

@@ -11,7 +11,8 @@ export default function NoticiaPrincipalIzquierda({ noticia }: { noticia: Notici
     if (!noticia) return null;
 
     const urlNoticia = `/Categorias/Noticias/${noticia.slug}`;
-    const imageUrl = noticia.featuredImage?.node?.sourceUrl;
+    // CORRECCIÓN: Accedemos directamente a `sourceUrl` según la nueva interfaz `Noticia`
+    const imageUrl = noticia.sourceUrl;
     const title = noticia.title || 'Título no disponible';
 
     return (

@@ -8,7 +8,8 @@ import Typewriter from "./ui/components/maquinaDeEscribir";
 // --- Componentes ASÍNCRONOS (cargan datos) ---
 import GridNoticiasPrincipales from './ui/Page_Index/GridNoticiasPrincipales';
 import DesayunoPymesSection from './ui/Page_Index/DesayunoPymesSection';
-import ReporteInternacional from './ui/Page_Index/ReporteInternacional'; 
+// CORRECCIÓN: Importamos el nuevo componente de SERVIDOR
+import ReporteInternacionalServer from './ui/Page_Index/ReporteInternacional.server'; 
 import SeccionNoticiasVarias from './ui/Page_Index/SeccionNoticiasVarias';
 
 // --- SKELETONS para el fallback de Suspense ---
@@ -53,7 +54,8 @@ export default function Page() {
 
       {/* --- CARGA DEL REPORTE INTERNACIONAL --- */}
       <Suspense fallback={<ReporteNoticiasSkeleton />}>
-        <ReporteInternacional />
+        {/* CORRECCIÓN: Usamos el nuevo componente de SERVIDOR */}
+        <ReporteInternacionalServer />
       </Suspense>
       
       {/* --- CARGA DE LAS NOTICIAS VARIAS --- */}

@@ -1,46 +1,40 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import React from 'react';
+
+// Importamos la interfaz centralizada para garantizar la seguridad de tipos.
+import { Noticia } from '@/app/lib/db';
 import '../../fonts.css';
 
-// --- FUNCIONES DE AYUDA ---
-
-// Limpia las etiquetas HTML de un string para mostrar texto plano.
+// La función auxiliar para limpiar HTML sigue siendo útil por si el excerpt contiene formato.
 function stripHtml(html: string = ''): string {
   return String(html || '').replace(/<\/?[^>]+(>|$)/g, '');
 }
 
-// Extrae la primera URL de imagen del contenido HTML si no hay imagen destacada.
-function extractImageUrl(content?: string): string | null {
-  if (!content) return null;
-  const match = content.match(/<img.*?src=['"](.*?)['"]/);
-  return match ? match[1] : null;
-}
+// --- COMPONENTE DE TARJETA REFACTORIZADO ---
 
-// --- COMPONENTE DE TARJETA ---
-
-export default function TarjetaNoticia({ post }: { post: any }) {
-  // --- Paso 1: Verificación de seguridad ---
+// Usamos la interfaz Noticia en lugar de `any` para tipar las props.
+export default function TarjetaNoticia({ post }: { post: Noticia }) {
+  // --- Paso 1: Verificación de seguridad (aunque con TS es menos probable que falle) ---
   if (!post || !post.slug) {
-    return null; // No renderizar nada si el post no es válido.
+    return null;
   }
 
-  // --- Paso 2: Extracción y limpieza de datos ---
-  const title = post.title || 'Sin título';
-  const urlNoticia = `/Categorias/Noticias/${post.slug}`;
+  // --- Paso 2: Extracción de datos usando la nueva estructura ---
+  const { title, slug, categories, sourceUrl, excerpt, databaseId } = post;
+  const urlNoticia = `/Categorias/Noticias/${slug}`;
 
   // Se obtiene la primera categoría para mostrarla como etiqueta.
-  const category = post.categories?.nodes?.[0];
+  const category = categories?.nodes?.[0];
 
-  // Se busca la imagen destacada; si no existe, se busca en el contenido del post.
-  const imageUrl =
-    post.featuredImage?.node?.sourceUrl ||
-    extractImageUrl(post.content);
+  // CORRECCIÓN: Accedemos directamente a `sourceUrl`. La lógica de fallback ya no es necesaria
+  // porque la capa de datos (`db.ts`) ahora garantiza que `sourceUrl` siempre exista.
+  const imageUrl = sourceUrl;
 
-  // Se limpia el 'excerpt' de HTML y se recorta para una vista previa.
+  // Limpiamos el excerpt para asegurar que no se cuele HTML y lo recortamos.
   const cleanExcerpt =
-    stripHtml(post.excerpt || '').substring(0, 120) +
-    (post.excerpt?.length > 120 ? '...' : '');
+    stripHtml(excerpt || '').substring(0, 120) +
+    ((excerpt || '').length > 120 ? '...' : '');
 
   // --- Paso 3: Renderizado del componente ---
   return (
@@ -50,19 +44,14 @@ export default function TarjetaNoticia({ post }: { post: any }) {
         {/* SECCIÓN DE LA IMAGEN */}
         <div className="relative">
           <div className="w-full h-56 relative bg-gray-100">
-            {imageUrl ? (
-              <Image
-                src={imageUrl}
-                alt={title}
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <span className="text-gray-500">Sin Imagen</span>
-              </div>
-            )}
+            {/* `imageUrl` ahora está garantizado que es un string */}
+            <Image
+              src={imageUrl}
+              alt={title}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover"
+            />
           </div>
 
           {/* Etiqueta de la categoría sobre la imagen */}
@@ -77,17 +66,14 @@ export default function TarjetaNoticia({ post }: { post: any }) {
 
         {/* SECCIÓN DEL CONTENIDO TEXTUAL */}
         <div className="p-6 flex flex-col flex-grow">
-          {/* Título de la noticia */}
           <h2 className="text-xl font-semibold text-gray-900 mb-3 leading-snug group-hover:text-blue-700 transition-colors">
             {title}
           </h2>
 
-          {/* Extracto limpio y recortado */}
           <p className="text-sm text-gray-600 mb-4 line-clamp-3 flex-grow">
             {cleanExcerpt}
           </p>
 
-          {/* Pie de la tarjeta */}
           <div className="mt-auto flex justify-between items-center text-xs text-gray-500 pt-3 border-t border-gray-100">
             <span>by RadioEmpresarial</span>
             <span className="font-semibold tracking-wider text-gray-600 group-hover:text-indigo-600 transition-colors duration-300">

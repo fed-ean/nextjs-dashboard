@@ -1,13 +1,17 @@
 // app/ui/Page_Index/ReporteInternacional.tsx
+
+// AÑADIDO: Declaramos explícitamente que los componentes en este archivo son de cliente.
+// El componente de servidor que obtiene los datos se moverá a un archivo separado.
 "use client";
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { obtenerNoticiasPorCategoria, Noticia } from '@/app/lib/db';
+import { Noticia } from '@/app/lib/db';
 
 // --- TARJETA PRINCIPAL ---
 function NoticiaPrincipalCard({ noticia }: { noticia: Noticia }) {
-  const imageUrl = noticia.imagenUrl;
+  // CORRECCIÓN: Usamos `sourceUrl` en lugar de `imagenUrl`.
+  const imageUrl = noticia.sourceUrl;
   const title = noticia.title || 'Título no disponible';
 
   return (
@@ -44,7 +48,8 @@ function NoticiaPrincipalCard({ noticia }: { noticia: Noticia }) {
 
 // --- TARJETA SECUNDARIA ---
 function NoticiaSecundariaCard({ noticia }: { noticia: Noticia }) {
-  const imageUrl = noticia.imagenUrl;
+  // CORRECCIÓN: Usamos `sourceUrl` en lugar de `imagenUrl`.
+  const imageUrl = noticia.sourceUrl;
   const title = noticia.title || 'Título no disponible';
 
   return (
@@ -76,27 +81,23 @@ function NoticiaSecundariaCard({ noticia }: { noticia: Noticia }) {
   );
 }
 
-// --- COMPONENTE PRINCIPAL ---
-export default async function ReporteInternacional() {
-  const noticias: Noticia[] = await obtenerNoticiasPorCategoria({
-    limit: 4,
-    categoryName: "Internacional",
-  });
-
+// --- COMPONENTE CONTENEDOR (CLIENTE) ---
+// Este componente ahora solo se encarga de la presentación.
+export default function ReporteInternacional({ noticias }: { noticias: Noticia[] }) {
   if (!noticias || noticias.length < 4) return null;
 
   const noticiaPrincipal = noticias[0];
   const noticiasSecundarias = noticias.slice(1, 4);
 
   return (
-    <div className="bg-gray-950">
-      <div className="max-w-7xl mx-auto">
-        <h2 className="text-3xl font-extrabold uppercase tracking-wider text-white mb-6">INTERNACIONAL</h2>
+    <div className="bg-gray-950 py-12">
+      <div className="max-w-7xl mx-auto px-4">
+        <h2 className="text-3xl font-extrabold uppercase tracking-wider text-white mb-8 text-center md:text-left">INTERNACIONAL</h2>
 
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-8">
           <NoticiaPrincipalCard noticia={noticiaPrincipal} />
           <div className="flex justify-center">
-            <div className="grid w-full max-w-3xl grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid w-full max-w-4xl grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {noticiasSecundarias.map(noticia => (
                 <NoticiaSecundariaCard key={noticia.databaseId} noticia={noticia} />
               ))}
