@@ -24,7 +24,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${alegreyaSans.variable} font-sans antialiased flex flex-col h-full`}>
         <EnVivoLayout />
         <NavBar />
-        <main className="flex-grow">
+        {/* SOLUCIÓN: Añadimos padding-top para compensar la altura del Navbar pegajoso */}
+        <main className="flex-grow pt-28">
           {children}
         </main>
         <Footer />
