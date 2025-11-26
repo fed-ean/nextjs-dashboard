@@ -29,7 +29,7 @@ ol a{
 }
 :root {
     /* Colores para el tema CLARO */
-    --color-fondo-claro: #fffbf0; /* Color de fondo principal de la sección */
+    --color-fondo-claro: #F8F8F8; /* Color de fondo principal de la sección */
     --color-texto-claro: #000000; /* Color de texto general */
     --color-barra-navegacion-claro: #241F55; /* Color de la barra de navegación */
     --color-footer-claro: #222; /* Color del pie de página */
