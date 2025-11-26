@@ -1,6 +1,6 @@
 // app/ui/Page_Index/DesayunoPymesSection.tsx
 
-// CORRECCIÓN: Se eliminó "use client";. 
+// CORRECCIÓN: Se eliminó "use client";.
 // Este componente debe ser un Server Component para poder usar async/await y obtener datos del servidor.
 
 import CarouselNoticias from './CarouselNoticias';
@@ -19,7 +19,7 @@ export default async function DesayunoPymesSection() {
   }
 
   return (
-    <section className="container mx-auto px-4 mt-10">
+    <section className="w-full max-w-screen-lg mx-auto px-4 mt-10">
       <h2 className="titillium-web-semibold p-0">Desayuno Pymes</h2>
       <CarouselNoticias noticias={noticiasDesayunoPymes} slidesPerView={1} />
     </section>
