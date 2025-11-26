@@ -2,6 +2,8 @@
 import { Suspense } from "react";
 import Card from "../../components/card";
 import type { AsyncSearchParams } from "@/types/next-async";
+export const dynamic = 'force-dynamic'
+
 
 const GQL_ENDPOINT = "/graphql";
 
