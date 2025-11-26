@@ -15,7 +15,7 @@ function CarouselCard({ noticia }: { noticia: Noticia }) {
   return (
     <Link href={urlNoticia} passHref>
       <div className="border rounded-lg overflow-hidden shadow-md group h-full flex flex-col">
-        <div className="relative w-full h-screen">
+        <div className="relative w-full h-80">
           {noticia.sourceUrl ? (
             <Image
               src={noticia.sourceUrl}
