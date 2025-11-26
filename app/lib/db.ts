@@ -136,7 +136,7 @@ const GET_NOTICIAS_POR_CATEGORIA_QUERY = gql`
  * Ahora recibe un tipo específico `PostNodeFromQuery`, no `any`.
  */
 const mapPostNode = (node: PostNodeFromQuery): Noticia => ({
-  databaseId: node.databaseId,
+  databaseId: Number(node.databaseId), // ✅ Conversión segura
   slug: node.slug,
   title: node.title,
   content: node.content || undefined,
@@ -145,6 +145,7 @@ const mapPostNode = (node: PostNodeFromQuery): Noticia => ({
   categories: node.categories || { nodes: [] },
   date: node.post_date,
 });
+
 
 // --- FUNCIONES DE OBTENCIÓN ---
 
