@@ -1,30 +1,12 @@
+
 import Link from 'next/link';
 
-// CORRECCIÓN: Usar la variable de entorno para el endpoint de GraphQL.
-const GQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT_URL || '';
-
-// Las consultas GraphQL como cadenas de texto
-const GET_ALL_CATEGORIES_QUERY = `
-  query AllCategories {
-    categories(first: 100) {
-      nodes { databaseId name slug }
-    }
-  }
-`;
-
-const GET_LATEST_POSTS_QUERY = `
-  query AllPosts($first: Int!, $after: String) {
-    posts(first: $first, after: $after) {
-      nodes { databaseId title slug date }
-    }
-  }
-`;
-
-// Interfaces para la tipificación de los datos
+// Tipos (sin cambios)
 interface Category {
-  databaseId: number;
+  databaseId?: number;
   name: string;
   slug: string;
+  count?: number | null;
 }
 
 interface Post {
@@ -34,65 +16,27 @@ interface Post {
   date: string;
 }
 
-// Función auxiliar para realizar una única petición GraphQL
-async function fetchGraphQL(query: string, variables?: Record<string, any>) {
-    // Si la variable de entorno no está, no podemos continuar.
-    if (!GQL_ENDPOINT) {
-        console.error("Error Crítico: La variable de entorno GRAPHQL_ENDPOINT_URL no está configurada.");
-        return null;
-    }
-
-    try {
-        const response = await fetch(GQL_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, variables }),
-            next: { revalidate: 3600 }, // Revalidar cada hora
-        });
-
-        if (!response.ok) {
-            console.error(`Error en la petición a GraphQL: ${response.statusText}`);
-            return null;
-        }
-
-        const json = await response.json();
-        if (json.errors) {
-            console.error(`Error en la respuesta de GraphQL:`, json.errors);
-            return null;
-        }
-
-        return json.data;
-    } catch (error) {
-        console.error("Fallo en la petición fetch a GraphQL:", error);
-        return null; // Devuelve null si hay un error de red o de parseo
-    }
+interface SideNavProps {
+  categories: Category[];
+  latestPosts?: Post[];
 }
 
-// El componente SideNav que obtiene y muestra los datos
-export default async function SideNav() {
-  // Realiza las peticiones en paralelo
-  const [categoriesResult, postsResult] = await Promise.all([
-    fetchGraphQL(GET_ALL_CATEGORIES_QUERY),
-    fetchGraphQL(GET_LATEST_POSTS_QUERY, { first: 5, after: null }),
-  ]);
-
-  // Extrae los datos de forma segura, con fallback a un array vacío
-  const categories: Category[] = categoriesResult?.categories?.nodes || [];
-  const latestPosts: Post[] = postsResult?.posts?.nodes || [];
+export default function SideNav({ categories, latestPosts = [] }: SideNavProps) {
 
   return (
-    <aside className="h-auto w-full bg-white border-r overflow-y-auto">
-      <div className="p-4 space-y-6">
-        {/* Sección de Últimas Publicaciones */}
+    <aside className="h-auto w-full bg-gray-50 border-r overflow-y-auto shadow-lg rounded-lg">
+      <div className="p-6 space-y-8">
+        
+        {/* 1. SECCIÓN DE ÚLTIMAS PUBLICACIONES (se mantiene igual) */}
         {latestPosts.length > 0 && (
           <div>
-            <h2 className="text-lg font-semibold mb-2 mt-10">Últimas publicaciones</h2>
-            <ul className="space-y-3">
+            <h2 className="text-xl font-bold mb-4 border-b pb-2 text-gray-800">Últimas publicaciones</h2>
+            <ul className="space-y-4">
               {latestPosts.map((post) => (
                 <li key={post.databaseId}>
-                  <Link href={`/Categorias/Noticias/${post.slug}`} className="hover:underline">
-                    <p className="text-sm font-medium" dangerouslySetInnerHTML={{ __html: post.title }} />
-                    <span className="text-xs text-gray-500">
+                  <Link href={`/Categorias/Noticias/${post.slug}`} className="block p-2 rounded-md hover:bg-gray-200 transition-colors duration-200">
+                    <p className="text-sm font-semibold text-gray-900" dangerouslySetInnerHTML={{ __html: post.title }} />
+                    <span className="text-xs text-gray-600">
                       {new Date(post.date).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
                     </span>
                   </Link>
@@ -102,25 +46,28 @@ export default async function SideNav() {
           </div>
         )}
 
-        {/* Sección de Categorías */}
+        {/* 2. SECCIÓN DE CATEGORÍAS (CON EL NUEVO DISEÑO) */}
         {categories.length > 0 && (
           <div>
-            <h2 className="text-lg font-semibold mb-2">Categorías</h2>
-            <ul className="space-y-2 text-sm">
+            <h2 className="text-xl font-bold mb-4 border-b pb-2 text-gray-800">Categorías</h2>
+            <div className="flex flex-wrap gap-2 pt-2">
               {categories.map((category) => (
-                <li key={category.databaseId}>
-                  <Link href={`/Categorias/${category.slug}`} className="hover:underline">
-                    {category.name}
-                  </Link>
-                </li>
+                <Link 
+                  key={category.slug}
+                  href={`/Categorias/${category.slug}`}
+                  className="block px-3 py-1.5 rounded-full text-sm font-medium text-gray-700 bg-gray-200 hover:bg-blue-500 hover:text-white transition-all duration-200 shadow-sm"
+                >
+                  {category.name} 
+                  {category.count != null && <span className="text-xs opacity-75 ml-1">({category.count})</span>}
+                </Link>
               ))}
-            </ul>
+            </div>
           </div>
         )}
 
-        {/* Placeholder si no se carga ninguna sección */}
+        {/* Mensaje de fallback */}
         {latestPosts.length === 0 && categories.length === 0 && (
-            <div className='p-4 text-center text-gray-500'>No se pudo cargar el contenido de la barra lateral.</div>
+            <div className='p-4 text-center text-gray-500'>No hay contenido para mostrar.</div>
         )}
       </div>
     </aside>

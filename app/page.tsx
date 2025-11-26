@@ -1,18 +1,8 @@
+
 import { Suspense } from 'react';
-import Link from 'next/link';
 
-// --- Componentes que NO necesitan carga de datos ---
-import Typewriter from "./ui/components/maquinaDeEscribir";
-
-
-// --- Componentes ASÍNCRONOS (cargan datos) ---
-import GridNoticiasPrincipales from './ui/Page_Index/GridNoticiasPrincipales';
-import DesayunoPymesSection from './ui/Page_Index/DesayunoPymesSection';
-// CORRECCIÓN: Importamos el nuevo componente de SERVIDOR
-import ReporteInternacionalServer from './ui/Page_Index/ReporteInternacional.server'; 
-import SeccionNoticiasVarias from './ui/Page_Index/SeccionNoticiasVarias';
-
-// --- SKELETONS para el fallback de Suspense ---
+// Componentes de UI y Skeletons
+// YA NO SE IMPORTA NADA RELACIONADO CON SIDENAV
 import { 
   GridNoticiasPrincipalesSkeleton, 
   CarouselNoticiasSkeleton, 
@@ -20,19 +10,23 @@ import {
   SeccionNoticiasVariasSkeleton 
 } from './ui/skeletons';
 
-// --- Estilos ---
+import Typewriter from "./ui/components/maquinaDeEscribir";
+import GridNoticiasPrincipales from './ui/Page_Index/GridNoticiasPrincipales';
+import DesayunoPymesSection from './ui/Page_Index/DesayunoPymesSection';
+import ReporteInternacionalServer from './ui/Page_Index/ReporteInternacional.server'; 
+import SeccionNoticiasVarias from './ui/Page_Index/SeccionNoticiasVarias';
+
 import './fonts.css';
 
-
 export default function Page() {
-
   return(
-    <>
-      <main className="mx-1">
+    // LAYOUT DE UNA SOLA COLUMNA: Eliminamos Grid y Flexbox, es un flujo simple.
+    <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
+      
+      {/* --- CONTENIDO PRINCIPAL A ANCHO COMPLETO --- */}
+      <main className="w-full">
         <header className="py-12 px-6">
-          <h1 className="font-extrabold leading-tight
-                         text-xl sm:text-xl md:text-xl lg:text-3xl
-                         max-w-full">        
+          <h1 className="font-extrabold leading-tight text-xl sm:text-xl md:text-xl lg:text-3xl max-w-full">        
             <Typewriter
               phrases={["DIFUSIÓN y ANÁLISIS DE LAS PYMES", "SOMOS LA VOZ DEL SECTOR PRODUCTIVO"]}
             />
@@ -40,28 +34,25 @@ export default function Page() {
         </header>
         <h2 className="titullium-web-semibold uppercase text-xl">Noticias Principales</h2>
         
-        {/* --- CARGA DEL GRID DE NOTICIAS PRINCIPALES --- */}
         <Suspense fallback={<GridNoticiasPrincipalesSkeleton />}>
           <GridNoticiasPrincipales />
         </Suspense>
 
+        <Suspense fallback={<CarouselNoticiasSkeleton />}>
+          <DesayunoPymesSection />
+        </Suspense>
+
+        <Suspense fallback={<ReporteNoticiasSkeleton />}>
+          <ReporteInternacionalServer />
+        </Suspense>
+        
+        <Suspense fallback={<SeccionNoticiasVariasSkeleton />}>
+          <SeccionNoticiasVarias />
+        </Suspense>
       </main>
 
-      {/* --- CARGA DEL CARRUSEL DESAYUNO PYMES --- */}
-      <Suspense fallback={<CarouselNoticiasSkeleton />}>
-        <DesayunoPymesSection />
-      </Suspense>
+      {/* --- NO HAY SIDENAV AQUÍ --- */}
 
-      {/* --- CARGA DEL REPORTE INTERNACIONAL --- */}
-      <Suspense fallback={<ReporteNoticiasSkeleton />}>
-        {/* CORRECCIÓN: Usamos el nuevo componente de SERVIDOR */}
-        <ReporteInternacionalServer />
-      </Suspense>
-      
-      {/* --- CARGA DE LAS NOTICIAS VARIAS --- */}
-      <Suspense fallback={<SeccionNoticiasVariasSkeleton />}>
-        <SeccionNoticiasVarias />
-      </Suspense>
-    </>
+    </div>
   );
 }

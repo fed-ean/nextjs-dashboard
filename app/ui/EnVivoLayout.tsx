@@ -1,11 +1,10 @@
-
 'use client';
-import AlAireRadio from './AlAireRadio';
+import ReproductorMovil from './ReproductorMovil';
 
 export default function EnVivoLayout() {
   return (
     <div className="lg:hidden">
-      <AlAireRadio />
+      <ReproductorMovil />
     </div>
   );
 }

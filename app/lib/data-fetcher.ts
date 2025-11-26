@@ -1,3 +1,4 @@
+
 // app/lib/data-fetcher.ts
 import { 
     GET_ALL_CATEGORIES,
@@ -11,7 +12,7 @@ async function fetchGraphQL(query: any, variables: Record<string, any> = {}) {
     const response = await fetch(GQL_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        next: { revalidate: 60 }, // Cache por 1 minuto mientras depuramos
+        next: { revalidate: 60 },
         body: JSON.stringify({ 
             query: query.loc.source.body, 
             variables 
@@ -20,7 +21,7 @@ async function fetchGraphQL(query: any, variables: Record<string, any> = {}) {
 
     if (!response.ok) {
         console.error("Network response was not ok.", await response.text());
-        return null; // Devolver null para evitar que la app crashee
+        return null;
     }
 
     const json = await response.json();
@@ -45,6 +46,19 @@ const mapPostData = (p: any) => p ? ({
 async function getCategoryDetails(slug: string) {
     const data = await fetchGraphQL(GET_ALL_CATEGORIES, {});
     return data?.categories?.nodes?.find((c: any) => c.slug === slug) || null;
+}
+
+// AÑADIMOS LA FUNCIÓN NECESARIA Y LA EXPORTAMOS
+export async function getAllCategories() {
+    const data = await fetchGraphQL(GET_ALL_CATEGORIES, {});
+    if (!data || !data.categories) {
+        return [];
+    }
+    return data.categories.nodes.map((c: any) => ({
+        name: c.name,
+        slug: c.slug,
+        count: c.count
+    }));
 }
 
 // FUNCIÓN REESTRUCTURADA Y SIMPLIFICADA
