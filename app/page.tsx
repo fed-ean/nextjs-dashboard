@@ -1,5 +1,7 @@
 
 import { Suspense } from 'react';
+export const dynamic = 'force-dynamic'
+
 
 // Componentes de UI y Skeletons
 // YA NO SE IMPORTA NADA RELACIONADO CON SIDENAV
