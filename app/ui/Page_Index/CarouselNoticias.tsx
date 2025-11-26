@@ -15,13 +15,13 @@ function CarouselCard({ noticia }: { noticia: Noticia }) {
   return (
     <Link href={urlNoticia} passHref>
       <div className="border rounded-lg overflow-hidden shadow-md group h-full flex flex-col">
-        <div className="relative w-full h-80">
+        <div className="relative w-full h-60">
           {noticia.sourceUrl ? (
             <Image
               src={noticia.sourceUrl}
               alt={noticia.title || 'Imagen de la noticia'}
               fill
-              style={{ objectFit: 'contain' }}
+              style={{ objectFit: 'cover' }}
               sizes="(max-width: 768px) 100vw, 50vw"
             />
           ) : (
