@@ -2,7 +2,10 @@
 
 import type { NextConfig } from 'next';
 
-const nextConfig: NextConfig = {
+const nextConfig: NextConfig = {output: 'export',            // si necesita exportación estática
+  experimental: {
+    globalNotFound: true       // habilita 404 global
+  },
   // Configuración de Imágenes (MÉTODO MODERNO)
   images: {
     // remotePatterns es la forma correcta de configurar dominios en Next.js 13+

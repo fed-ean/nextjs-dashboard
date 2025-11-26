@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig = {output: 'export',            // si necesita exportación estática
+  experimental: {
+    globalNotFound: true       // habilita 404 global
+  },
   async rewrites() {
     return [
       {
