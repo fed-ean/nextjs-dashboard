@@ -3,6 +3,8 @@ import React from 'react';
 import { getCachedPostsPage } from '../lib/data-fetcher';
 import CategoryGrid from '../ui/categorias/CategoryGrid';
 import CategoryPagination from '../ui/categorias/CategoryPagination';
+export const dynamic = 'force-dynamic';
+
 
 const PER_PAGE = 9;
 
