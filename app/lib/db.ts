@@ -42,15 +42,31 @@ export interface Categoria {
  * lista para ser usada en los componentes de la aplicación.
  */
 export interface Noticia {
-  databaseId: string | number;
-  slug?: string;
-  title?: string;
-  content?: string;
+  databaseId: number;
+  title: string;
+  slug: string;
   excerpt?: string;
-  sourceUrl?: string; // Simplificado desde featuredImage.node.sourceUrl
-  categories?: { nodes?: Categoria[] };
-  date?: string; // Unificado desde fechaPublicacion y post_date
+  date?: string;
+
+  // ✅ AGREGAR ESTO
+  featuredImage?: {
+    node?: {
+      sourceUrl?: string | null;
+    };
+  };
+
+  // Sin cambios
+  categories?: {
+    nodes?: {
+      name: string;
+      slug: string;
+    }[];
+  };
+
+  // (opcional si a veces lo usas directo)
+  sourceUrl?: string;
 }
+
 
 // --- CONSULTAS ---
 const GET_NOTICIAS_QUERY = gql`
