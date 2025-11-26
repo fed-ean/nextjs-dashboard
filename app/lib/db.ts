@@ -49,13 +49,14 @@ export interface Noticia {
   date?: string;
 
   // ✅ AGREGAR ESTO
+  content?: string;
+
   featuredImage?: {
     node?: {
       sourceUrl?: string | null;
     };
   };
 
-  // Sin cambios
   categories?: {
     nodes?: {
       name: string;
@@ -63,9 +64,9 @@ export interface Noticia {
     }[];
   };
 
-  // (opcional si a veces lo usas directo)
   sourceUrl?: string;
 }
+
 
 
 // --- CONSULTAS ---
@@ -136,7 +137,7 @@ const GET_NOTICIAS_POR_CATEGORIA_QUERY = gql`
  * Ahora recibe un tipo específico `PostNodeFromQuery`, no `any`.
  */
 const mapPostNode = (node: PostNodeFromQuery): Noticia => ({
-  databaseId: Number(node.databaseId), // ✅ Conversión segura
+  databaseId: Number(node.databaseId), // ✅ conversión segura
   slug: node.slug,
   title: node.title,
   content: node.content || undefined,
