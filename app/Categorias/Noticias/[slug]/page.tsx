@@ -1,8 +1,9 @@
 import { getServerSideClient } from '@/app/lib/server-cliente';
 import { gql } from '@apollo/client';
 import { Metadata } from 'next';
-import Image from 'next/image';
 import React from 'react';
+import parse from 'html-react-parser';
+import './styles.css';
 
 const GET_POST_BY_SLUG = gql`
   query GetPostBySlug($id: ID!) {
@@ -19,6 +20,13 @@ const GET_POST_BY_SLUG = gql`
         node {
           sourceUrl
           altText
+        }
+      }
+      categories {
+        nodes {
+          databaseId
+          slug
+          name
         }
       }
     }
@@ -46,6 +54,13 @@ type PostData = {
         sourceUrl?: string;
         altText?: string;
       };
+    };
+    categories?: {
+      nodes: {
+        databaseId: number;
+        slug: string;
+        name: string;
+      }[];
     };
   } | null;
 };
@@ -85,27 +100,73 @@ export default async function Page({ params }: PageProps) {
     return <div>Post not found.</div>;
   }
 
-  return (
-    <article className="prose lg:prose-xl mx-auto p-4">
-      <h1>{post.title}</h1>
+  const featuredUrl = post.featuredImage?.node?.sourceUrl;
+  const parseOptions = {}; // Define your parse options here
 
-      {post.featuredImage?.node?.sourceUrl && (
-        <Image
-          src={post.featuredImage.node.sourceUrl}
-          alt={post.featuredImage.node.altText || post.title}
-          width={800}
-          height={400}
-          className="w-full h-auto object-cover rounded-lg"
-          priority
-        />
+  return (
+    <div className="relative">
+      {featuredUrl ? (
+        <header
+          className="hero-bleed"
+          style={{
+            backgroundImage: `url(${featuredUrl})`,
+            width: '100%',
+          }}
+        >
+          <div className="hero-overlay" />
+          <div className="hero-inner max-w-[2200px] mx-auto px-6 py-16 md:py-28">
+            <div className="flex flex-col gap-3">
+              <div className="badges flex flex-wrap gap-2">
+                {post.categories?.nodes?.map((c: any) => (
+                  <a
+                    key={c.databaseId}
+                    href={`/Categorias/${c.slug}`}
+                    className="inline-block bg-white/10 backdrop-blur-sm text-white text-xs font-semibold uppercase px-3 py-1 rounded-md ring-1 ring-white/10"
+                  >
+                    {c.name}
+                  </a>
+                ))}
+              </div>
+
+              <h1
+                className="text-white text-2xl md:text-3xl lg:text-4xl font-extrabold leading-tight drop-shadow-lg text-shadow-lg/30"
+                dangerouslySetInnerHTML={{ __html: post.title }}
+              />
+
+              <div className="m-2 text-sm text-gray-200 flex items-center gap-4 text-shadow-lg">
+                <svg className="w-5 h-5 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Publicado el {new Date(post.date).toLocaleDateString()}
+              </div>
+            </div>
+          </div>
+        </header>
+      ) : (
+        <div className="w-full h-64 bg-gray-800" />
       )}
 
-      <div className="text-sm text-gray-500 mt-2 mb-4">
-        By {post.author.node.name} on{' '}
-        {new Date(post.date).toLocaleDateString()}
-      </div>
+      <main className="content-container">
+        <article className="bg-white rounded-xl shadow-xl p-6 md:p-10 prose max-w-none titillium-web-bold">
+          {/* Aquí parseamos y renderizamos el HTML con control */}
+          <div className="post-content text-gray-800">
+            {parse(post.content || "", parseOptions)}
+          </div>
 
-      <div dangerouslySetInnerHTML={{ __html: post.content }} />
-    </article>
+          {post.categories?.nodes?.length > 0 && (
+            <div className="mt-8">
+              <strong className="block mb-2">Categorías:</strong>
+              <div className="flex flex-wrap gap-2">
+                {post.categories.nodes.map((c: any) => (
+                  <a key={c.databaseId} href={`/Categorias/${c.slug}`} className="inline-block text-blue-600 hover:underline bg-blue-50 px-3 py-1 rounded">
+                    {c.name}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </article>
+      </main>
+    </div>
   );
 }
