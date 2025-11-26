@@ -19,7 +19,7 @@ export default async function DesayunoPymesSection() {
   }
 
   return (
-    <section className="w-full max-w-screen-lg mx-auto px-4 mt-10">
+    <section className="w-full max-w-screen-md mx-auto px-4 mt-10">
       <h2 className="titillium-web-semibold p-0">Desayuno Pymes</h2>
       <CarouselNoticias noticias={noticiasDesayunoPymes} slidesPerView={1} />
     </section>
