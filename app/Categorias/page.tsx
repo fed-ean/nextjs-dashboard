@@ -2,6 +2,8 @@
 import React from "react";
 import { getCachedPostsPage } from "../lib/data-fetcher";
 import NoticiasVarias from "../ui/dashboard/noticias-varias";
+export const dynamic = 'force-dynamic'
+
 
 // Componente para cuando no hay noticias
 const NoPostsDisplay = () => (
