@@ -2,19 +2,21 @@
 import type { Metadata } from "next";
 import { Alegreya_Sans } from "next/font/google";
 import "./global.css";
-import NavBar from "@/app/ui/Page_Index/navbar";
-import EnVivoLayout from "@/app/ui/EnVivoLayout";
-import Footer from "@/app/ui/Page_Index/footer"; // Importamos el Footer
+import dynamic from "next/dynamic";
 
-// Importamos la fuente con los pesos y subconjuntos que necesitamos
+// ⛔ IMPORTANTE: los cargamos sin SSR
+const NavBar = dynamic(() => import("@/app/ui/Page_Index/navbar"), { ssr: false });
+const EnVivoLayout = dynamic(() => import("@/app/ui/EnVivoLayout"), { ssr: false });
+const Footer = dynamic(() => import("@/app/ui/Page_Index/footer"), { ssr: false });
+
 const alegreyaSans = Alegreya_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "700", "800", "900"], // Añadimos todos los grosores que podríamos necesitar
-  variable: "--font-alegreya-sans", // La definimos como una variable CSS
+  weight: ["400", "500", "700", "800", "900"],
+  variable: "--font-alegreya-sans",
 });
 
 export const metadata: Metadata = {
-  title: "Radio Empresaria",
+  title: "Radio Empresarial",
   description: "La voz del empresario y el emprendedor",
 };
 
@@ -24,10 +26,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${alegreyaSans.variable} font-sans antialiased flex flex-col h-full`}>
         <EnVivoLayout />
         <NavBar />
-        {/* SOLUCIÓN: Añadimos padding-top para compensar la altura del Navbar pegajoso */}
+
         <main className="flex-grow pt-28">
           {children}
         </main>
+
         <Footer />
       </body>
     </html>
