@@ -21,7 +21,7 @@ function CarouselCard({ noticia }: { noticia: Noticia }) {
               src={noticia.sourceUrl}
               alt={noticia.title || 'Imagen de la noticia'}
               fill
-              style={{ objectFit: 'cover' }}
+              style={{ objectFit: 'contain' }}
               sizes="(max-width: 768px) 100vw, 50vw"
             />
           ) : (
