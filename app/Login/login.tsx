@@ -1,9 +1,4 @@
-import {
-  AtSymbolIcon,
-  KeyIcon,
-} from '@heroicons/react/24/outline';
-import { ArrowRightIcon } from '@heroicons/react/20/solid';
-import { Button } from '../ui/button';
+
 import Image from 'next/image';
 
 export default function LoginForm() {
