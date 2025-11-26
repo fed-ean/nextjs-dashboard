@@ -2,7 +2,8 @@
 
 import type { NextConfig } from 'next';
 
-const nextConfig: NextConfig = {output: 'export',            // si necesita exportación estática
+const nextConfig: NextConfig = {
+  reactStrictMode: true,            // si necesita exportación estática
   experimental: {
     globalNotFound: true       // habilita 404 global
   },
