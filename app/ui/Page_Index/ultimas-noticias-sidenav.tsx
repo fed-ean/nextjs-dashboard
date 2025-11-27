@@ -1,16 +1,9 @@
 // app/ui/Page_Index/ultimas-noticias-sidenav.tsx
 import Link from 'next/link';
 import Image from 'next/image';
+import type { Post } from '@/app/lib/definitions'; // 1. IMPORTAR TIPO CENTRALIZADO
 
-type Noticia = {
-  id: string;
-  slug?: string;
-  titulo?: string;
-  title?: string;
-  imagenUrl?: string;
-  fecha?: string;
-  [k: string]: any;
-};
+// 2. ELIMINAR TIPO LOCAL `Noticia`
 
 // Función para formatear la fecha
 const formatDate = (dateString: string | undefined) => {
@@ -23,33 +16,36 @@ const formatDate = (dateString: string | undefined) => {
   });
 };
 
-export default function UltimasNoticiasSidenav({ noticias }: { noticias: Noticia[] }) {
+// 3. USAR `Post[]` EN LAS PROPS
+export default function UltimasNoticiasSidenav({ noticias }: { noticias: Post[] }) {
   if (!noticias || noticias.length === 0) {
     return <p className="p-4 text-gray-400">No hay noticias recientes.</p>;
   }
 
   return (
-    <div className="p-4">
-      <h3 className="text-base font-bold text-gray-800 mb-4 uppercase tracking-wider">
+    <div className="bg-white rounded-xl shadow-lg p-6">
+      <h3 className="text-xl font-bold text-gray-900 mb-4 pb-2 border-b">
         Últimas publicaciones
       </h3>
       <div className="space-y-4">
         {noticias.map((noticia) => {
-          const title = noticia.titulo || noticia.title || 'Sin título';
+          // 4. USAR LAS PROPIEDADES DEL TIPO `Post`
+          const title = noticia.title || 'Sin título';
+          const imageUrl = noticia.featuredImage?.node?.sourceUrl;
           const urlNoticia = `/Categorias/Noticias/${noticia.slug || ''}`;
-          const formattedDate = formatDate(noticia.fecha);
+          const formattedDate = formatDate(noticia.date);
 
           return (
             <Link
-              key={noticia.id}
+              key={noticia.databaseId} // USAR `databaseId`
               href={urlNoticia}
-              className="group flex items-start space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+              className="group flex items-start space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200"
             >
               {/* Imagen Miniatura */}
               <div className="flex-shrink-0">
-                {noticia.imagenUrl ? (
+                {imageUrl ? (
                   <Image
-                    src={noticia.imagenUrl}
+                    src={imageUrl} // USAR `imageUrl`
                     alt={title}
                     width={80}
                     height={80}
@@ -69,7 +65,7 @@ export default function UltimasNoticiasSidenav({ noticias }: { noticias: Noticia
                 </h4>
                 {formattedDate && (
                   <div className="flex items-center mt-1.5 text-xs text-gray-500">
-                    <span className="mr-1.5">⌚</span>
+                     <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m3 5H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2z"></path></svg>
                     <time>{formattedDate}</time>
                   </div>
                 )}

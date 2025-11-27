@@ -1,34 +1,21 @@
 
 import { getAllCategories, getCachedPostsPage } from '../../lib/data-fetcher';
-// 1. VOLVEMOS A IMPORTAR EL SIDENAV ORIGINAL
 import Sidenav from './sidenav';
+import type { Post, Category } from '@/app/lib/definitions';
 
-// Tipos (sin cambios)
-interface Post {
-  databaseId: number;
-  title: string;
-  slug: string;
-  date: string;
-  [key: string]: any;
-}
-
-interface Category {
-  name: string;
-  slug: string;
-  count: number | null;
-}
-
-// Este componente vuelve a su propósito original: obtener datos y pasarlos.
+// Este componente se encarga de obtener los datos del servidor
 export default async function SidenavServer() {
   
+  // Obtenemos categorías y posts simultáneamente
   const [categoriesData, postsData] = await Promise.all([
     getAllCategories(),
-    getCachedPostsPage(null) 
+    getCachedPostsPage(null) // `null` para obtener los posts más recientes
   ]);
 
+  // Aseguramos que los datos no sean nulos
   const allCategories: Category[] = categoriesData || [];
   const latestPosts: Post[] = postsData?.posts?.slice(0, 5) || [];
 
-  // 2. RENDERIZAMOS EL SIDENAV ORIGINAL y le pasamos los datos como props.
+  // Renderizamos el componente de UI (`Sidenav`) y le pasamos los datos como props
   return <Sidenav categories={allCategories} latestPosts={latestPosts} />;
 }

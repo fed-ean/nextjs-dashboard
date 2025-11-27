@@ -1,12 +1,11 @@
+
 import React from 'react';
-import { getAllCategories, getCachedPostsPage } from '../../lib/data-fetcher';
+import { getCachedPostsPage } from '../../lib/data-fetcher';
 import { notFound } from 'next/navigation';
 
-import SideNav from '../../ui/Page_Index/sidenav'; 
 import CategoryGrid from '../../ui/categorias/CategoryGrid';
 import PaginationControls from '../../ui/categorias/PaginationControls';
-import UltimasNoticiasSidenav from '../../ui/Page_Index/ultimas-noticias-sidenav';
-import type { Category, Post } from '../../lib/definitions';
+import SidenavServer from '@/app/ui/Page_Index/SidenavServer';
 
 // Tipado corregido para Next.js App Router con Server Components asíncronos
 type Props = {
@@ -25,9 +24,6 @@ export default async function CategoriaPage({ params, searchParams: searchParams
   // 2. Obtener datos de la categoría y posts paginados
   const { posts, totalPages, category } = await getCachedPostsPage(slug, currentPage);
   
-  // 3. Obtener todas las categorías para el SideNav
-  const allCategories = await getAllCategories();
-
   // Si no hay categoría o posts, mostrar notFound
   if (!category || !posts || posts.length === 0) {
     return notFound();
@@ -51,8 +47,9 @@ export default async function CategoriaPage({ params, searchParams: searchParams
 
         {/* Barra Lateral */}
         <aside className="lg:col-span-3 space-y-8">
-          <SideNav categories={allCategories} />
-          <UltimasNoticiasSidenav />
+          <div className="sticky top-24">
+            <SidenavServer />
+          </div>
         </aside>
 
       </div>
