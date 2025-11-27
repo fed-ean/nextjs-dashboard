@@ -1,18 +1,18 @@
 
-// app/lib/data-fetcher.ts
 import { 
     GET_ALL_CATEGORIES,
     GET_POSTS_BY_CATEGORY_SIMPLE,
     GET_ALL_POSTS_SIMPLE
 } from './queries';
+import type { Post, Category, PagedPosts } from './definitions';
 
 const GQL_ENDPOINT = "https://radioempresaria.com.ar/graphql";
 
-async function fetchGraphQL(query: any, variables: Record<string, any> = {}) {
+async function fetchGraphQL(query: any, variables: Record<string, any> = {}): Promise<any> {
     const response = await fetch(GQL_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        next: { revalidate: 60 },
+        next: { revalidate: 60 }, // Revalidar cada 60 segundos
         body: JSON.stringify({ 
             query: query.loc.source.body, 
             variables 
@@ -33,40 +33,42 @@ async function fetchGraphQL(query: any, variables: Record<string, any> = {}) {
     return json.data;
 }
 
-const mapPostData = (p: any) => p ? ({
+const mapPostData = (p: any): Post => ({
     databaseId: p.databaseId,
     title: p.title,
     excerpt: p.excerpt,
     slug: p.slug,
     date: p.date,
     featuredImage: { node: { sourceUrl: p.featuredImage?.node?.sourceUrl || null } },
-    categories: { nodes: (p.categories?.nodes || []).map((c:any) => ({ name: c.name, slug: c.slug })) },
-}) : null;
+    categories: { nodes: (p.categories?.nodes || []).map((c: any) => ({ name: c.name, slug: c.slug })) },
+});
 
-async function getCategoryDetails(slug: string) {
+async function getCategoryDetails(slug: string): Promise<Category | null> {
     const data = await fetchGraphQL(GET_ALL_CATEGORIES, {});
-    return data?.categories?.nodes?.find((c: any) => c.slug === slug) || null;
+    const category = data?.categories?.nodes?.find((c: any) => c.slug === slug);
+    return category ? { name: category.name, slug: category.slug, count: category.count } : null;
 }
 
-// AÑADIMOS LA FUNCIÓN NECESARIA Y LA EXPORTAMOS
-export async function getAllCategories() {
+export async function getAllCategories(): Promise<Category[]> {
     const data = await fetchGraphQL(GET_ALL_CATEGORIES, {});
     if (!data || !data.categories) {
         return [];
     }
     return data.categories.nodes.map((c: any) => ({
+        databaseId: c.databaseId,
         name: c.name,
         slug: c.slug,
         count: c.count
     }));
 }
 
-// FUNCIÓN REESTRUCTURADA Y SIMPLIFICADA
-export async function getCachedPostsPage(slug: string | null) {
+export async function getCachedPostsPage(slug: string | null, page: number = 1, pageSize: number = 10): Promise<PagedPosts> {
     const isCategoryPage = !!slug;
     
     const query = isCategoryPage ? GET_POSTS_BY_CATEGORY_SIMPLE : GET_ALL_POSTS_SIMPLE;
-    const variables = isCategoryPage ? { categoryName: slug } : {};
+    const variables = isCategoryPage
+        ? { categoryName: slug, size: pageSize, offset: (page - 1) * pageSize }
+        : { size: pageSize, offset: (page - 1) * pageSize };
 
     const data = await fetchGraphQL(query, variables);
 
@@ -75,11 +77,13 @@ export async function getCachedPostsPage(slug: string | null) {
     }
 
     const category = isCategoryPage ? await getCategoryDetails(slug) : null;
+    const totalPosts = data.posts.pageInfo?.offsetPagination?.total ?? 0;
+    const totalPages = Math.ceil(totalPosts / pageSize);
     
     return {
         posts: data.posts.nodes.map(mapPostData),
-        totalPages: 1, // Paginación deshabilitada temporalmente
-        total: data.posts.nodes.length,
+        totalPages: totalPages,
+        total: totalPosts,
         category: category ? { name: category.name, slug: category.slug } : null
     };
 }
