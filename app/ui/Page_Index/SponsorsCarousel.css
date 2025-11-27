@@ -1,13 +1,30 @@
+
+.sponsors-container {
+  border: 2px solid #FFD700; /* Golden border */
+  border-radius: 10px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+}
+
+.sponsors-title {
+  text-align: center;
+  font-size: 2em;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+}
+
 .sponsors-carousel-container {
     width: 100%;
     overflow: hidden;
-    padding: 20px 0;
   }
   
   .sponsors-carousel-track {
     display: flex;
     width: calc(300px * 82); 
-    animation: scroll 60s linear infinite;
+    animation: scroll 120s linear infinite;
   }
   
   .sponsor-slide {
@@ -35,7 +52,7 @@
   @media (max-width: 768px) {
     .sponsors-carousel-track {
         width: calc(300px * 82); 
-        animation: scroll-mobile 60s linear infinite;
+        animation: scroll-mobile 120s linear infinite;
     }
     .sponsor-slide {
         width: 300px;

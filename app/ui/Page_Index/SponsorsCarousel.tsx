@@ -48,15 +48,18 @@ const sponsors = [
 
 const SponsorsCarousel = () => {
   return (
-    <div className="sponsors-carousel-container">
-      <div className="sponsors-carousel-track">
-        {sponsors.map((sponsor) => (
-          <div className="sponsor-slide" key={sponsor.id}>
-            <a href={sponsor.href} target="_blank" rel="noopener noreferrer">
-              <img src={sponsor.src} alt={sponsor.alt} />
-            </a>
-          </div>
-        ))}
+    <div className="sponsors-container">
+      <h2 className="sponsors-title">Sponsor</h2>
+      <div className="sponsors-carousel-container">
+        <div className="sponsors-carousel-track">
+          {sponsors.map((sponsor) => (
+            <div className="sponsor-slide" key={sponsor.id}>
+              <a href={sponsor.href} target="_blank" rel="noopener noreferrer">
+                <img src={sponsor.src} alt={sponsor.alt} />
+              </a>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
