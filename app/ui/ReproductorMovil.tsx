@@ -18,7 +18,8 @@ export default function ReproductorMovil() {
 
   return (
     <>
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between bg-gray-100 text-white p-2 h-14 shadow-lg">
+      {/* Se añade la clase 'envivo-bar' para referenciarla en global.css */}
+      <div className="envivo-bar lg:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between bg-gray-100 text-white p-2 h-14 shadow-lg">
         {/* 1. Botón de Reproducción a la Izquierda */}
         <button
           onClick={togglePlay}

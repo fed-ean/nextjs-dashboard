@@ -16,11 +16,16 @@ export default function NoticiaSecundariaCard({ noticia, priority = false }: Pro
   const urlNoticia = `/Categorias/Noticias/${noticia.slug || ''}`;
   const tituloCorto = noticia.title.length > 80 ? noticia.title.substring(0, 80) + '...' : noticia.title;
   const imageUrl: string | undefined = noticia.sourceUrl;
-  const category = noticia.categories?.nodes?.[0]; // Obtenemos la categoría de forma segura
 
   return (
-    <Link href={urlNoticia} passHref>
-      <div className="relative h-[250px] w-full overflow-hidden rounded-lg shadow-lg cursor-pointer group mt-2">
+    // El componente Link ahora es un elemento flex que crecerá para llenar el espacio.
+    <Link href={urlNoticia} passHref className="flex-1 w-full">
+      {/* 
+        Contenedor de la tarjeta: Se eliminó la altura fija.
+        Ahora tiene `h-full` para ocupar todo el espacio que le da el componente Link.
+      */}
+      <div className="relative h-full w-full overflow-hidden rounded-lg shadow-lg cursor-pointer group">
+        {/* Imagen de fondo optimizada */}
         {imageUrl ? (
           <Image
             src={imageUrl}
@@ -37,16 +42,14 @@ export default function NoticiaSecundariaCard({ noticia, priority = false }: Pro
           </div>
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-10"></div>
+        {/* Degradado inferior */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10"></div>
 
-        <div className="absolute bottom-0 left-0 p-4 z-20 text-container">
-          {/* Etiqueta de la categoría */}
-          {category?.name && (
-            <span className="mb-1 inline-block bg-indigo-600 text-white text-xs font-semibold px-2 py-1 rounded-md shadow">
-              {category.name}
-            </span>
-          )}
-          <h3 className="text-xl font-alegreya-extrabold leading-snug">{tituloCorto}</h3>
+        {/* Contenedor del texto */}
+        <div className="absolute bottom-0 left-0 p-4 z-20">
+          <h3 className="text-xl font-alegreya-extrabold leading-snug text-white uppercase text-shadow-md">
+            {tituloCorto}
+          </h3>
         </div>
       </div>
     </Link>

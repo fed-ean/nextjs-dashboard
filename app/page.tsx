@@ -17,6 +17,7 @@ import GridNoticiasPrincipales from './ui/Page_Index/GridNoticiasPrincipales';
 import DesayunoPymesSection from './ui/Page_Index/DesayunoPymesSection';
 import ReporteInternacionalServer from './ui/Page_Index/ReporteInternacional.server'; 
 import SeccionNoticiasVarias from './ui/Page_Index/SeccionNoticiasVarias';
+import SponsorsCarousel from './ui/Page_Index/SponsorsCarousel';
 
 import './fonts.css';
 
@@ -51,6 +52,7 @@ export default function Page() {
         <Suspense fallback={<SeccionNoticiasVariasSkeleton />}>
           <SeccionNoticiasVarias />
         </Suspense>
+        <SponsorsCarousel />
       </main>
 
       {/* --- NO HAY SIDENAV AQUÍ --- */}

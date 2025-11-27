@@ -20,13 +20,24 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className="h-full">
-      <body className={`${alegreyaSans.variable} font-sans antialiased flex flex-col h-full`}>
-        <EnVivoLayout />
-        <NavBar />
-        <main className="flex-grow pt-28">
+    <html lang="es">
+      <body className={`${alegreyaSans.variable} font-sans antialiased`}>
+        {/* Contenedor para los elementos de navegación fijos */}
+        <div>
+          <EnVivoLayout />
+          <NavBar />
+        </div>
+
+        {/* 
+          SOLUCIÓN GLOBAL DEFINITIVA:
+          El <main> aplica un padding-top que utiliza las variables CSS globales.
+          Esto empuja todo el contenido de la página hacia abajo, resolviendo el 
+          problema de superposición de forma centralizada y definitiva.
+        */}
+        <main className="pt-[var(--navbar-height-mobile)] lg:pt-[var(--navbar-height-desktop)]">
           {children}
         </main>
+
         <Footer />
       </body>
     </html>

@@ -2,9 +2,6 @@
 
 /*
   HERO BANNER (FULL-BLEED)
-  - Ocupa el ancho completo de la pantalla.
-  - Usa display flex para centrar el contenido verticalmente.
-  - Tiene una altura mínima para asegurar visibilidad en diferentes pantallas.
 */
 .hero-bleed {
   position: relative;
@@ -14,12 +11,11 @@
   display: flex;
   align-items: flex-end; /* Alinea el contenido hacia abajo */
   min-height: 45vh; /* Altura mínima para el banner */
-  padding-top: 80px; /* Espacio para el navbar fijo */
+  /* Se elimina el padding. El layout global es responsable de este espaciado. */
 }
 
 /* 
   SUPERPOSICIÓN OSCURA (OVERLAY)
-  - Crea un fondo semi-transparente sobre la imagen para mejorar la legibilidad del texto.
 */
 .hero-overlay {
   position: absolute;
@@ -33,8 +29,6 @@
 
 /*
   CONTENIDO DEL BANNER
-  - Contenedor para el título, metadatos, etc.
-  - Se posiciona sobre el overlay.
 */
 .hero-inner {
   position: relative;
@@ -45,13 +39,11 @@
 
 /* 
   CONTENIDO DEL POST (CUERPO DEL ARTÍCULO)
-  - Estilos para el contenido generado desde el CMS.
-  - Asegura que los encabezados y otros elementos tengan un estilo coherente.
 */
 .post-content h1,
 .post-content h2,
 .post-content h3 {
-  color: var(--color-texto-claro, #1f2937); /* Color oscuro para el texto del artículo */
+  color: var(--color-texto-claro, #1f2937);
   margin-bottom: 1rem;
   margin-top: 1.5rem;
 }
@@ -64,7 +56,6 @@
 
 /* 
   SOMBRAS DE TEXTO
-  - Clases de utilidad para añadir sombras al texto, mejorando la legibilidad sobre imágenes.
 */
 .text-shadow-lg {
   text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
@@ -76,7 +67,6 @@
 
 /*
   AJUSTES RESPONSIVE
-  - Modifica la altura del banner en pantallas más pequeñas.
 */
 @media (max-width: 768px) {
   .hero-bleed {

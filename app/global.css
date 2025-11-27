@@ -4,12 +4,22 @@
 @tailwind utilities;
 
 @layer base {
+  /* 
+    SOLUCIÓN ESTRUCTURAL DEFINITIVA
+    Se definen las alturas de la barra de navegación como variables CSS para una 
+    gestión centralizada y semántica.
+  */
+  :root {
+    --navbar-height-mobile: 138px; /* Altura total de los elementos fijos en móvil */
+    --navbar-height-desktop: 148px; /* Altura total de los elementos fijos en escritorio */
+  }
+
   body {
-    /* 
-      Aplicamos las clases personalizadas que definimos en tailwind.config.ts.
-      - `bg-fondo-svg` aplica el color de fondo #b9d9eb.
-      - `bg-hexagon-pattern` aplica la imagen SVG del patrón de hexágonos.
-    */
     @apply bg-fondo-svg bg-hexagon-pattern;
   }
+
+  /* 
+    El padding se elimina de aquí y se gestionará directamente en el layout
+    utilizando las variables CSS para máxima claridad y mantenibilidad.
+  */
 }

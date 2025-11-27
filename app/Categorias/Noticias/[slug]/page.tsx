@@ -93,8 +93,14 @@ export default async function Page({ params }: PageProps) {
   const featuredUrl = post.featuredImage?.node?.sourceUrl;
 
   return (
+    // Contenedor de página que envuelve todo.
     <div className="w-full">
-      {/* BANNER DE ANCHO COMPLETO */}
+
+      {/* 
+        BANNER DE ANCHO COMPLETO
+        Se eliminan los márgenes y paddings. El espaciado superior ahora es
+        gestionado exclusivamente por el layout principal (app/layout.tsx).
+      */}
       <header
         className="hero-bleed"
         style={{ backgroundImage: featuredUrl ? `url(${featuredUrl})` : undefined }}
