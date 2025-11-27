@@ -44,25 +44,26 @@ const legalLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white pt-16 pb-6 mt-12 titillium-web-regular">
+    <footer className="bg-gradient-to-b from-gray-900 to-black text-gray-300 pt-20 pb-8 mt-12 titillium-web-regular border-t-4 border-yellow-500">
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-10">
           
           {/* Columna 1: Sobre nosotros */}
-          <div className="flex flex-col">
-            <img src="/RadioAColor.png" alt="Radio Empresaria Logo" className="h-12 w-auto mb-4 self-start"/>
-            <p className="text-gray-400 text-sm">
+          <div className="flex flex-col lg:col-span-2 md:col-span-3">
+            <img src="/RadioAColor.png" alt="Radio Empresaria Logo" className="h-16 w-auto mb-6 self-start"/>
+            <p className="text-gray-400 text-sm leading-relaxed">
               Radio online de la Fundación Pro Buenos Aires, dedicada a pymes, comercios, emprendedores y grandes empresas de nuestra región.
             </p>
           </div>
 
           {/* Columna 2: Secciones */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Secciones</h3>
-            <ul className="space-y-3">
+            <h3 className="text-xl font-bold mb-6 text-white uppercase tracking-wider">Secciones</h3>
+            <ul className="space-y-4">
               {siteSections.map(section => (
                 <li key={section.name}>
-                  <Link href={section.href} className="text-gray-400 hover:text-white transition-colors">
+                  <Link href={section.href} className="text-gray-400 hover:text-yellow-400 transition-colors duration-300 flex items-center">
+                    <span className="w-2 h-2 bg-yellow-500 rounded-full mr-3"></span>
                     {section.name}
                   </Link>
                 </li>
@@ -70,28 +71,16 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Columna 3: Legal */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Legal</h3>
-            <ul className="space-y-3">
-              {legalLinks.map(link => (
-                <li key={link.name}>
-                  <Link href={link.href} className="text-gray-400 hover:text-white transition-colors">
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          
 
           {/* Columna 4: Contacto */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Contacto</h3>
-            <ul className="space-y-4 text-sm">
+          <div className="md:col-span-2 lg:col-span-1">
+            <h3 className="text-xl font-bold mb-6 text-white uppercase tracking-wider">Contacto</h3>
+            <ul className="space-y-5 text-sm">
               {contactInfo.map((item, index) => (
-                <li key={index} className="flex items-center">
-                  <item.icon className="text-xl mr-3 text-gray-400" />
-                  <span className="text-gray-400">{item.text}</span>
+                <li key={index} className="flex items-center group">
+                  <item.icon className="text-2xl mr-4 text-yellow-400 group-hover:scale-110 transition-transform" />
+                  <span className="text-gray-400 group-hover:text-white">{item.text}</span>
                 </li>
               ))}
             </ul>
@@ -100,10 +89,10 @@ export default function Footer() {
         </div>
 
         {/* Redes Sociales y Copyright */}
-        <div className="border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center">
-          <div className="flex space-x-5 mb-4 md:mb-0">
+        <div className="border-t border-gray-700 pt-8 flex flex-col sm:flex-row justify-between items-center">
+          <div className="flex space-x-6 mb-6 sm:mb-0">
             {socialLinks.map(social => (
-              <a key={social.label} href={social.href} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors text-2xl">
+              <a key={social.label} href={social.href} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transform hover:scale-125 transition-all duration-300 text-3xl">
                 <social.icon />
               </a>
             ))}
