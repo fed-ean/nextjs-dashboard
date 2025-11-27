@@ -15,7 +15,7 @@ export default function NoticiaPrincipalIzquierda({ noticia }: { noticia: Notici
     const urlNoticia = `/Categorias/Noticias/${noticia.slug}`;
     const imageUrl = noticia.sourceUrl;
     const title = noticia.title || 'Título no disponible';
-    const authorName = noticia.author?.node?.name || 'RadioEmpresaria';
+    const authorName = 'RadioEmpresaria';
 
     return (
         <div className="w-full md:w-7/12">
