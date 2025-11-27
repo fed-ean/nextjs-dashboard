@@ -8,21 +8,24 @@ import PaginationControls from '../../ui/categorias/PaginationControls';
 import UltimasNoticiasSidenav from '../../ui/Page_Index/ultimas-noticias-sidenav';
 import type { Category, Post } from '../../lib/definitions';
 
+// Tipado corregido para Next.js App Router con Server Components asíncronos
 type Props = {
   params: Promise<{ 
     slug: string;
   }>;
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export default async function CategoriaPage({ params, searchParams }: Props) {
+export default async function CategoriaPage({ params, searchParams: searchParamsProp }: Props) {
+  // 1. Resolver las promesas de los parámetros
   const { slug } = await params;
+  const searchParams = await searchParamsProp;
   const currentPage = Number(searchParams?.page || '1');
 
-  // 1. Obtener datos de la categoría y posts paginados
+  // 2. Obtener datos de la categoría y posts paginados
   const { posts, totalPages, category } = await getCachedPostsPage(slug, currentPage);
   
-  // 2. Obtener todas las categorías para el SideNav
+  // 3. Obtener todas las categorías para el SideNav
   const allCategories = await getAllCategories();
 
   // Si no hay categoría o posts, mostrar notFound
