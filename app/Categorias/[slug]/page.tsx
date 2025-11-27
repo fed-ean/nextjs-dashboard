@@ -1,39 +1,70 @@
 
 import React from 'react';
-import { getCachedPostsPage } from '../../lib/data-fetcher';
+import { getCachedPostsPage, getAllCategories } from '../../lib/data-fetcher';
+import type { Category } from '@/app/lib/definitions';
 import { notFound } from 'next/navigation';
 
 import CategoryGrid from '../../ui/categorias/CategoryGrid';
 import PaginationControls from '../../ui/categorias/PaginationControls';
 import SidenavServer from '@/app/ui/Page_Index/SidenavServer';
 
-// Tipado corregido para Next.js App Router con Server Components asíncronos
+// --- FUNCIÓN generateStaticParams AÑADIDA ---
+export async function generateStaticParams() {
+  const categories: Category[] = await getAllCategories();
+  
+  // Mapear categorías al formato requerido por Next.js
+  return categories.map(category => ({
+    slug: category.slug,
+  }));
+}
+
+// Tipado de Props corregido para las convenciones modernas de Next.js
 type Props = {
-  params: Promise<{ 
+  params: { 
     slug: string;
-  }>;
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+  };
+  searchParams?: { [key: string]: string | string[] | undefined };
 };
 
-export default async function CategoriaPage({ params, searchParams: searchParamsProp }: Props) {
-  // 1. Resolver las promesas de los parámetros
-  const { slug } = await params;
-  const searchParams = await searchParamsProp;
+export default async function CategoriaPage({ params, searchParams }: Props) {
+  // Los parámetros ya vienen resueltos, no se necesita `await`
+  const { slug } = params;
   const currentPage = Number(searchParams?.page || '1');
 
-  // 2. Obtener datos de la categoría y posts paginados
   const { posts, totalPages, category } = await getCachedPostsPage(slug, currentPage);
   
-  // Si no hay categoría o posts, mostrar notFound
-  if (!category || !posts || posts.length === 0) {
+  // Si la categoría en sí no existe, mostramos un 404
+  if (!category) {
     return notFound();
+  }
+
+  // Si no hay posts, aún mostramos la página con un mensaje
+  if (!posts || posts.length === 0) {
+      return (
+        <div className="container mx-auto px-4 py-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                <main className="lg:col-span-9">
+                    <div className="border-b pb-4 mb-6">
+                        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Categoría</h1>
+                        <p className="text-xl text-blue-600 mt-1">{category.name}</p>
+                    </div>
+                    <p className='py-10 text-center'>No hay publicaciones para mostrar en esta página.</p>
+                    <PaginationControls totalPages={totalPages} currentSectionSlug={slug} />
+                </main>
+                <aside className="lg:col-span-3 space-y-8">
+                    <div className="sticky top-24">
+                        <SidenavServer />
+                    </div>
+                </aside>
+            </div>
+        </div>
+      )
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
-        {/* Columna Principal de Contenido */}
         <main className="lg:col-span-9">
           <div className="border-b pb-4 mb-6">
             <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Categoría</h1>
@@ -45,7 +76,6 @@ export default async function CategoriaPage({ params, searchParams: searchParams
           <PaginationControls totalPages={totalPages} currentSectionSlug={slug} />
         </main>
 
-        {/* Barra Lateral */}
         <aside className="lg:col-span-3 space-y-8">
           <div className="sticky top-24">
             <SidenavServer />

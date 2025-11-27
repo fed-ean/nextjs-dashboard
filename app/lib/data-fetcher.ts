@@ -33,20 +33,25 @@ async function fetchGraphQL(query: any, variables: Record<string, any> = {}): Pr
     return json.data;
 }
 
-// CORRECCIÓN: Asegurar que el mapeo de categorías de un post coincida con el tipo `Category`
+// SOLUCIÓN: Asegurar que el objeto `categories` sea serializable.
 const mapPostData = (p: any): Post => ({
     databaseId: p.databaseId,
     title: p.title,
     excerpt: p.excerpt,
     slug: p.slug,
     date: p.date,
-    featuredImage: { node: { sourceUrl: p.featuredImage?.node?.sourceUrl || null } },
+    featuredImage: { 
+        node: { 
+            sourceUrl: p.featuredImage?.node?.sourceUrl || null 
+        } 
+    },
+    // Se crea un nuevo objeto explícitamente para evitar pasar funciones o propiedades no serializables.
     categories: {
         nodes: (p.categories?.nodes || []).map((c: any) => ({
-            databaseId: c.databaseId, // Añadido
+            databaseId: c.databaseId,
             name: c.name,
             slug: c.slug,
-            count: c.count,       // Añadido
+            count: c.count,
         }))
     },
 });
@@ -54,7 +59,6 @@ const mapPostData = (p: any): Post => ({
 async function getCategoryDetails(slug: string): Promise<Category | null> {
     const data = await fetchGraphQL(GET_ALL_CATEGORIES, {});
     const category = data?.categories?.nodes?.find((c: any) => c.slug === slug);
-    // Asegurar que el objeto devuelto coincida con el tipo `Category`
     return category ? { 
         databaseId: category.databaseId,
         name: category.name,
