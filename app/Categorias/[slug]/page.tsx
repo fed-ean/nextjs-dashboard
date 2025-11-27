@@ -6,17 +6,17 @@ import SideNav from '../../ui/Page_Index/sidenav';
 import CategoryGrid from '../../ui/categorias/CategoryGrid';
 import PaginationControls from '../../ui/categorias/PaginationControls';
 import UltimasNoticiasSidenav from '../../ui/Page_Index/ultimas-noticias-sidenav';
+import type { Category, Post } from '../../lib/definitions';
 
 type Props = {
-  params: { 
+  params: Promise<{ 
     slug: string;
-    page?: string;
-  };
+  }>;
   searchParams?: { [key: string]: string | string[] | undefined };
 };
 
 export default async function CategoriaPage({ params, searchParams }: Props) {
-  const { slug } = params;
+  const { slug } = await params;
   const currentPage = Number(searchParams?.page || '1');
 
   // 1. Obtener datos de la categoría y posts paginados
