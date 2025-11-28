@@ -4,44 +4,44 @@ import CategoryGrid from '../ui/categorias/CategoryGrid';
 import CategoryPagination from '../ui/categorias/CategoryPagination';
 import SidenavServer from '@/app/ui/Page_Index/SidenavServer';
 
+export const dynamic = 'force-dynamic'; // ✅ IMPORTANTE: evita error de prerender
+
 const PER_PAGE = 9;
 
-// ✅ Tipado compatible con Next.js 15
-type Props = {
-  searchParams?: Promise<{ 
-    [key: string]: string | string[] | undefined;
-  }>;
+type PageProps = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 const NoPostsDisplay = () => (
   <div className="text-center py-10">
     <h1 className="text-2xl font-semibold mb-3">No hay publicaciones</h1>
-    <p className="text-gray-500">Todavía no se ha publicado ningún artículo en esta sección.</p>
+    <p className="text-gray-500">
+      Todavía no se ha publicado ningún artículo en esta sección.
+    </p>
   </div>
 );
 
-export default async function InteresGeneralPage({ searchParams }: Props) {
-  // ✅ Resolver Promise de searchParams
-  const resolvedSearchParams = searchParams ? await searchParams : {};
+export default async function InteresGeneralPage({ searchParams }: PageProps) {
+  const params = await searchParams; // ✅ Se espera la promesa
 
-  // Lógica de paginación
-  const page = Number(resolvedSearchParams.page || '1');
+  const page = Number(params?.page || '1');
 
-  // Obtener posts
-  const { posts, totalPages } = await getCachedPostsPage(null, page, PER_PAGE);
+  const { posts, totalPages } = await getCachedPostsPage(
+    null,
+    page,
+    PER_PAGE
+  );
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        
-        {/* Sidebar */}
+
         <aside className="lg:col-span-3 space-y-8">
           <div className="sticky top-24">
             <SidenavServer />
           </div>
         </aside>
 
-        {/* Contenido principal */}
         <main className="lg:col-span-9">
           <h1 className="text-3xl font-bold mb-6 border-b pb-4">
             Interés General
@@ -49,11 +49,10 @@ export default async function InteresGeneralPage({ searchParams }: Props) {
 
           {posts && posts.length > 0 ? (
             <>
-              <CategoryGrid 
-                posts={posts} 
-                currentSectionSlug="interes-general" 
+              <CategoryGrid
+                posts={posts}
+                currentSectionSlug="interes-general"
               />
-
               <div className="mt-8">
                 <CategoryPagination
                   basePath="/interes-general"
