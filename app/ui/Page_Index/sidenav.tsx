@@ -1,8 +1,7 @@
-
 import Link from 'next/link';
 import type { Category, Post } from '@/app/lib/definitions';
 import { format, parseISO } from 'date-fns';
-import es from 'date-fns/locale/es';
+import { es } from 'date-fns/locale/es';
 
 interface SidenavProps {
   categories: Category[];
@@ -22,7 +21,9 @@ export default function SideNav({ categories, latestPosts }: SidenavProps) {
           <div className="space-y-4">
             {latestPosts.map((post) => {
                 // Formateo de la fecha
-                const formattedDate = post.date ? format(parseISO(post.date), "d 'de' MMMM, yyyy", { locale: es }) : '';
+                const formattedDate = post.date 
+                  ? format(parseISO(post.date), "d 'de' MMMM, yyyy", { locale: es }) 
+                  : '';
 
                 return (
                     <div key={post.databaseId} className="flex items-start gap-4">
