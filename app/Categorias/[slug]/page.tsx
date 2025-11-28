@@ -2,6 +2,8 @@ import React from 'react';
 import { getCachedPostsPage, getAllCategories } from '../../lib/data-fetcher';
 import type { Category } from '@/app/lib/definitions';
 import { notFound } from 'next/navigation';
+export const dynamic = 'force-dynamic';
+
 
 import CategoryGrid from '../../ui/categorias/CategoryGrid';
 import PaginationControls from '../../ui/categorias/PaginationControls';

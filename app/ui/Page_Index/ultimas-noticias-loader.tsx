@@ -1,5 +1,7 @@
 // app/ui/Page_Index/ultimas-noticias-loader.tsx
 import NoticiasVarias from "../dashboard/noticias-varias";
+import type { Post } from "@/app/lib/definitions";
+
 
 const GQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT_URL || '';
 
@@ -24,20 +26,7 @@ const GET_LATEST_POSTS_QUERY = `
   }
 `;
 
-interface Post {
-  databaseId: number;
-  title: string;
-  slug: string;
-  excerpt: string;
-  date: string;
-  featuredImage: { node: { sourceUrl: string } };
-  categories: {
-    nodes: {
-      name: string;
-      slug: string; // ✅ AGREGADO
-    }[];
-  };
-}
+
 
 async function fetchLatestPosts(): Promise<{ posts: Post[]; error: string | null }> {
   if (!GQL_ENDPOINT) {
