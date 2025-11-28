@@ -4,12 +4,12 @@ import CategoryGrid from '../ui/categorias/CategoryGrid';
 import CategoryPagination from '../ui/categorias/CategoryPagination';
 import SidenavServer from '@/app/ui/Page_Index/SidenavServer';
 
-export const dynamic = 'force-dynamic'; // ✅ IMPORTANTE: evita error de prerender
+export const dynamic = 'force-dynamic';
 
 const PER_PAGE = 9;
 
 type PageProps = {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams?: { [key: string]: string | string[] | undefined };
 };
 
 const NoPostsDisplay = () => (
@@ -22,9 +22,7 @@ const NoPostsDisplay = () => (
 );
 
 export default async function InteresGeneralPage({ searchParams }: PageProps) {
-  const params = await searchParams; // ✅ Se espera la promesa
-
-  const page = Number(params?.page || '1');
+  const page = Number(searchParams?.page || '1');
 
   const { posts, totalPages } = await getCachedPostsPage(
     null,

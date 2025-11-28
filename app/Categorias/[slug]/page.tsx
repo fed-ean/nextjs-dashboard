@@ -1,101 +1,71 @@
 import React from 'react';
-import { getCachedPostsPage, getAllCategories } from '../../lib/data-fetcher';
-import type { Category } from '@/app/lib/definitions';
-import { notFound } from 'next/navigation';
-
-import CategoryGrid from '../../ui/categorias/CategoryGrid';
-import PaginationControls from '../../ui/categorias/PaginationControls';
+import { getCachedPostsPage } from '@/app/lib/data-fetcher';
+import CategoryGrid from '@/app/ui/categorias/CategoryGrid';
+import CategoryPagination from '@/app/ui/categorias/CategoryPagination';
 import SidenavServer from '@/app/ui/Page_Index/SidenavServer';
 
-export async function generateStaticParams() {
-  const categories: Category[] = await getAllCategories();
-  return categories.map(category => ({ slug: category.slug }));
-}
+export const dynamic = 'force-dynamic';
 
-// ✅ Tipado compatible con Next.js 15
-type Props = {
-  params: Promise<{ 
-    slug: string;
-  }>;
-  searchParams?: Promise<{ 
-    [key: string]: string | string[] | undefined;
-  }>;
+const PER_PAGE = 9;
+
+type PageProps = {
+  params: { slug: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 };
 
-export default async function CategoriaPage({ params, searchParams }: Props) {
-  // ✅ Resolver Promises
-  const { slug } = await params;
-  const resolvedSearchParams = searchParams ? await searchParams : {};
+const NoPostsDisplay = () => (
+  <div className="text-center py-10">
+    <h1 className="text-2xl font-semibold mb-3">No hay publicaciones</h1>
+    <p className="text-gray-500">
+      Todavía no se ha publicado ningún artículo en esta sección.
+    </p>
+  </div>
+);
 
-  const currentPage = Number(resolvedSearchParams.page || '1');
+export default async function CategoriaPage({ params, searchParams }: PageProps) {
+  const { slug } = params;
 
-  const { posts, totalPages, category } = await getCachedPostsPage(slug, currentPage);
-  
-  if (!category) {
-    return notFound();
-  }
+  const page = Number(searchParams?.page || '1');
 
-  // Layout de la página
-  const PageLayout = ({ children }: { children: React.ReactNode }) => (
+  const { posts, totalPages, category } = await getCachedPostsPage(
+    slug,
+    page,
+    PER_PAGE
+  );
+
+  return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        {/* ASIDE IZQUIERDA */}
+
         <aside className="lg:col-span-3 space-y-8">
           <div className="sticky top-24">
             <SidenavServer />
           </div>
         </aside>
 
-        {/* MAIN DERECHA */}
         <main className="lg:col-span-9">
-          {children}
+          <h1 className="text-3xl font-bold mb-6 border-b pb-4">
+            {category?.name || 'Categoría'}
+          </h1>
+
+          {posts && posts.length > 0 ? (
+            <>
+              <CategoryGrid posts={posts} currentSectionSlug={slug} />
+              <div className="mt-8">
+                <CategoryPagination
+                  basePath={`/Categorias/${slug}`}
+                  current={page}
+                  totalPages={totalPages}
+                  perPage={PER_PAGE}
+                />
+              </div>
+            </>
+          ) : (
+            <NoPostsDisplay />
+          )}
         </main>
+
       </div>
     </div>
-  );
-
-  // Sin posts
-  if (!posts || posts.length === 0) {
-    return (
-      <PageLayout>
-        <div className="border-b pb-4 mb-6">
-          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
-            Categoría
-          </h1>
-          <p className="text-xl text-blue-600 mt-1">{category.name}</p>
-        </div>
-
-        <p className="py-10 text-center">
-          No hay publicaciones para mostrar en esta página.
-        </p>
-
-        <PaginationControls
-          totalPages={totalPages}
-          currentSectionSlug={slug}
-        />
-      </PageLayout>
-    );
-  }
-
-  // Con posts
-  return (
-    <PageLayout>
-      <div className="border-b pb-4 mb-6">
-        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
-          Categoría
-        </h1>
-        <p className="text-xl text-blue-600 mt-1">{category.name}</p>
-      </div>
-
-      <CategoryGrid 
-        posts={posts} 
-        currentSectionSlug={slug} 
-      />
-
-      <PaginationControls 
-        totalPages={totalPages} 
-        currentSectionSlug={slug} 
-      />
-    </PageLayout>
   );
 }
