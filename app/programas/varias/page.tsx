@@ -53,7 +53,6 @@ export default async function VariasPage(props: Props) {
   totalPages={totalPages}
 />
 
-        />
       </div>
     </div>
   );
