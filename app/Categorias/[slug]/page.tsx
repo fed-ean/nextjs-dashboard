@@ -7,14 +7,14 @@ import CategoryGrid from "@/app/ui/categorias/CategoryGrid";
 
 const PER_PAGE = 9;
 
-type Props = {
-  params: { slug: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
-};
-
-export default async function CategoriaPage({ params, searchParams }: Props) {
+export default async function CategoriaPage(
+  props: { params: { slug: string }; searchParams?: Record<string, string | string[] | undefined> }
+): Promise<JSX.Element> {
+  const { params, searchParams } = props;
   const slug = params.slug;
-  const page = Number(searchParams?.page ?? 1);
+
+  const rawPage = searchParams?.page;
+  const page = rawPage ? Number(Array.isArray(rawPage) ? rawPage[0] : rawPage) || 1 : 1;
 
   const { posts, totalPages } = await getCachedPostsPage(slug, page, PER_PAGE);
 
