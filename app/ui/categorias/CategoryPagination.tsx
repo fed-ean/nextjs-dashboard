@@ -2,29 +2,28 @@
 
 import Link from "next/link";
 
-type Props = {
-  currentPage: number;
-  totalPages: number;
-  slug: string;
-};
+interface Props {
+  basePath: string;       // Ej: "/categorias/politica"
+  current: number;        // Página actual
+  totalPages: number;     // Total de páginas
+  perPage?: number;       // No es estrictamente necesario pero lo dejamos por si lo usas
+}
 
 export default function CategoryPagination({
-  currentPage,
+  basePath,
+  current,
   totalPages,
-  slug,
 }: Props) {
-  if (totalPages <= 1) return null;
-
-  const prevPage = currentPage > 1 ? currentPage - 1 : null;
-  const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+  const prevPage = current > 1 ? current - 1 : null;
+  const nextPage = current < totalPages ? current + 1 : null;
 
   return (
-    <div className="flex items-center justify-center gap-4 mt-6">
-      {/* Prev */}
+    <div className="flex justify-center items-center space-x-4 mt-6">
+      {/* Página anterior */}
       {prevPage ? (
         <Link
-          href={`/Categorias/${slug}?page=${prevPage}`}
-          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
+          href={`${basePath}?page=${prevPage}`}
+          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
         >
           ← Anterior
         </Link>
@@ -32,16 +31,16 @@ export default function CategoryPagination({
         <span className="px-4 py-2 text-gray-400">← Anterior</span>
       )}
 
-      {/* Page indicator */}
-      <span className="px-4 py-2 font-semibold">
-        Página {currentPage} de {totalPages}
+      {/* Indicador */}
+      <span className="font-semibold">
+        Página {current} de {totalPages}
       </span>
 
-      {/* Next */}
+      {/* Página siguiente */}
       {nextPage ? (
         <Link
-          href={`/Categorias/${slug}?page=${nextPage}`}
-          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
+          href={`${basePath}?page=${nextPage}`}
+          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
         >
           Siguiente →
         </Link>

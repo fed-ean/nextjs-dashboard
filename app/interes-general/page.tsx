@@ -53,12 +53,12 @@ export default async function InteresGeneralPage({ searchParams }: PageProps) {
                 currentSectionSlug="interes-general"
               />
               <div className="mt-8">
-                <CategoryPagination
-                  basePath="/interes-general"
-                  current={page}
-                  totalPages={totalPages}
-                  perPage={PER_PAGE}
-                />
+              <CategoryPagination
+  basePath="/interes-general"
+  current={page}
+  totalPages={totalPages}
+/>
+
               </div>
             </>
           ) : (
