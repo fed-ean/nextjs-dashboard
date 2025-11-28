@@ -1,7 +1,6 @@
 // app/ui/Page_Index/ultimas-noticias-loader.tsx
 import NoticiasVarias from "../dashboard/noticias-varias";
 
-// Endpoint desde variable de entorno
 const GQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT_URL || '';
 
 const GET_LATEST_POSTS_QUERY = `
@@ -14,7 +13,12 @@ const GET_LATEST_POSTS_QUERY = `
         excerpt
         date
         featuredImage { node { sourceUrl } }
-        categories(first: 1) { nodes { name } }
+        categories(first: 1) {
+          nodes {
+            name
+            slug
+          }
+        }
       }
     }
   }
@@ -25,9 +29,14 @@ interface Post {
   title: string;
   slug: string;
   excerpt: string;
-  date: string; // ✅ AGREGADO
+  date: string;
   featuredImage: { node: { sourceUrl: string } };
-  categories: { nodes: { name: string }[] };
+  categories: {
+    nodes: {
+      name: string;
+      slug: string; // ✅ AGREGADO
+    }[];
+  };
 }
 
 async function fetchLatestPosts(): Promise<{ posts: Post[]; error: string | null }> {
