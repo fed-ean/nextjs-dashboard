@@ -1,4 +1,3 @@
-import UltimasNoticiasSidenav from "../Page_Index/ultimas-noticias-sidenav";
 import { fetchLatestInvoices } from "../../lib/data";
 
 export default async function SideNav() {
@@ -9,7 +8,6 @@ export default async function SideNav() {
     <aside className="h-full w-full bg-white border-r">
       <div className="p-4 space-y-6">
         <div className="mt-8">
-          <UltimasNoticiasSidenav noticias={latestInvoices} />
         </div>
 
         <div>
