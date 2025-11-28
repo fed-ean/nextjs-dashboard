@@ -1,4 +1,3 @@
-// app/Categorias/[slug]/page.tsx
 export const dynamic = "force-dynamic";
 
 import React from "react";
@@ -15,15 +14,9 @@ type Props = {
 
 export default async function CategoriaPage({ params, searchParams }: Props) {
   const slug = params.slug;
-
   const page = Number(searchParams?.page ?? 1);
 
-  // Obtiene noticias paginadas por categoría o todas si es null.
-  const { posts, totalPages } = await getCachedPostsPage(
-    slug,
-    page,
-    PER_PAGE
-  );
+  const { posts, totalPages } = await getCachedPostsPage(slug, page, PER_PAGE);
 
   if (!posts || posts.length === 0) {
     return (
