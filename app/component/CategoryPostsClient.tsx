@@ -1,9 +1,8 @@
-// app/component/CategoryPostsClient.tsx
 'use client';
 
 import React, { useState } from 'react';
 import { getClient } from '../lib/cliente';
-import { GET_POSTS_BY_CATEGORY_SIMPLE, GET_ALL_POSTS } from '../lib/queries';
+import { GET_POSTS_BY_CATEGORY_SIMPLE, GET_ALL_POSTS_SIMPLE } from '../lib/queries';
 import Link from 'next/link';
 
 type PageInfo = {
@@ -31,7 +30,7 @@ export default function CategoryPostsClient({
 
       if (isInteresGeneral) {
         const { data }: any = await client.query({
-          query: GET_ALL_POSTS,
+          query: GET_ALL_POSTS_SIMPLE,
           variables: {
             first: 10,
             after: pageInfo?.endCursor || null
