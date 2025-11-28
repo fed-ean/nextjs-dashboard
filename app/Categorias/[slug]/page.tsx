@@ -8,16 +8,22 @@ import CategoryGrid from "@/app/ui/categorias/CategoryGrid";
 
 const PER_PAGE = 9;
 
-export default async function CategoriaPage(
-  props: any // <<--- evita conflictos de PageProps
-): Promise<JSX.Element> {
-  const { params, searchParams } = props;
+type Props = {
+  params: { slug: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
+};
+
+export default async function CategoriaPage({ params, searchParams }: Props) {
   const slug = params.slug;
 
-  const rawPage = searchParams?.page;
-  const page = rawPage ? Number(Array.isArray(rawPage) ? rawPage[0] : rawPage) || 1 : 1;
+  const page = Number(searchParams?.page ?? 1);
 
-  const { posts, totalPages } = await getCachedPostsPage(slug, page, PER_PAGE);
+  // Obtiene noticias paginadas por categoría o todas si es null.
+  const { posts, totalPages } = await getCachedPostsPage(
+    slug,
+    page,
+    PER_PAGE
+  );
 
   if (!posts || posts.length === 0) {
     return (
