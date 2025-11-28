@@ -1,3 +1,4 @@
+// app/Categorias/[slug]/page.tsx
 export const dynamic = "force-dynamic";
 
 import React from "react";
@@ -8,7 +9,7 @@ import CategoryGrid from "@/app/ui/categorias/CategoryGrid";
 const PER_PAGE = 9;
 
 export default async function CategoriaPage(
-  props: { params: { slug: string }; searchParams?: Record<string, string | string[] | undefined> }
+  props: any // <<--- evita conflictos de PageProps
 ): Promise<JSX.Element> {
   const { params, searchParams } = props;
   const slug = params.slug;
