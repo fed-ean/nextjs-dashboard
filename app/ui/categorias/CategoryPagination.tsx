@@ -25,8 +25,16 @@ export default function CategoryPagination({
   // eslint-disable-next-line no-console
   console.log('[Pagination] props:', { basePath, current, totalPages, perPage });
 
-  // Build page URL: page 1 => basePath, page>1 => basePath/page/n
-  const pageUrl = (n: number) => (n <= 1 ? `${basePath.replace(/\/$/, '')}` : `${basePath.replace(/\/$/, '')}/page/${n}`);
+  // Build page URL:
+  // page 1 => basePath (sin query)
+  // page>1 => basePath?page=n
+  const normalizeBase = (p: string) => p.replace(/\/+$/, '');
+  const pageUrl = (n: number) => {
+    const base = normalizeBase(basePath);
+    if (n <= 1) return base;
+    // Si base ya tiene query (poco probable aquí), añadimos con &
+    return base.includes('?') ? `${base}&page=${n}` : `${base}?page=${n}`;
+  };
 
   // window of pages
   let start = Math.max(1, current - Math.floor(maxButtons / 2));
@@ -43,7 +51,7 @@ export default function CategoryPagination({
   // Robust slug extraction:
   const slugFromBase = (() => {
     try {
-      const p = basePath.replace(/\/+$/, ''); // quitar slashes finales
+      const p = normalizeBase(basePath);
       // Formatos posibles:
       //  - /Categorias/politica
       //  - /Categorias/politica/page
@@ -90,9 +98,10 @@ export default function CategoryPagination({
       // eslint-disable-next-line no-console
       console.log('[Pagination] navigating to', href);
       router.push(href);
+      // fallback visual
       setTimeout(() => setNavigating(false), 1500);
     });
-  }, [router]);
+  }, [router, basePath, perPage]);
 
   const disablePrev = current <= 1;
   const disableNext = totalPages > 0 ? current >= totalPages : false;
