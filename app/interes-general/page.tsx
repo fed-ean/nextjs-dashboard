@@ -1,61 +1,63 @@
-// app/interes-general/page.tsx
+
 import React from 'react';
 import { getCachedPostsPage } from '../lib/data-fetcher';
 import CategoryGrid from '../ui/categorias/CategoryGrid';
 import CategoryPagination from '../ui/categorias/CategoryPagination';
-export const dynamic = 'force-dynamic';
-
+import SidenavServer from '@/app/ui/Page_Index/SidenavServer'; // 1. IMPORTAR SIDENAV
 
 const PER_PAGE = 9;
 
-type SearchParamsShape = { [key: string]: string | string[] | undefined };
-
-// Tipado compatible con Next 15: searchParams es Promise<...>
 type Props = {
-  searchParams?: Promise<SearchParamsShape>;
+  searchParams?: { [key: string]: string | string[] | undefined };
 };
-
-const ErrorDisplay = ({ message }: { message: string }) => (
-  <div className="text-center py-10">
-    <h1 className="text-2xl font-bold mb-4">Error al Cargar Contenido</h1>
-    <p className="text-red-500">{message}</p>
-    <p className="mt-4">Puede haber un problema de conexión. Por favor, inténtelo más tarde.</p>
-  </div>
-);
 
 const NoPostsDisplay = () => (
   <div className="text-center py-10">
     <h1 className="text-2xl font-semibold mb-3">No hay publicaciones</h1>
-    <p className="text-gray-500">Todavía no se ha publicado ningún artículo.</p>
+    <p className="text-gray-500">Todavía no se ha publicado ningún artículo en esta sección.</p>
   </div>
 );
 
 export default async function InteresGeneralPage({ searchParams }: Props) {
-  // Si no viene searchParams, await a Promise.resolve({})
-  const resolvedSearchParams: SearchParamsShape = await (searchParams ?? Promise.resolve({}));
+  // Lógica de paginación simplificada
+  const page = Number(searchParams?.page || '1');
 
-  const page = Math.max(1, Number(resolvedSearchParams?.page ?? 1));
-
-  // Tu data-fetcher actual acepta solo 1 argumento (slug | null)
-  const { posts, totalPages } = await getCachedPostsPage(null);
-
-  if (!posts || posts.length === 0) {
-    return <NoPostsDisplay />;
-  }
+  // Se obtienen los posts para "Interés General" (sin slug) y la paginación
+  const { posts, totalPages } = await getCachedPostsPage(null, page, PER_PAGE);
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold mb-6">Interés General</h1>
+    // 2. CREAR ESTRUCTURA DE REJILLA
+    <div className="container mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        
+        {/* Columna Izquierda: Sidenav */}
+        <aside className="lg:col-span-3 space-y-8">
+          <div className="sticky top-24">
+            <SidenavServer />
+          </div>
+        </aside>
 
-      <CategoryGrid posts={posts} currentSectionSlug="interes-general" />
+        {/* Columna Derecha: Contenido Principal */}
+        <main className="lg:col-span-9">
+          <h1 className="text-3xl font-bold mb-6 border-b pb-4">Interés General</h1>
 
-      <div className="mt-8">
-        <CategoryPagination
-          basePath="/interes-general"
-          current={page}
-          totalPages={totalPages}
-          perPage={PER_PAGE}
-        />
+          {posts && posts.length > 0 ? (
+            <>
+              <CategoryGrid posts={posts} currentSectionSlug="interes-general" />
+              <div className="mt-8">
+                <CategoryPagination
+                  basePath="/interes-general"
+                  current={page}
+                  totalPages={totalPages}
+                  perPage={PER_PAGE}
+                />
+              </div>
+            </>
+          ) : (
+            <NoPostsDisplay />
+          )}
+        </main>
+
       </div>
     </div>
   );
