@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 const PER_PAGE = 9;
 
 type PageProps = {
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 const NoPostsDisplay = () => (
@@ -22,7 +22,8 @@ const NoPostsDisplay = () => (
 );
 
 export default async function InteresGeneralPage({ searchParams }: PageProps) {
-  const page = Number(searchParams?.page || '1');
+  const search = await searchParams;
+  const page = Number(search?.page || '1');
 
   const { posts, totalPages } = await getCachedPostsPage(
     null,
