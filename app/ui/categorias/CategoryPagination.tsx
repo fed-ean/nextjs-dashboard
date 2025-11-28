@@ -3,9 +3,9 @@
 import Link from "next/link";
 
 type Props = {
-  basePath: string;     // ej: /categorias/politica  |  /interes-general
-  current: number;      // página actual
-  totalPages: number;   // total de páginas
+  basePath: string;
+  current: number;
+  totalPages: number;
 };
 
 export default function CategoryPagination({ basePath, current, totalPages }: Props) {
@@ -16,7 +16,7 @@ export default function CategoryPagination({ basePath, current, totalPages }: Pr
 
   return (
     <div className="flex items-center justify-center gap-4 mt-6">
-      {/* Prev */}
+      
       {prevPage ? (
         <Link
           href={`${basePath}?page=${prevPage}`}
@@ -30,12 +30,10 @@ export default function CategoryPagination({ basePath, current, totalPages }: Pr
         </span>
       )}
 
-      {/* Page numbers */}
       <span className="text-lg font-semibold">
         Página {current} de {totalPages}
       </span>
 
-      {/* Next */}
       {nextPage ? (
         <Link
           href={`${basePath}?page=${nextPage}`}

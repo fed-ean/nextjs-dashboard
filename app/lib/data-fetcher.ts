@@ -33,7 +33,7 @@ async function fetchGraphQL(query: any, variables: Record<string, any> = {}) {
   return json.data;
 }
 
-// NORMALIZADOR
+// Normalizador
 const mapPostData = (p: any): Post => ({
   databaseId: Number(p.databaseId),
   title: p.title ?? '',
@@ -71,13 +71,13 @@ export async function getAllCategories(): Promise<Category[]> {
   }));
 }
 
-// Info de categoría por slug
+// Info categoría
 async function getCategoryDetails(slug: string): Promise<Category | null> {
   const categories = await getAllCategories();
   return categories.find(c => c.slug === slug) ?? null;
 }
 
-// Paginación real SSR
+// Paginación REAL — función estable
 export async function getCachedPostsPage(
   slug: string | null,
   page: number = 1,
@@ -111,6 +111,6 @@ export async function getCachedPostsPage(
     posts: data.posts.nodes.map(mapPostData),
     totalPages,
     total: totalPosts,
-    category: isCategory ? await getCategoryDetails(slug) : null
+    category: isCategory ? await getCategoryDetails(slug!) : null
   };
 }
