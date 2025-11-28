@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 const PER_PAGE = 9;
 
 type PageProps = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
   searchParams?: { [key: string]: string | string[] | undefined };
 };
 
@@ -23,7 +23,7 @@ const NoPostsDisplay = () => (
 );
 
 export default async function CategoriaPage({ params, searchParams }: PageProps) {
-  const { slug } = params;
+  const { slug } = await params;
 
   const page = Number(searchParams?.page || '1');
 
