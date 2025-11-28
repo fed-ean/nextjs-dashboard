@@ -1,14 +1,16 @@
-
 import React from 'react';
 import { getCachedPostsPage } from '../lib/data-fetcher';
 import CategoryGrid from '../ui/categorias/CategoryGrid';
 import CategoryPagination from '../ui/categorias/CategoryPagination';
-import SidenavServer from '@/app/ui/Page_Index/SidenavServer'; // 1. IMPORTAR SIDENAV
+import SidenavServer from '@/app/ui/Page_Index/SidenavServer';
 
 const PER_PAGE = 9;
 
+// ✅ Tipado compatible con Next.js 15
 type Props = {
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams?: Promise<{ 
+    [key: string]: string | string[] | undefined;
+  }>;
 };
 
 const NoPostsDisplay = () => (
@@ -19,31 +21,39 @@ const NoPostsDisplay = () => (
 );
 
 export default async function InteresGeneralPage({ searchParams }: Props) {
-  // Lógica de paginación simplificada
-  const page = Number(searchParams?.page || '1');
+  // ✅ Resolver Promise de searchParams
+  const resolvedSearchParams = searchParams ? await searchParams : {};
 
-  // Se obtienen los posts para "Interés General" (sin slug) y la paginación
+  // Lógica de paginación
+  const page = Number(resolvedSearchParams.page || '1');
+
+  // Obtener posts
   const { posts, totalPages } = await getCachedPostsPage(null, page, PER_PAGE);
 
   return (
-    // 2. CREAR ESTRUCTURA DE REJILLA
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
         
-        {/* Columna Izquierda: Sidenav */}
+        {/* Sidebar */}
         <aside className="lg:col-span-3 space-y-8">
           <div className="sticky top-24">
             <SidenavServer />
           </div>
         </aside>
 
-        {/* Columna Derecha: Contenido Principal */}
+        {/* Contenido principal */}
         <main className="lg:col-span-9">
-          <h1 className="text-3xl font-bold mb-6 border-b pb-4">Interés General</h1>
+          <h1 className="text-3xl font-bold mb-6 border-b pb-4">
+            Interés General
+          </h1>
 
           {posts && posts.length > 0 ? (
             <>
-              <CategoryGrid posts={posts} currentSectionSlug="interes-general" />
+              <CategoryGrid 
+                posts={posts} 
+                currentSectionSlug="interes-general" 
+              />
+
               <div className="mt-8">
                 <CategoryPagination
                   basePath="/interes-general"
