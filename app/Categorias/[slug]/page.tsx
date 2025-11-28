@@ -1,29 +1,29 @@
 // app/Categorias/[slug]/page.tsx
 export const dynamic = "force-dynamic";
 
-import CategoryGrid from "@/app/ui/categorias/CategoryGrid";
-import CategoryPagination from "@/app/ui/categorias/CategoryPagination";
+import React from "react";
 import { getCachedPostsPage } from "@/app/lib/data-fetcher";
+import CategoryPagination from "@/app/ui/categorias/CategoryPagination";
+import CategoryGrid from "@/app/ui/categorias/CategoryGrid";
 
 const PER_PAGE = 9;
 
-// Tipo correcto para Next.js
 type Props = {
-  params: {
-    slug: string;
-  };
-  searchParams?: {
-    page?: string;
-  };
+  params: { slug: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 };
 
-export default async function CategoryPage({ params, searchParams }: Props) {
+export default async function CategoriaPage({ params, searchParams }: Props) {
   const slug = params.slug;
+
   const page = Number(searchParams?.page ?? 1);
 
-  const result = await getCachedPostsPage(slug, page, PER_PAGE);
-
-  const { posts, totalPages } = result;
+  // Obtiene noticias paginadas por categoría o todas si es null.
+  const { posts, totalPages } = await getCachedPostsPage(
+    slug,
+    page,
+    PER_PAGE
+  );
 
   if (!posts || posts.length === 0) {
     return (
@@ -38,9 +38,9 @@ export default async function CategoryPage({ params, searchParams }: Props) {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold mb-6">{slug}</h1>
+      <h1 className="text-3xl font-bold mb-6">{slug.toUpperCase()}</h1>
 
-      <CategoryGrid posts={posts} currentSectionSlug={slug} />
+      <CategoryGrid posts={posts} currentSectionSlug={`categorias/${slug}`} />
 
       <div className="mt-8">
         <CategoryPagination
