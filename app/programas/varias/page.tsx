@@ -47,11 +47,12 @@ export default async function VariasPage(props: Props) {
       />
 
       <div className="mt-8">
-        <CategoryPagination
-          basePath="/programas/varias"
-          current={page}
-          totalPages={totalPages}
-          perPage={PER_PAGE}
+      <CategoryPagination
+  basePath="/programas/varias"
+  current={page}
+  totalPages={totalPages}
+/>
+
         />
       </div>
     </div>
