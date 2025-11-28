@@ -1,9 +1,7 @@
 // app/ui/Page_Index/ultimas-noticias-loader.tsx
 import NoticiasVarias from "../dashboard/noticias-varias";
 
-// CORRECCIÓN: Usar la variable de entorno para el endpoint de GraphQL.
-// Esto es más seguro y flexible. El proceso de build de Vercel reemplazará esto
-// con el valor que configuraste en el dashboard.
+// Endpoint desde variable de entorno
 const GQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT_URL || '';
 
 const GET_LATEST_POSTS_QUERY = `
@@ -14,6 +12,7 @@ const GET_LATEST_POSTS_QUERY = `
         title
         slug
         excerpt
+        date
         featuredImage { node { sourceUrl } }
         categories(first: 1) { nodes { name } }
       }
@@ -26,49 +25,50 @@ interface Post {
   title: string;
   slug: string;
   excerpt: string;
-  featuredImage: { node: { sourceUrl: string; }; };
-  categories: { nodes: { name: string; }[]; };
+  date: string; // ✅ AGREGADO
+  featuredImage: { node: { sourceUrl: string } };
+  categories: { nodes: { name: string }[] };
 }
 
 async function fetchLatestPosts(): Promise<{ posts: Post[]; error: string | null }> {
-    // Si GQL_ENDPOINT está vacío, no se puede hacer la petición. Es un error de configuración.
-    if (!GQL_ENDPOINT) {
-        console.error("Error Crítico: La variable de entorno GRAPHQL_ENDPOINT_URL no está configurada.");
-        return { posts: [], error: "El servidor no está configurado para obtener noticias." };
+  if (!GQL_ENDPOINT) {
+    console.error("GRAPHQL_ENDPOINT_URL no está configurada.");
+    return { posts: [], error: "El servidor no está configurado correctamente." };
+  }
+
+  try {
+    const response = await fetch(GQL_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: GET_LATEST_POSTS_QUERY }),
+      next: { revalidate: 3600 },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error de red: ${response.status} ${errorText}`);
     }
 
-    try {
-        const response = await fetch(GQL_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: GET_LATEST_POSTS_QUERY }),
-            next: { revalidate: 3600 }, // Cache de 1 hora
-        });
+    const json = await response.json();
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`La respuesta de la red no fue OK: ${response.status} ${errorText}`);
-        }
-
-        const json = await response.json();
-        if (json.errors) {
-            throw new Error(json.errors.map((e: any) => e.message).join(', '));
-        }
-
-        return { posts: json.data?.posts?.nodes || [], error: null };
-
-    } catch (err: any) {
-        console.error("Error al obtener los últimos posts:", err.message);
-        return { posts: [], error: "No se pudieron cargar las últimas noticias." };
+    if (json.errors) {
+      throw new Error(json.errors.map((e: any) => e.message).join(', '));
     }
+
+    return { posts: json.data?.posts?.nodes || [], error: null };
+
+  } catch (err: any) {
+    console.error("Error al obtener posts:", err.message);
+    return { posts: [], error: "No se pudieron cargar las últimas noticias." };
+  }
 }
 
 const ErrorDisplay = ({ message }: { message: string }) => (
-    <div className="text-center py-8 px-4 bg-red-50 rounded-lg border border-red-200">
-        <h3 className="font-bold text-red-700">Error de Carga</h3>
-        <p className="text-red-600">{message}</p>
-        <p className="text-sm text-gray-500 mt-2">Inténtelo de nuevo más tarde.</p>
-    </div>
+  <div className="text-center py-8 px-4 bg-red-50 rounded-lg border border-red-200">
+    <h3 className="font-bold text-red-700">Error de Carga</h3>
+    <p className="text-red-600">{message}</p>
+    <p className="text-sm text-gray-500 mt-2">Intentá más tarde.</p>
+  </div>
 );
 
 export default async function UltimasNoticiasLoader() {
@@ -77,16 +77,16 @@ export default async function UltimasNoticiasLoader() {
   if (error) {
     return <ErrorDisplay message={error} />;
   }
-  
+
   if (posts.length === 0) {
-      return null; 
+    return null;
   }
 
   return (
-    <NoticiasVarias 
-      posts={posts} 
-      page={1} 
-      categoriaSlug="" 
+    <NoticiasVarias
+      posts={posts}
+      page={1}
+      categoriaSlug=""
       categoriaNombre=""
     />
   );
