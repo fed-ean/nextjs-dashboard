@@ -9,31 +9,37 @@ import type { Post, Category, PagedPosts } from './definitions';
 const GQL_ENDPOINT = "https://radioempresaria.com.ar/graphql";
 
 async function fetchGraphQL(query: any, variables: Record<string, any> = {}) {
-  const response = await fetch(GQL_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    next: { revalidate: 60 },
-    body: JSON.stringify({
-      query: query.loc.source.body,
-      variables
-    }),
-  });
+  try {
+    const response = await fetch(GQL_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      next: { revalidate: 60 },
+      body: JSON.stringify({
+        query: query.loc.source.body,
+        variables
+      }),
+    });
 
-  if (!response.ok) {
-    console.error("GraphQL Network Error:", await response.text());
+    if (!response.ok) {
+      const txt = await response.text();
+      console.error("GraphQL Network Error:", response.status, response.statusText, txt);
+      return null;
+    }
+
+    const json = await response.json();
+    if (json.errors) {
+      console.error("GraphQL query failed:", json.errors);
+      return null;
+    }
+
+    return json.data;
+  } catch (err) {
+    console.error("fetchGraphQL error:", err);
     return null;
   }
-
-  const json = await response.json();
-  if (json.errors) {
-    console.error("GraphQL query failed:", json.errors);
-    return null;
-  }
-
-  return json.data;
 }
 
-// Normalizador
+// NORMALIZADOR
 const mapPostData = (p: any): Post => ({
   databaseId: Number(p.databaseId),
   title: p.title ?? '',
@@ -50,8 +56,8 @@ const mapPostData = (p: any): Post => ({
   categories: {
     nodes: p.categories?.nodes?.map((c: any) => ({
       databaseId: Number(c.databaseId),
-      name: c.name,
-      slug: c.slug,
+      name: c.name ?? '',
+      slug: c.slug ?? '',
       count: Number(c.count ?? 0)
     })) ?? []
   }
@@ -71,13 +77,13 @@ export async function getAllCategories(): Promise<Category[]> {
   }));
 }
 
-// Info categoría
+// Info de categoría por slug
 async function getCategoryDetails(slug: string): Promise<Category | null> {
   const categories = await getAllCategories();
   return categories.find(c => c.slug === slug) ?? null;
 }
 
-// Paginación REAL — función estable
+// Paginación real SSR
 export async function getCachedPostsPage(
   slug: string | null,
   page: number = 1,
@@ -87,10 +93,10 @@ export async function getCachedPostsPage(
   const isCategory = !!slug;
   const query = isCategory ? GET_POSTS_BY_CATEGORY_SIMPLE : GET_ALL_POSTS_SIMPLE;
 
-  const offset = (page - 1) * pageSize;
+  const offset = Math.max(0, (page - 1) * pageSize);
 
   const variables = isCategory
-    ? { categoryName: slug, size: pageSize, offset }
+    ? { categorySlug: slug, size: pageSize, offset }
     : { size: pageSize, offset };
 
   const data = await fetchGraphQL(query, variables);
@@ -105,7 +111,7 @@ export async function getCachedPostsPage(
   }
 
   const totalPosts = Number(data.posts.pageInfo?.offsetPagination?.total ?? 0);
-  const totalPages = Math.ceil(totalPosts / pageSize);
+  const totalPages = totalPosts > 0 ? Math.ceil(totalPosts / pageSize) : 0;
 
   return {
     posts: data.posts.nodes.map(mapPostData),

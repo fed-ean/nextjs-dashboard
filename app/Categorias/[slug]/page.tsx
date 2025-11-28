@@ -1,51 +1,62 @@
-// app/Categorias/[slug]/page.tsx
-export const dynamic = "force-dynamic";
+import React from 'react';
+import { getCachedPostsPage } from '@/app/lib/data-fetcher';
+import CategoryGrid from '@/app/ui/categorias/CategoryGrid';
+import CategoryPagination from '@/app/ui/categorias/CategoryPagination';
+import SidenavServer from '@/app/ui/Page_Index/SidenavServer';
 
-import React from "react";
-import { getCachedPostsPage } from "@/app/lib/data-fetcher";
-import CategoryGrid from "@/app/ui/categorias/CategoryGrid";
-import CategoryPagination from "@/app/ui/categorias/CategoryPagination";
+export const dynamic = 'force-dynamic';
 
 const PER_PAGE = 9;
 
 type Props = {
-  params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+  params: { slug: string };
+  searchParams?: { page?: string | number };
 };
 
-export default async function CategoriaPage(props: Props) {
-  const { slug } = await props.params;
-  const searchParams = await props.searchParams;
+export default async function CategoriaPage({ params, searchParams }: Props) {
+  const slug = params.slug;
   const page = Number(searchParams?.page ?? 1);
 
-  // ❗ Llamada correcta
-  const result = await getCachedPostsPage(slug, page, PER_PAGE);
-
-  const { posts, totalPages } = result;
-
-  if (!posts || posts.length === 0) {
-    return (
-      <div className="text-center py-10">
-        <h1 className="text-2xl font-semibold mb-3">No hay publicaciones</h1>
-        <p className="text-gray-500">
-          Todavía no se ha publicado ningún artículo en esta sección.
-        </p>
-      </div>
-    );
-  }
+  // fetch
+  const { posts, totalPages, category } = await getCachedPostsPage(slug, page, PER_PAGE);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold capitalize mb-6">{slug}</h1>
+    <div className="container mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
-      <CategoryGrid posts={posts} currentSectionSlug={slug} />
+        <aside className="lg:col-span-3 space-y-8">
+          <div className="sticky top-24">
+            <SidenavServer />
+          </div>
+        </aside>
 
-      <div className="mt-8">
-        <CategoryPagination
-          basePath={`/Categorias/${slug}`}
-          current={page}
-          totalPages={totalPages}
-        />
+        <main className="lg:col-span-9">
+          <h1 className="text-3xl font-bold mb-6 border-b pb-4">
+            {category?.name || 'Categoría'}
+          </h1>
+
+          {posts && posts.length > 0 ? (
+            <>
+              <CategoryGrid posts={posts} currentSectionSlug={slug} />
+              <div className="mt-8">
+                <CategoryPagination
+                  basePath={`/categorias/${slug}`}
+                  current={page}
+                  totalPages={totalPages}
+                  perPage={PER_PAGE}
+                />
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-10">
+              <h1 className="text-2xl font-semibold mb-3">No hay publicaciones</h1>
+              <p className="text-gray-500">
+                Todavía no se ha publicado ningún artículo en esta sección.
+              </p>
+            </div>
+          )}
+        </main>
+
       </div>
     </div>
   );
