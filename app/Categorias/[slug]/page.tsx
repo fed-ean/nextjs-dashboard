@@ -10,7 +10,7 @@ const PER_PAGE = 9;
 
 type PageProps = {
   params: Promise<{ slug: string }>;
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 const NoPostsDisplay = () => (
@@ -24,8 +24,9 @@ const NoPostsDisplay = () => (
 
 export default async function CategoriaPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
+  const search = await searchParams;
 
-  const page = Number(searchParams?.page || '1');
+  const page = Number(search?.page || '1');
 
   const { posts, totalPages, category } = await getCachedPostsPage(
     slug,
