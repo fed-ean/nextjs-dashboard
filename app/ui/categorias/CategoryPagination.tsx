@@ -31,10 +31,10 @@ export default function CategoryPagination({
   const normalizeBase = (p: string) => p.replace(/\/+$/, '');
   const pageUrl = (n: number) => {
     const base = normalizeBase(basePath);
-    if (n <= 1) return base;
-    // Si base ya tiene query (poco probable aquí), añadimos con &
-    return base.includes('?') ? `${base}&page=${n}` : `${base}?page=${n}`;
+    if (n <= 1) return `${base}/1`;
+    return `${base}/${n}`;
   };
+  
 
   // window of pages
   let start = Math.max(1, current - Math.floor(maxButtons / 2));

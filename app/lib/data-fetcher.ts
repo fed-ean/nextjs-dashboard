@@ -95,13 +95,16 @@ import {
       ? GET_POSTS_BY_CATEGORY_SIMPLE
       : GET_ALL_POSTS_SIMPLE;
   
+    // ✅ Calculamos el offset real
+    const offset = (page - 1) * pageSize;
+  
     const variables = isCategoryPage
-      ? { categoryName: slug, size: pageSize, offset: (page - 1) * pageSize }
-      : { size: pageSize, offset: (page - 1) * pageSize };
+      ? { categoryName: slug, size: pageSize, offset }
+      : { size: pageSize, offset };
   
     const data = await fetchGraphQL(query, variables);
   
-    if (!data?.posts) {
+    if (!data?.posts?.nodes) {
       return {
         posts: [],
         totalPages: 0,
@@ -110,9 +113,15 @@ import {
       };
     }
   
-    const categoryInfo = isCategoryPage ? await getCategoryDetails(slug!) : null;
+    const categoryInfo = isCategoryPage
+      ? await getCategoryDetails(slug!)
+      : null;
   
-    const totalPosts = Number(data.posts.pageInfo?.offsetPagination?.total ?? 0);
+    // ✅ Total REAL de posts de WordPress
+    const totalPosts = Number(
+      data.posts.pageInfo?.offsetPagination?.total ?? 0
+    );
+  
     const totalPages = Math.ceil(totalPosts / pageSize);
   
     return {

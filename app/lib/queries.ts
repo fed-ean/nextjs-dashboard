@@ -2,20 +2,40 @@
 import { gql } from '@apollo/client';
 
 export const GET_POSTS_BY_CATEGORY_SIMPLE = gql`
-  query GetPostsByCategorySimple($categoryName: String!) {
-    posts(first: 9, where: { categoryName: $categoryName }) {
+  query GetPostsByCategory($categoryName: String, $size: Int!, $offset: Int!) {
+    posts(
+      where: {
+        categoryName: $categoryName
+        offsetPagination: { size: $size, offset: $offset }
+      }
+    ) {
+      pageInfo {
+        offsetPagination {
+          total
+        }
+      }
       nodes {
         databaseId
         title
         excerpt
-        date
         slug
-        featuredImage { node { sourceUrl } }
-        categories { nodes { name slug } }
+        date
+        featuredImage {
+          node { sourceUrl }
+        }
+        categories {
+          nodes {
+            databaseId
+            name
+            slug
+            count
+          }
+        }
       }
     }
   }
 `;
+
 
 export const GET_ALL_POSTS_SIMPLE = gql`
   query GetAllPostsSimple {

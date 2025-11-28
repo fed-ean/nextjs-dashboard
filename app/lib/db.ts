@@ -173,22 +173,39 @@ export async function obtenerNoticias({ limit = 10, offset = 0, status = 'PUBLIS
   }
 }
 
-export async function obtenerNoticiasPorCategoria({ limit = 10, status = 'PUBLISH', categoryName }: { limit?: number; status?: string; categoryName: string }): Promise<Noticia[]> {
+export async function obtenerNoticiasPorCategoria({
+  limit = 10,
+  offset = 0,
+  status = 'PUBLISH',
+  categoryName
+}: {
+  limit?: number;
+  offset?: number;
+  status?: string;
+  categoryName: string;
+}): Promise<Noticia[]> {
   try {
     const client = getServerSideClient();
     const { data } = await client.query<GraphQLPostsResponse>({
       query: GET_NOTICIAS_POR_CATEGORIA_QUERY,
-      variables: { first: limit, status, categoryName },
+      variables: {
+        first: limit + offset,
+        status,
+        categoryName
+      },
       fetchPolicy: 'no-cache',
     });
 
     if (!data?.posts?.nodes) return [];
-    return data.posts.nodes.map(mapPostNode);
+
+    const nodesAfterOffset = data.posts.nodes.slice(offset);
+    return nodesAfterOffset.map(mapPostNode);
   } catch (error) {
     console.error(`Error al obtener noticias de la categoría ${categoryName}:`, error);
     return [];
   }
 }
+
 
 // Ya no es necesaria una función de mapeo separada para el carrusel,
 // la estructura de `Noticia` es ahora consistente.
