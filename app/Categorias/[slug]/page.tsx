@@ -16,27 +16,25 @@ export async function generateStaticParams() {
   }));
 }
 
-// ✅ Props corregidas para Next.js 15
+// ✅ Props compatibles con el tipado de Next 15
 type Props = {
-  params: { 
+  params: Promise<{
     slug: string;
-  };
+  }>;
   searchParams?: { [key: string]: string | string[] | undefined };
 };
 
 export default async function CategoriaPage({ params, searchParams }: Props) {
-  // ✅ YA NO es Promise
-  const { slug } = params;
+  // ✅ En Next 15 params es Promise → se hace await
+  const { slug } = await params;
   const currentPage = Number(searchParams?.page || '1');
 
   const { posts, totalPages, category } = await getCachedPostsPage(slug, currentPage);
 
-  // Si la categoría no existe → 404
   if (!category) {
     notFound();
   }
 
-  // Cuando no hay posts
   if (!posts || posts.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -69,7 +67,6 @@ export default async function CategoriaPage({ params, searchParams }: Props) {
     );
   }
 
-  // Render normal
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
