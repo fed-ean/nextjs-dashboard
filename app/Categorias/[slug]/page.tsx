@@ -53,11 +53,10 @@ export default async function CategoriaPage({ params }: PageProps) {
               <CategoryGrid posts={posts} currentSectionSlug={slug} />
               <div className="mt-8">
               <CategoryPagination
-  currentPage={page}
-  totalPages={totalPages}
-  slug={slug}
+                currentPage={page}
+                totalPages={totalPages}
+                slug={slug}
 />
-
               </div>
             </>
           ) : (
