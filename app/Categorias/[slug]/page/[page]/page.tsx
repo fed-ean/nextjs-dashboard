@@ -1,4 +1,3 @@
-
 import React from "react";
 import { getAllCategories, getCachedPostsPage } from "../../../../lib/data-fetcher";
 import CategoryGrid from "../../../../ui/categorias/CategoryGrid";
@@ -31,15 +30,17 @@ export async function generateStaticParams() {
   return allParams.flat();
 }
 
+// ✅ Props compatibles con Next 15
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
     page: string;
-  };
+  }>;
 };
 
 export default async function CategoriaPagePaginada({ params }: Props) {
-  const { slug, page } = params; // No es necesario esperar una promesa aquí
+  // ✅ Resolvemos la promesa
+  const { slug, page } = await params;
   const pageNum = Number(page) || 1;
 
   // Pasamos el número de página al fetcher
