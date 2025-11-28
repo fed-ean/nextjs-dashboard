@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { getCachedPostsPage, getAllCategories } from '../../lib/data-fetcher';
 import type { Category } from '@/app/lib/definitions';
@@ -8,17 +7,16 @@ import CategoryGrid from '../../ui/categorias/CategoryGrid';
 import PaginationControls from '../../ui/categorias/PaginationControls';
 import SidenavServer from '@/app/ui/Page_Index/SidenavServer';
 
-// --- FUNCIÓN generateStaticParams AÑADIDA ---
+// --- FUNCIÓN generateStaticParams ---
 export async function generateStaticParams() {
   const categories: Category[] = await getAllCategories();
-  
-  // Mapear categorías al formato requerido por Next.js
-  return categories.map(category => ({
+
+  return categories.map((category) => ({
     slug: category.slug,
   }));
 }
 
-// Tipado de Props corregido para las convenciones modernas de Next.js
+// ✅ Props corregidas para Next.js 15
 type Props = {
   params: { 
     slug: string;
@@ -27,53 +25,68 @@ type Props = {
 };
 
 export default async function CategoriaPage({ params, searchParams }: Props) {
-  // Los parámetros ya vienen resueltos, no se necesita `await`
+  // ✅ YA NO es Promise
   const { slug } = params;
   const currentPage = Number(searchParams?.page || '1');
 
   const { posts, totalPages, category } = await getCachedPostsPage(slug, currentPage);
-  
-  // Si la categoría en sí no existe, mostramos un 404
+
+  // Si la categoría no existe → 404
   if (!category) {
-    return notFound();
+    notFound();
   }
 
-  // Si no hay posts, aún mostramos la página con un mensaje
+  // Cuando no hay posts
   if (!posts || posts.length === 0) {
-      return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                <main className="lg:col-span-9">
-                    <div className="border-b pb-4 mb-6">
-                        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Categoría</h1>
-                        <p className="text-xl text-blue-600 mt-1">{category.name}</p>
-                    </div>
-                    <p className='py-10 text-center'>No hay publicaciones para mostrar en esta página.</p>
-                    <PaginationControls totalPages={totalPages} currentSectionSlug={slug} />
-                </main>
-                <aside className="lg:col-span-3 space-y-8">
-                    <div className="sticky top-24">
-                        <SidenavServer />
-                    </div>
-                </aside>
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <main className="lg:col-span-9">
+            <div className="border-b pb-4 mb-6">
+              <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
+                Categoría
+              </h1>
+              <p className="text-xl text-blue-600 mt-1">{category.name}</p>
             </div>
+
+            <p className="py-10 text-center">
+              No hay publicaciones para mostrar en esta página.
+            </p>
+
+            <PaginationControls
+              totalPages={totalPages}
+              currentSectionSlug={slug}
+            />
+          </main>
+
+          <aside className="lg:col-span-3 space-y-8">
+            <div className="sticky top-24">
+              <SidenavServer />
+            </div>
+          </aside>
         </div>
-      )
+      </div>
+    );
   }
 
+  // Render normal
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-
         <main className="lg:col-span-9">
           <div className="border-b pb-4 mb-6">
-            <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Categoría</h1>
+            <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
+              Categoría
+            </h1>
             <p className="text-xl text-blue-600 mt-1">{category.name}</p>
           </div>
-          
+
           <CategoryGrid posts={posts} currentSectionSlug={slug} />
 
-          <PaginationControls totalPages={totalPages} currentSectionSlug={slug} />
+          <PaginationControls
+            totalPages={totalPages}
+            currentSectionSlug={slug}
+          />
         </main>
 
         <aside className="lg:col-span-3 space-y-8">
@@ -81,7 +94,6 @@ export default async function CategoriaPage({ params, searchParams }: Props) {
             <SidenavServer />
           </div>
         </aside>
-
       </div>
     </div>
   );
