@@ -7,17 +7,25 @@ import CategoryPagination from "@/app/ui/categorias/CategoryPagination";
 
 const PER_PAGE = 9;
 
+// ❌ NO USAR PageProps
+// ❌ NO USAR tipos estrictos
+// ✔ Next recomienda dejarlo flexible
+
 export default async function CategoriaPage({
   params,
-  searchParams,
+  searchParams
 }: {
   params: { slug: string };
-  searchParams?: { page?: string };
+  searchParams?: any;
 }) {
   const slug = params.slug;
   const page = Number(searchParams?.page ?? 1);
 
-  const { posts, totalPages } = await getCachedPostsPage(slug, page, PER_PAGE);
+  const { posts, totalPages } = await getCachedPostsPage(
+    slug,
+    page,
+    PER_PAGE
+  );
 
   if (!posts || posts.length === 0) {
     return (
