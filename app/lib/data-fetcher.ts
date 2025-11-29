@@ -9,14 +9,18 @@ import type { Post, Category, PagedPosts } from "./definitions";
 
 const GQL_ENDPOINT = "https://radioempresaria.com.ar/graphql";
 
-// --- Fetch genérico ---
-async function fetchGraphQL(query: string, variables: Record<string, any> = {}) {
+import { DocumentNode } from "graphql";
+
+async function fetchGraphQL(
+  query: string | DocumentNode,
+  variables: Record<string, any> = {}
+) {
   const response = await fetch(GQL_ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     next: { revalidate: 60 },
     body: JSON.stringify({
-      query,
+      query: typeof query === "string" ? query : query.loc?.source.body,
       variables,
     }),
   });
@@ -30,6 +34,7 @@ async function fetchGraphQL(query: string, variables: Record<string, any> = {}) 
 
   return json.data;
 }
+
 
 // --- Normalizador de posts ---
 const mapPostData = (p: any): Post => {
