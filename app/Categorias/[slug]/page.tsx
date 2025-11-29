@@ -7,23 +7,17 @@ import CategoryPagination from "@/app/ui/categorias/CategoryPagination";
 
 const PER_PAGE = 9;
 
-// NO IMPORTAR PageProps DE NEXT
-// NO USAR PageProps EN NINGÚN LADO
-
-type Props = {
+export default async function CategoriaPage({
+  params,
+  searchParams,
+}: {
   params: { slug: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
-};
-
-export default async function CategoriaPage({ params, searchParams }: Props) {
+  searchParams?: { page?: string };
+}) {
   const slug = params.slug;
   const page = Number(searchParams?.page ?? 1);
 
-  const { posts, totalPages } = await getCachedPostsPage(
-    slug,
-    page,
-    PER_PAGE
-  );
+  const { posts, totalPages } = await getCachedPostsPage(slug, page, PER_PAGE);
 
   if (!posts || posts.length === 0) {
     return (
