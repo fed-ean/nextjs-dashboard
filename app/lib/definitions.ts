@@ -87,34 +87,35 @@ export type InvoiceForm = {
   status: 'pending' | 'paid';
 };
 
-// --- Tipos para el Blog (Corregidos) ---
-
-export interface Category {
+// app/lib/definitions.ts
+export type Category = {
   databaseId: number;
   name: string;
   slug: string;
   count: number;
-}
+};
 
-export interface Post {
+export type FeaturedImage = {
+  node: {
+    sourceUrl: string | null;
+  };
+};
+
+export type Post = {
   databaseId: number;
   title: string;
   excerpt: string;
   slug: string;
   date: string;
-  featuredImage: {
-    node: {
-      sourceUrl: string | null;
-    };
-  };
+  featuredImage: FeaturedImage;
   categories: {
     nodes: Category[];
   };
-}
+};
 
-export interface PagedPosts {
+export type PagedPosts = {
   posts: Post[];
   totalPages: number;
   total: number;
   category: Category | null;
-}
+};

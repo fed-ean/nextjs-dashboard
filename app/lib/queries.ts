@@ -1,8 +1,6 @@
 // app/lib/queries.ts
 import { gql } from "@apollo/client";
 
-// ✅ Obtener posts de una categoría (el método correcto para WPGraphQL)
-// Obtener posts de una categoría usando el slug de la categoría (método robusto)
 export const GET_POSTS_BY_CATEGORY_SIMPLE = gql`
   query GetPostsByCategory($slug: String!, $size: Int!, $offset: Int!) {
     categories(where: { slug: $slug }) {
@@ -10,6 +8,7 @@ export const GET_POSTS_BY_CATEGORY_SIMPLE = gql`
         databaseId
         name
         slug
+        count
         posts(where: { offsetPagination: { size: $size, offset: $offset } }) {
           nodes {
             databaseId
@@ -42,13 +41,9 @@ export const GET_POSTS_BY_CATEGORY_SIMPLE = gql`
   }
 `;
 
-
-// ✅ Obtener todos los posts (Interés General)
 export const GET_ALL_POSTS_SIMPLE = gql`
   query GetAllPosts($size: Int!, $offset: Int!) {
-    posts(
-      where: { offsetPagination: { size: $size, offset: $offset } }
-    ) {
+    posts(where: { offsetPagination: { size: $size, offset: $offset } }) {
       nodes {
         databaseId
         title
@@ -78,7 +73,6 @@ export const GET_ALL_POSTS_SIMPLE = gql`
   }
 `;
 
-// ✅ Categorías
 export const GET_ALL_CATEGORIES = gql`
   query GetAllCategories {
     categories(first: 100) {
@@ -91,6 +85,7 @@ export const GET_ALL_CATEGORIES = gql`
     }
   }
 `;
+
 
 // El resto de queries para el dashboard se mantienen intactas
 export const GET_ALL_POSTS = gql`
