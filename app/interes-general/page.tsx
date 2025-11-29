@@ -1,50 +1,53 @@
-// app/interes-general/page.tsx
-export const dynamic = "force-dynamic";
-
-import React from "react";
+import React, { Suspense } from "react";
 import { getCachedPostsPage } from "../lib/data-fetcher";
-import CategoryGrid from "../ui/categorias/CategoryGrid";
-import CategoryPagination from "../ui/categorias/CategoryPagination";
+import NoticiasVarias from "../ui/dashboard/noticias-varias";
+import SidenavServer from '../ui/Page_Index/SidenavServer';
+import { SidenavSkeleton } from '../ui/skeletons';
 
-const PER_PAGE = 9;
+export const dynamic = 'force-dynamic';
 
-type Props = {
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
-};
+// Componente para cuando no hay noticias
+const NoPostsDisplay = () => (
+  <div className="text-center py-10">
+    <h1 className="text-2xl font-bold mb-4">No hay noticias disponibles</h1>
+    <p>No se encontraron noticias para mostrar en este momento.</p>
+  </div>
+);
 
-export default async function InteresGeneralPage(props: Props) {
-  const searchParams = await props.searchParams;
-  const page = Number(searchParams?.page ?? 1);
-
-  // ❗ Llamada correcta
-  const result = await getCachedPostsPage(null, page, PER_PAGE);
-
-  const { posts, totalPages } = result;
+export default async function NoticiasPage() {
+  const { posts } = await getCachedPostsPage(null);
 
   if (!posts || posts.length === 0) {
     return (
-      <div className="text-center py-10">
-        <h1 className="text-2xl font-semibold mb-3">No hay publicaciones</h1>
-        <p className="text-gray-500">
-          Todavía no se ha publicado ningún artículo.
-        </p>
-      </div>
+        <div className="max-w-7xl mx-auto">
+            <NoPostsDisplay />
+        </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold mb-6">Interés General</h1>
-
-      <CategoryGrid posts={posts} currentSectionSlug="interes-general" />
-
-      <div className="mt-8">
-        <CategoryPagination
-          basePath="/interes-general"
-          current={page}
-          totalPages={totalPages}
+    <div className="flex flex-col md:flex-row-reverse max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
+      
+      {/* --- CONTENIDO PRINCIPAL (derecha en desktop) --- */}
+      <main className="w-full">
+        <h1 className="text-3xl font-bold mb-8">Todas las Noticias</h1>
+        <NoticiasVarias
+          posts={posts}
+          page={1}
+          categoriaSlug=""
+          categoriaNombre=""
         />
-      </div>
+      </main>
+
+      {/* --- BARRA LATERAL (izquierda en desktop) --- */}
+      <aside className="w-full md:w-72 md:mr-8 flex-shrink-0 mt-8 md:mt-0">
+        <div className="sticky top-32">
+          <Suspense fallback={<SidenavSkeleton />}>
+            <SidenavServer />
+          </Suspense>
+        </div>
+      </aside>
+
     </div>
   );
 }
