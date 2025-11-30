@@ -1,13 +1,12 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import CategoryGrid from './CategoryGrid';
+// 1. IMPORTAR EL TIPO POST OFICIAL
+import type { Post } from '@/app/lib/definitions'; 
 
 const PAGE_SIZE = 9;
 
-interface Post {
-  databaseId: string;
-  [key: string]: any;
-}
+// 2. ELIMINAR LA INTERFAZ LOCAL Y ERRÓNEA DE POST
 
 interface PageInfo {
   endCursor: string | null;
@@ -18,6 +17,7 @@ interface CategoryPostsListClientProps {
   slug: string;
 }
 
+// La función ahora espera recibir el tipo Post oficial
 async function fetchPosts(slug: string, after: string | null): Promise<{ posts: Post[]; pageInfo: PageInfo; totalCount: number }> {
     const response = await fetch('/api/category-posts', {
         method: 'POST',
@@ -35,17 +35,18 @@ async function fetchPosts(slug: string, after: string | null): Promise<{ posts: 
         throw new Error(errorBody.error || "No se pudieron cargar los posts.");
     }
 
+    // Asumimos que la API ahora devuelve el tipo Post completo
     const { posts, pageInfo, totalCount } = await response.json();
     return { posts, pageInfo, totalCount };
 }
 
 export default function CategoryPostsListClient({ slug }: CategoryPostsListClientProps) {
+  // 3. USAR EL TIPO POST OFICIAL EN EL ESTADO
   const [posts, setPosts] = useState<Post[]>([]);
   const [pageInfo, setPageInfo] = useState<PageInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Carga inicial de posts
   useEffect(() => {
     const loadInitialPosts = async () => {
       setLoading(true);
@@ -62,7 +63,7 @@ export default function CategoryPostsListClient({ slug }: CategoryPostsListClien
     };
 
     loadInitialPosts();
-  }, [slug]); // Se vuelve a ejecutar si el slug de la categoría cambia
+  }, [slug]);
 
   const handleLoadMore = async () => {
     if (!pageInfo?.hasNextPage || loading) return;
@@ -70,9 +71,10 @@ export default function CategoryPostsListClient({ slug }: CategoryPostsListClien
     setLoading(true);
     try {
       const { posts: newPosts, pageInfo: newPageInfo } = await fetchPosts(slug, pageInfo.endCursor);
-      // Evitar duplicados
+      
       const existingIds = new Set(posts.map(p => p.databaseId));
       const uniqueNewPosts = newPosts.filter(p => !existingIds.has(p.databaseId));
+      
       setPosts(prev => [...prev, ...uniqueNewPosts]);
       setPageInfo(newPageInfo);
     } catch (err: any) {
@@ -96,6 +98,7 @@ export default function CategoryPostsListClient({ slug }: CategoryPostsListClien
 
   return (
     <section className="p-6">
+      {/* Ahora el `posts` que se pasa aquí tiene el tipo correcto y el error de compilación debería desaparecer */}
       <CategoryGrid posts={posts} currentSectionSlug={slug} />
 
       <div className="mt-8 flex justify-center">

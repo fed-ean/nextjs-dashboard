@@ -1,9 +1,10 @@
 
 import { NextResponse } from 'next/server';
 
-const GQL_ENDPOINT = "/graphql";
+// NOTA: Este endpoint de GraphQL debe ser la URL completa de tu instancia de WordPress.
+const GQL_ENDPOINT = process.env.WORDPRESS_API_URL || "https://radioempresaria.com.ar/graphql";
 
-// Las consultas GQL como cadenas de texto sin formato
+// Corregimos las consultas para que pidan todos los campos necesarios del tipo Category
 const QUERY_POSTS_BY_CATEGORY = `
   query GetCategoryPosts($slug: String!, $first: Int!, $after: String, $tagSlugs: [String!]) {
     categories(where: { slug: $slug }) {
@@ -17,10 +18,17 @@ const QUERY_POSTS_BY_CATEGORY = `
             slug
             featuredImage { node { sourceUrl } }
             tags { nodes { name slug } }
-            categories { nodes { name slug } }
+            categories { 
+              nodes { 
+                databaseId  # <-- CAMPO AÑADIDO
+                name 
+                slug
+                count       # <-- CAMPO AÑADIDO
+              } 
+            }
           }
           pageInfo { endCursor hasNextPage }
-          totalCount
+          # Eliminamos totalCount de aquí porque no existe en la paginación de cursor
         }
       }
     }
@@ -38,15 +46,22 @@ const QUERY_POSTS_BY_TAGS = `
         slug
         featuredImage { node { sourceUrl } }
         tags { nodes { name slug } }
-        categories { nodes { name slug } }
+        categories { 
+          nodes { 
+            databaseId  # <-- CAMPO AÑADIDO
+            name 
+            slug
+            count       # <-- CAMPO AÑADIDO
+          } 
+        }
       }
       pageInfo { endCursor hasNextPage }
-      totalCount
+      # Eliminamos totalCount de aquí
     }
   }
 `;
 
-// Función auxiliar para realizar la petición fetch a la API de GraphQL
+
 async function fetchGraphQL(query: string, variables: Record<string, any>) {
     const response = await fetch(GQL_ENDPOINT, {
         method: 'POST',
@@ -94,13 +109,13 @@ export async function POST(req: Request) {
         
         const posts = data?.categories?.nodes?.[0]?.posts?.nodes || [];
         const pageInfo = data?.categories?.nodes?.[0]?.posts?.pageInfo || { endCursor: null, hasNextPage: false };
-        const totalCount = data?.categories?.nodes?.[0]?.posts?.totalCount || 0;
-
-        return NextResponse.json({ ok: true, posts, pageInfo, totalCount });
+        
+        // totalCount no viene con este tipo de paginación, lo eliminamos de la respuesta.
+        return NextResponse.json({ ok: true, posts, pageInfo });
 
     } else if (mode === "byTags") {
-        if (!tagSlugs || !Array.isArray(tagSlugs) || tagSlugs.length === 0) {
-            return NextResponse.json({ ok: true, posts: [], pageInfo: { endCursor: null, hasNextPage: false }, totalCount: 0 });
+        if (!tagSlugs || !Array.isArray(tagSlgs) || tagSlugs.length === 0) {
+            return NextResponse.json({ ok: true, posts: [], pageInfo: { endCursor: null, hasNextPage: false } });
         }
         
         const data = await fetchGraphQL(QUERY_POSTS_BY_TAGS, {
@@ -111,9 +126,8 @@ export async function POST(req: Request) {
 
         const posts = data?.posts?.nodes || [];
         const pageInfo = data?.posts?.pageInfo || { endCursor: null, hasNextPage: false };
-        const totalCount = data?.posts?.totalCount || 0;
         
-        return NextResponse.json({ ok: true, posts, pageInfo, totalCount });
+        return NextResponse.json({ ok: true, posts, pageInfo });
     }
 
     return NextResponse.json({ ok: false, error: "Modo no soportado" }, { status: 400 });

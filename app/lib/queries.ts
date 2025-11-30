@@ -1,6 +1,7 @@
 // app/lib/queries.ts
 import { gql } from "@apollo/client";
 
+// Mantenemos esta consulta que es completa y correcta
 export const GET_POSTS_BY_CATEGORY_SIMPLE = gql`
   query GetPostsByCategory($slug: String!, $size: Int!, $offset: Int!) {
     categories(where: { slug: $slug }) {
@@ -41,6 +42,7 @@ export const GET_POSTS_BY_CATEGORY_SIMPLE = gql`
   }
 `;
 
+// Mantenemos esta consulta para obtener todos los posts (ej. Interés General)
 export const GET_ALL_POSTS_SIMPLE = gql`
   query GetAllPosts($size: Int!, $offset: Int!) {
     posts(where: { offsetPagination: { size: $size, offset: $offset } }) {
@@ -147,78 +149,7 @@ export const GET_ALL_POST_SLUGS = gql`
   }
 `;
 
-
-export const GET_CATEGORY_POSTS_BY_SLUG_ARRAY = gql`
-  query GetCategoryPostsBySlugArray($slugs: [String], $first: Int, $after: String) {
-    categories(where: { slug: $slugs }) {
-      nodes {
-        id
-        name
-        slug
-        posts(first: $first, after: $after) {
-          nodes {
-            id
-            title
-            slug
-            featuredImage {
-              node {
-                sourceUrl
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-export const GET_CATEGORY_POSTS_BY_SLUG = gql`
-  query GetCategoryPostsBySlug($slug: String, $first: Int, $after: String) {
-    categories(where: { slug: $slug }) {
-      nodes {
-        id
-        name
-        slug
-        posts(first: $first, after: $after) {
-          nodes {
-            id
-            title
-            slug
-            featuredImage {
-              node {
-                sourceUrl
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-export const GET_CATEGORY_POSTS_BY_SLUGIN = gql`
-  query GetCategoryPostsBySlugIn($slugIn: [String], $first: Int, $after: String) {
-    categories(where: { slugIn: $slugIn }) {
-      nodes {
-        id
-        name
-        slug
-        posts(first: $first, after: $after) {
-          nodes {
-            id
-            title
-            slug
-            featuredImage {
-              node {
-                sourceUrl
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
+// Se mantiene esta última para la sección "Varios"
 export const GET_VARIAS_POSTS = gql`
   query GetVariasPosts($size: Int!, $offset: Int!) {
     categories(where: { slug: "programas" }) {
@@ -255,3 +186,11 @@ export const GET_VARIAS_POSTS = gql`
     }
   }
 `;
+
+/*
+  SE HAN ELIMINADO LAS SIGUIENTES CONSULTAS OBSOLETAS E INCOMPLETAS:
+  - GET_CATEGORY_POSTS_BY_SLUG_ARRAY
+  - GET_CATEGORY_POSTS_BY_SLUG
+  - GET_CATEGORY_POSTS_BY_SLUGIN
+  Causaban errores de tipo porque no solicitaban todos los campos requeridos.
+*/
