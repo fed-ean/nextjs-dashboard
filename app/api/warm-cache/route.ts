@@ -16,8 +16,9 @@ export async function GET(req: Request) {
       );
     }
 
-    // ✅ Ahora usamos la firma correcta (solo 1 argumento)
-    const data = await getCachedPostsPage(slug);
+    // Se corrige la llamada para que coincida con la firma (slug, page)
+    // Se asume que queremos calentar la primera página.
+    const data = await getCachedPostsPage(slug, 1);
 
     return NextResponse.json({
       ok: true,
