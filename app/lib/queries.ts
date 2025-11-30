@@ -219,3 +219,39 @@ export const GET_CATEGORY_POSTS_BY_SLUGIN = gql`
     }
   }
 `;
+export const GET_VARIAS_POSTS = gql`
+  query GetVariasPosts($size: Int!, $offset: Int!) {
+    categories(where: { slug: "programas" }) {
+      nodes {
+        posts(where: {
+          offsetPagination: { size: $size, offset: $offset }
+          taxQuery: {
+            taxArray: [
+              {
+                taxonomy: CATEGORY
+                field: SLUG
+                terms: ["locales", "desayuno-pymes", "cadena-verdeamarilla"]
+                operator: NOT_IN
+              }
+            ]
+          }
+        }) {
+          nodes {
+            databaseId
+            title
+            excerpt
+            slug
+            date
+            featuredImage { node { sourceUrl } }
+            categories { nodes { databaseId name slug } }
+          }
+          pageInfo {
+            offsetPagination {
+              total
+            }
+          }
+        }
+      }
+    }
+  }
+`;

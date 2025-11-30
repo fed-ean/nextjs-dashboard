@@ -2,7 +2,7 @@
 export const dynamic = "force-dynamic";
 
 import React from "react";
-import { getCachedPostsPage } from "../../lib/data-fetcher";
+import { getVariasPostsPage } from "../../lib/data-fetcher";
 import CategoryPagination from "../../ui/categorias/CategoryPagination";
 import CategoryGrid from "../../ui/categorias/CategoryGrid";
 
@@ -16,8 +16,8 @@ export default async function VariasPage(props: Props) {
   const searchParams = await props.searchParams;
   const page = Number(searchParams?.page ?? 1);
 
-  // ❗ Llamada CORRECTA
-  const result = await getCachedPostsPage(null, page, PER_PAGE);
+  // ✔️ Ahora sí trae solo las publicaciones “Varias”
+  const result = await getVariasPostsPage(page, PER_PAGE);
 
   const { posts, totalPages } = result;
 
