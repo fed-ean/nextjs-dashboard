@@ -24,7 +24,6 @@ async function fetchGraphQL(
   const response = await fetch(GQL_ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    // revalidate corto mientras debuggeamos
     next: { revalidate: 60 },
     body: JSON.stringify({ query: queryString, variables }),
   });
@@ -77,11 +76,9 @@ export async function getCachedPostsPage(
   const offset = (page - 1) * pageSize;
 
   if (slug) {
-    // usamos query por categoria (categories -> posts)
     const variables = { slug, size: pageSize, offset };
     const data = await fetchGraphQL(GET_POSTS_BY_CATEGORY_SIMPLE, variables);
 
-    // Extraemos la categoría (si existe)
     const categoryNode = data?.categories?.nodes?.[0] ?? null;
     const postsNodes = categoryNode?.posts?.nodes ?? [];
     const totalPosts = Number(categoryNode?.posts?.pageInfo?.offsetPagination?.total ?? 0);
@@ -102,7 +99,6 @@ export async function getCachedPostsPage(
     };
   }
 
-  // todos los posts
   const variables = { size: pageSize, offset };
   const data = await fetchGraphQL(GET_ALL_POSTS_SIMPLE, variables);
 
@@ -115,5 +111,36 @@ export async function getCachedPostsPage(
     total: totalPosts,
     totalPages,
     category: null,
+  };
+}
+
+// --- NUEVO: Varias (programas excluyendo ciertas categorías) ---
+import { GET_VARIAS_POSTS } from "./queries";
+
+export async function getVariasPostsPage(
+  page: number = 1,
+  pageSize: number = 9
+): Promise<PagedPosts> {
+  const offset = (page - 1) * pageSize;
+  const variables = { size: pageSize, offset };
+
+  const data = await fetchGraphQL(GET_VARIAS_POSTS, variables);
+
+  const postsNodes = data?.categories?.nodes?.[0]?.posts?.nodes ?? [];
+  const totalPosts = Number(
+    data?.categories?.nodes?.[0]?.posts?.pageInfo?.offsetPagination?.total ?? 0
+  );
+  const totalPages = Math.ceil(totalPosts / pageSize) || 0;
+
+  return {
+    posts: postsNodes.map(mapPostData),
+    total: totalPosts,
+    totalPages,
+    category: {
+      databaseId: 0,
+      name: "Varias",
+      slug: "programas",
+      count: totalPosts,
+    },
   };
 }
