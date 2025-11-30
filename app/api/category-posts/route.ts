@@ -3,8 +3,39 @@ import { NextResponse } from 'next/server';
 
 const GQL_ENDPOINT = process.env.WORDPRESS_API_URL || "https://radioempresaria.com.ar/graphql";
 
-const QUERY_POSTS_BY_CATEGORY = `
-  query GetCategoryPosts($slug: String!, $first: Int!, $after: String, $tagSlugs: [String!]) {
+// Se deja la consulta base sin el filtro de tags, que se añadirá dinámicamente
+const QUERY_POSTS_BASE = `
+  query GetCategoryPosts($slug: String!, $first: Int!, $after: String) {
+    categories(where: { slug: $slug }) {
+      nodes {
+        posts(first: $first, after: $after) {
+          nodes {
+            databaseId
+            title
+            excerpt
+            date
+            slug
+            featuredImage { node { sourceUrl } }
+            tags { nodes { name slug } }
+            categories { 
+              nodes { 
+                databaseId
+                name 
+                slug
+                count
+              } 
+            }
+          }
+          pageInfo { endCursor hasNextPage }
+        }
+      }
+    }
+  }
+`;
+
+// La consulta con filtro de Tags
+const QUERY_POSTS_WITH_TAGS = `
+  query GetCategoryPostsWithTags($slug: String!, $first: Int!, $after: String, $tagSlugs: [String!]) {
     categories(where: { slug: $slug }) {
       nodes {
         posts(first: $first, after: $after, where: { tagSlugIn: $tagSlugs }) {
@@ -32,7 +63,8 @@ const QUERY_POSTS_BY_CATEGORY = `
   }
 `;
 
-const QUERY_POSTS_BY_TAGS = `
+// Se mantiene la consulta por tags sin cambios, ya que esta siempre requiere los tags.
+const QUERY_POSTS_BY_TAGS_ONLY = `
   query PostsByTagSlugs($tagSlugs: [String!]!, $first: Int!, $after: String) {
     posts(where: { tagSlugIn: $tagSlugs }, first: $first, after: $after) {
       nodes {
@@ -96,12 +128,17 @@ export async function POST(req: Request) {
             return NextResponse.json({ ok: false, error: "Falta el slug de la categoría" }, { status: 400 });
         }
         
-        const data = await fetchGraphQL(QUERY_POSTS_BY_CATEGORY, {
+        // Lógica para elegir la consulta correcta
+        const useTagFilter = tagSlugs && Array.isArray(tagSlugs) && tagSlugs.length > 0;
+        const query = useTagFilter ? QUERY_POSTS_WITH_TAGS : QUERY_POSTS_BASE;
+        const variables = {
             slug,
             first,
             after,
-            tagSlugs: tagSlugs && tagSlugs.length ? tagSlugs : null
-        });
+            ...(useTagFilter && { tagSlugs })
+        };
+        
+        const data = await fetchGraphQL(query, variables);
         
         const posts = data?.categories?.nodes?.[0]?.posts?.nodes || [];
         const pageInfo = data?.categories?.nodes?.[0]?.posts?.pageInfo || { endCursor: null, hasNextPage: false };
@@ -109,12 +146,11 @@ export async function POST(req: Request) {
         return NextResponse.json({ ok: true, posts, pageInfo });
 
     } else if (mode === "byTags") {
-        // AQUI ESTABA EL ERROR: tagSlgs -> tagSlugs
         if (!tagSlugs || !Array.isArray(tagSlugs) || tagSlugs.length === 0) {
             return NextResponse.json({ ok: true, posts: [], pageInfo: { endCursor: null, hasNextPage: false } });
         }
         
-        const data = await fetchGraphQL(QUERY_POSTS_BY_TAGS, {
+        const data = await fetchGraphQL(QUERY_POSTS_BY_TAGS_ONLY, {
             tagSlugs,
             first,
             after
