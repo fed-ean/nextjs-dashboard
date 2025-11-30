@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React from 'react'; // Importación explícita de React
 import SidenavServer from '@/app/ui/Page_Index/SidenavServer';
 import CategoryPostsListClient from '@/app/ui/categorias/CategoryPostsListClient';
 import { getAllCategories } from '@/app/lib/data-fetcher';
@@ -18,16 +17,19 @@ export async function generateStaticParams() {
   }
 }
 
-// --- CORRECCIÓN DEFINITIVA ---
-// El tipo de props para una página de Next.js debe incluir tanto `params` como `searchParams`
-// para satisfacer la restricción de tipo `PageProps` del framework.
-// Aunque no usemos searchParams en este componente de servidor, debe estar en la firma de tipo.
-type Props = {
+// --- CORRECCIÓN FINAL Y EXPLÍCITA ---
+// Se define un tipo completo para las props que Next.js pasa a una página.
+
+type PageProps = {
   params: { slug: string };
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
-export default async function CategoriaPage({ params }: Props) {
+// Se tipa de forma explícita tanto los props de entrada (`PageProps`) 
+// como el valor de retorno de la función async (`Promise<React.JSX.Element>`).
+// Esto elimina toda ambigüedad para el compilador de TypeScript.
+
+export default async function CategoriaPage({ params }: PageProps): Promise<React.JSX.Element> {
   const { slug } = params;
 
   const categories = await getAllCategories();
