@@ -1,27 +1,34 @@
-// app/Noticias/page.tsx
+// app/interes-general/page.tsx
 import React, { Suspense } from "react";
 import { getCachedPostsPage } from "@/app/lib/data-fetcher";
 import NoticiasVarias from "@/app/ui/dashboard/noticias-varias";
 import SidenavServer from '@/app/ui/Page_Index/SidenavServer';
 import { SidenavSkeleton } from '@/app/ui/skeletons';
+import CategoryPagination from "@/app/ui/categorias/CategoryPagination"; // Importar paginación
 
 export const dynamic = 'force-dynamic';
 
-const NoPostsDisplay = () => (
+const NoPostsDisplay = ({ categoryName }: { categoryName: string }) => (
   <div className="text-center py-10">
-    <h1 className="text-2xl font-bold mb-4">No hay noticias disponibles</h1>
+    <h1 className="text-2xl font-bold mb-4">No hay noticias en {categoryName}</h1>
     <p>No se encontraron noticias para mostrar en este momento.</p>
   </div>
 );
 
-export default async function NoticiasPage({ searchParams }: any) {
+export default async function InteresGeneralPage({ searchParams }: any) {
   const page = Number(searchParams?.page) || 1;
-  const { posts } = await getCachedPostsPage(null, page);
+  const slug = 'interes-general'; // Slug específico para esta página
+
+  // Se llama a la función con el slug y la página correctos.
+  // Se obtienen también los datos de la categoría y el total de páginas.
+  const { posts, totalPages, category } = await getCachedPostsPage(slug, page);
+
+  const categoryName = category?.name || 'Interés General';
 
   if (!posts || posts.length === 0) {
     return (
       <div className="max-w-7xl mx-auto">
-        <NoPostsDisplay />
+        <NoPostsDisplay categoryName={categoryName} />
       </div>
     );
   }
@@ -29,8 +36,23 @@ export default async function NoticiasPage({ searchParams }: any) {
   return (
     <div className="flex flex-col md:flex-row-reverse max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
       <main className="w-full">
-        <h1 className="text-3xl font-bold mb-8">Todas las Noticias</h1>
-        <NoticiasVarias posts={posts} page={page} categoriaSlug="" categoriaNombre="" />
+        {/* Título dinámico basado en la categoría */}
+        <h1 className="text-3xl font-bold mb-8">{categoryName}</h1>
+        
+        {/* Se pasan los datos correctos al componente hijo */}
+        <NoticiasVarias 
+          posts={posts} 
+          page={page} 
+          categoriaSlug={slug} 
+          categoriaNombre={categoryName} 
+        />
+
+        {/* Componente de paginación */}
+        <CategoryPagination
+            current={page}
+            total={totalPages}
+            path={`/interes-general`}
+        />
       </main>
 
       <aside className="w-full md:w-72 md:mr-8 flex-shrink-0 mt-8 md:mt-0">
