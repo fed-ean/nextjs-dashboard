@@ -4,7 +4,7 @@ import { getCachedPostsPage } from "@/app/lib/data-fetcher";
 import NoticiasVarias from "@/app/ui/dashboard/noticias-varias";
 import SidenavServer from '@/app/ui/Page_Index/SidenavServer';
 import { SidenavSkeleton } from '@/app/ui/skeletons';
-import CategoryPagination from "@/app/ui/categorias/CategoryPagination"; // Importar paginación
+import CategoryPagination from "@/app/ui/categorias/CategoryPagination";
 
 export const dynamic = 'force-dynamic';
 
@@ -17,10 +17,8 @@ const NoPostsDisplay = ({ categoryName }: { categoryName: string }) => (
 
 export default async function InteresGeneralPage({ searchParams }: any) {
   const page = Number(searchParams?.page) || 1;
-  const slug = 'interes-general'; // Slug específico para esta página
+  const slug = 'interes-general';
 
-  // Se llama a la función con el slug y la página correctos.
-  // Se obtienen también los datos de la categoría y el total de páginas.
   const { posts, totalPages, category } = await getCachedPostsPage(slug, page);
 
   const categoryName = category?.name || 'Interés General';
@@ -36,10 +34,8 @@ export default async function InteresGeneralPage({ searchParams }: any) {
   return (
     <div className="flex flex-col md:flex-row-reverse max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
       <main className="w-full">
-        {/* Título dinámico basado en la categoría */}
         <h1 className="text-3xl font-bold mb-8">{categoryName}</h1>
         
-        {/* Se pasan los datos correctos al componente hijo */}
         <NoticiasVarias 
           posts={posts} 
           page={page} 
@@ -47,11 +43,11 @@ export default async function InteresGeneralPage({ searchParams }: any) {
           categoriaNombre={categoryName} 
         />
 
-        {/* Componente de paginación */}
+        {/* CORRECCIÓN: Se usa 'totalPages' en lugar de 'total' */}
         <CategoryPagination
             current={page}
-            total={totalPages}
-            path={`/interes-general`}
+            totalPages={totalPages} // <--- Propiedad corregida
+            basePath={`/interes-general`}
         />
       </main>
 
