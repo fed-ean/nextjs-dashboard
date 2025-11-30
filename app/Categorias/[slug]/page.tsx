@@ -1,48 +1,32 @@
-import React from 'react';
-import SidenavServer from '@/app/ui/Page_Index/SidenavServer';
-import CategoryPageContent from '@/app/ui/categorias/CategoryPageContent';
+// app/Categorias/[slug]/page.tsx
+import React from "react";
+import { getCachedPostsPage, getAllCategories } from "@/app/lib/data-fetcher";
+import CategoryGrid from "@/app/ui/categorias/CategoryGrid";
+import CategoryPagination from "@/app/ui/categorias/CategoryPagination";
 
-// --- SOLUCIÓN FINAL AL BUG DEL COMPILADOR ---
-// Se comenta `generateStaticParams` por completo. Su presencia, siendo una función `async`
-// a nivel de módulo, activa un bug en el compilador de Next.js que corrompe la inferencia
-// de tipos para los props del componente de página.
-// Al eliminarlo, la página pasa de ser Generada Estáticamente (SSG) a ser Renderizada
-// en el Servidor bajo demanda (SSR), lo que soluciona el error de compilación.
+export const dynamic = "force-dynamic";
 
-/*
-import { getAllCategories } from '@/app/lib/data-fetcher';
-import type { Category } from '@/app/lib/definitions';
+export default async function CategoriaPage(props: any) {
+  const { params, searchParams } = props;
+  const slug = params.slug;
+  const page = Number(searchParams?.page) || 1;
 
-export async function generateStaticParams() {
-  try {
-    const categories: Category[] = await getAllCategories();
-    return categories.map(category => ({
-      slug: category.slug,
-    }));
-  } catch (error) {
-    console.error("Error al generar los static params para categorías:", error);
-    return [];
-  }
-}
-*/
+  const categories = await getAllCategories();
+  const { posts, totalPages, category } = await getCachedPostsPage(slug, page);
 
-// El componente se mantiene síncrono y limpio.
-function CategoriaPage({ params }: { params: { slug: string } }): React.JSX.Element {
-  const { slug } = params;
+  const categoryName = category?.name ?? slug;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        <aside className="lg:col-span-3 space-y-8">
-          <div className="sticky top-24">
-            <SidenavServer />
-          </div>
-        </aside>
+    <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
+      <h1 className="text-3xl font-bold mb-6">{categoryName}</h1>
 
-        <CategoryPageContent slug={slug} />
-      </div>
+      <CategoryGrid posts={posts} />
+
+      <CategoryPagination
+        current={page}
+        totalPages={totalPages}
+        basePath={`/Categorias/${slug}`}
+      />
     </div>
   );
 }
-
-export default CategoriaPage;
