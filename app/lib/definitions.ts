@@ -113,8 +113,20 @@ export type Post = {
   };
 };
 
+// --- NUEVO TIPO AÑADIDO ---
+// Este tipo representa la forma de los datos de un post después de ser mapeado
+// por la función `mapPostData`.
+export type MappedPost = {
+  databaseId: number;
+  title: string;
+  slug: string;
+  featuredImage: string;
+  category: string;
+  categorySlug: string;
+};
+
 export type PagedPosts = {
-  posts: Post[];
+  posts: MappedPost[]; // Modificado para usar MappedPost
   totalPages: number;
   total: number;
   category: Category | null;
