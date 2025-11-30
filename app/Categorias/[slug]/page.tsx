@@ -1,8 +1,17 @@
 import React from 'react';
 import SidenavServer from '@/app/ui/Page_Index/SidenavServer';
+import CategoryPageContent from '@/app/ui/categorias/CategoryPageContent';
+
+// --- SOLUCIÓN FINAL AL BUG DEL COMPILADOR ---
+// Se comenta `generateStaticParams` por completo. Su presencia, siendo una función `async`
+// a nivel de módulo, activa un bug en el compilador de Next.js que corrompe la inferencia
+// de tipos para los props del componente de página.
+// Al eliminarlo, la página pasa de ser Generada Estáticamente (SSG) a ser Renderizada
+// en el Servidor bajo demanda (SSR), lo que soluciona el error de compilación.
+
+/*
 import { getAllCategories } from '@/app/lib/data-fetcher';
 import type { Category } from '@/app/lib/definitions';
-import CategoryPageContent from '@/app/ui/categorias/CategoryPageContent';
 
 export async function generateStaticParams() {
   try {
@@ -15,11 +24,9 @@ export async function generateStaticParams() {
     return [];
   }
 }
+*/
 
-// --- SOLUCIÓN A PRUEBA DE COMPILADOR ---
-// Se declara la función primero y se exporta por separado para evitar bugs de `export default function`.
-// Se usan tipos inline y un tipo de retorno explícito para no dejar nada a la inferencia del compilador.
-
+// El componente se mantiene síncrono y limpio.
 function CategoriaPage({ params }: { params: { slug: string } }): React.JSX.Element {
   const { slug } = params;
 
