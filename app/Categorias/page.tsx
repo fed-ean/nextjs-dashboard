@@ -1,6 +1,6 @@
-
 import React, { Suspense } from "react";
-import { getCachedPostsPage } from "../lib/data-fetcher";
+// Se importa la función correcta para obtener todos los posts
+import { getAllPosts } from "@/app/lib/data-fetcher"; 
 import NoticiasVarias from "../ui/dashboard/noticias-varias";
 import SidenavServer from '../ui/Page_Index/SidenavServer';
 import { SidenavSkeleton } from '../ui/skeletons';
@@ -16,7 +16,8 @@ const NoPostsDisplay = () => (
 );
 
 export default async function NoticiasPage() {
-  const { posts } = await getCachedPostsPage(null);
+  // Se llama a la función correcta (getAllPosts) y se recibe el array directamente
+  const posts = await getAllPosts();
 
   if (!posts || posts.length === 0) {
     return (
@@ -34,7 +35,7 @@ export default async function NoticiasPage() {
         <h1 className="text-3xl font-bold mb-8">Todas las Noticias</h1>
         <NoticiasVarias
           posts={posts}
-          page={1}
+          page={1} // La paginación podría ser un siguiente paso, por ahora se deja en 1
           categoriaSlug=""
           categoriaNombre=""
         />
