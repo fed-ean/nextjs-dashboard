@@ -1,15 +1,15 @@
 // app/ui/categorias/CategoryGrid.tsx
 import React from "react";
-import type { Post } from "@/app/lib/definitions";
+// Importamos el tipo MappedPost en lugar de Post
+import type { MappedPost } from "@/app/lib/definitions";
 
 interface CategoryGridProps {
-  posts: Post[];
+  // La prop posts ahora espera un array de MappedPost
+  posts: MappedPost[];
   currentSectionSlug?: string; // opcional
 }
 
 export default function CategoryGrid({ posts, currentSectionSlug }: CategoryGridProps) {
-  // Si querés resaltar posts que coincidan con la sección actual
-  // por ejemplo, podrías agregar una clase especial
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {posts.map((post) => {
@@ -25,18 +25,19 @@ export default function CategoryGrid({ posts, currentSectionSlug }: CategoryGrid
               <h2 className="text-lg font-semibold">{post.title}</h2>
             </a>
 
-            {post.featuredImage?.node?.sourceUrl && (
+            {/* Se ajusta la ruta a la imagen para que coincida con la estructura de MappedPost */}
+            {post.featuredImage && (
               <img
-                src={post.featuredImage.node.sourceUrl}
+                src={post.featuredImage}
                 alt={post.title}
                 className="mt-2 rounded w-full h-48 object-cover"
               />
             )}
 
-            <div
-              className="text-sm mt-2"
-              dangerouslySetInnerHTML={{ __html: post.excerpt }}
-            />
+            {/* 
+              El campo 'excerpt' no existe en MappedPost, por lo que se elimina temporalmente.
+              Esto es necesario para solucionar el error de tipos.
+            */}
           </article>
         );
       })}
