@@ -1,10 +1,8 @@
 
 import { NextResponse } from 'next/server';
 
-// NOTA: Este endpoint de GraphQL debe ser la URL completa de tu instancia de WordPress.
 const GQL_ENDPOINT = process.env.WORDPRESS_API_URL || "https://radioempresaria.com.ar/graphql";
 
-// Corregimos las consultas para que pidan todos los campos necesarios del tipo Category
 const QUERY_POSTS_BY_CATEGORY = `
   query GetCategoryPosts($slug: String!, $first: Int!, $after: String, $tagSlugs: [String!]) {
     categories(where: { slug: $slug }) {
@@ -20,15 +18,14 @@ const QUERY_POSTS_BY_CATEGORY = `
             tags { nodes { name slug } }
             categories { 
               nodes { 
-                databaseId  # <-- CAMPO AÑADIDO
+                databaseId
                 name 
                 slug
-                count       # <-- CAMPO AÑADIDO
+                count
               } 
             }
           }
           pageInfo { endCursor hasNextPage }
-          # Eliminamos totalCount de aquí porque no existe en la paginación de cursor
         }
       }
     }
@@ -48,15 +45,14 @@ const QUERY_POSTS_BY_TAGS = `
         tags { nodes { name slug } }
         categories { 
           nodes { 
-            databaseId  # <-- CAMPO AÑADIDO
+            databaseId
             name 
             slug
-            count       # <-- CAMPO AÑADIDO
+            count
           } 
         }
       }
       pageInfo { endCursor hasNextPage }
-      # Eliminamos totalCount de aquí
     }
   }
 `;
@@ -110,11 +106,11 @@ export async function POST(req: Request) {
         const posts = data?.categories?.nodes?.[0]?.posts?.nodes || [];
         const pageInfo = data?.categories?.nodes?.[0]?.posts?.pageInfo || { endCursor: null, hasNextPage: false };
         
-        // totalCount no viene con este tipo de paginación, lo eliminamos de la respuesta.
         return NextResponse.json({ ok: true, posts, pageInfo });
 
     } else if (mode === "byTags") {
-        if (!tagSlugs || !Array.isArray(tagSlgs) || tagSlugs.length === 0) {
+        // AQUI ESTABA EL ERROR: tagSlgs -> tagSlugs
+        if (!tagSlugs || !Array.isArray(tagSlugs) || tagSlugs.length === 0) {
             return NextResponse.json({ ok: true, posts: [], pageInfo: { endCursor: null, hasNextPage: false } });
         }
         
