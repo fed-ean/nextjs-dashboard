@@ -19,28 +19,14 @@ export const GET_POSTS_BY_CATEGORY_SIMPLE = gql`
         excerpt
         slug
         date
-        featuredImage {
-          node {
-            sourceUrl
-          }
-        }
-        categories {
-          nodes {
-            databaseId
-            name
-            slug
-            count
-          }
-        }
+        featuredImage { node { sourceUrl } }
+        categories { nodes { databaseId name slug count } }
       }
-      pageInfo {
-        offsetPagination {
-          total
-        }
-      }
+      pageInfo { offsetPagination { total } }
     }
   }
 `;
+
 
 
 //
