@@ -1,11 +1,9 @@
 import Link from 'next/link';
-import type { Category, Post } from '@/app/lib/definitions';
-import { format, parseISO } from 'date-fns';
-import { es } from 'date-fns/locale/es';
+import type { Category, MappedPost } from '@/app/lib/definitions';
 
 interface SidenavProps {
   categories: Category[];
-  latestPosts: Post[]; 
+  latestPosts: MappedPost[];
 }
 
 // Componente unificado para toda la barra lateral
@@ -20,16 +18,11 @@ export default function SideNav({ categories, latestPosts }: SidenavProps) {
           <h3 className="text-xl font-bold text-gray-900 mb-4 pb-2 border-b">Últimas Noticias</h3>
           <div className="space-y-4">
             {latestPosts.map((post) => {
-                // Formateo de la fecha
-                const formattedDate = post.date 
-                  ? format(parseISO(post.date), "d 'de' MMMM, yyyy", { locale: es }) 
-                  : '';
-
                 return (
                     <div key={post.databaseId} className="flex items-start gap-4">
                         <Link href={`/Categorias/Noticias/${post.slug}`} className="shrink-0">
                             <img 
-                                src={post.featuredImage?.node?.sourceUrl || '/placeholder.png'} 
+                                src={post.featuredImage || '/placeholder.png'} 
                                 alt={`Imagen de ${post.title}`}
                                 className="w-20 h-20 object-cover rounded-md hover:opacity-80 transition-opacity"
                             />
@@ -38,7 +31,6 @@ export default function SideNav({ categories, latestPosts }: SidenavProps) {
                             <h4 className="font-semibold text-gray-800 hover:text-blue-600">
                                 <Link href={`/Categorias/Noticias/${post.slug}`}>{post.title}</Link>
                             </h4>
-                            <p className="text-sm text-gray-500 mt-1">{formattedDate}</p>
                         </div>
                     </div>
                 );
