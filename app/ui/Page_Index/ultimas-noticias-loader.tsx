@@ -1,6 +1,7 @@
 // app/ui/Page_Index/ultimas-noticias-loader.tsx
 import NoticiasVarias from "../dashboard/noticias-varias";
 import type { Post } from "@/app/lib/definitions";
+import { mapPostData } from "@/app/lib/data-fetcher";
 
 
 const GQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT_URL || '';
@@ -53,7 +54,10 @@ async function fetchLatestPosts(): Promise<{ posts: Post[]; error: string | null
       throw new Error(json.errors.map((e: any) => e.message).join(', '));
     }
 
-    return { posts: json.data?.posts?.nodes || [], error: null };
+    return { 
+      posts: (json.data?.posts?.nodes ?? []) as Post[], 
+      error: null 
+    };
 
   } catch (err: any) {
     console.error("Error al obtener posts:", err.message);
@@ -80,9 +84,12 @@ export default async function UltimasNoticiasLoader() {
     return null;
   }
 
+  // Convertimos Post[] → MappedPost[]
+  const mappedPosts = posts.map(mapPostData);
+
   return (
     <NoticiasVarias
-      posts={posts}
+      posts={mappedPosts}
       page={1}
       categoriaSlug=""
       categoriaNombre=""
