@@ -2,9 +2,9 @@
 export const dynamic = "force-dynamic";
 
 import React from "react";
-import { getVariasPostsPage } from "../../lib/data-fetcher";
-import CategoryPagination from "../../ui/categorias/CategoryPagination";
-import CategoryGrid from "../../ui/categorias/CategoryGrid";
+import { getVariasPostsPage } from "@/app/lib/data-fetcher";
+import CategoryPagination from "@/app/ui/categorias/CategoryPagination";
+import CategoryGrid from "@/app/ui/categorias/CategoryGrid";
 
 const PER_PAGE = 9;
 
@@ -16,8 +16,8 @@ export default async function VariasPage(props: Props) {
   const searchParams = await props.searchParams;
   const page = Number(searchParams?.page ?? 1);
 
-  // ✔️ Ahora sí trae solo las publicaciones “Varias”
-  const result = await getVariasPostsPage(page, PER_PAGE);
+  // ✔ Llamada correcta: Posts de "programas" excluyendo otras subcategorías
+  const result = await getVariasPostsPage(page);
 
   const { posts, totalPages } = result;
 

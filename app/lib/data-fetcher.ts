@@ -184,3 +184,105 @@ export async function getCachedPostsPage(slug: string, page: number): Promise<Pa
       };
     }
 }
+
+// ============================
+// ✔️ FUNCIÓN NUEVA: VARIAS
+// ============================
+export async function getVariasPostsPage(page: number): Promise<PagedPosts> {
+  noStore();
+  const pageSize = POSTS_PER_PAGE;
+  const offset = (page - 1) * pageSize;
+
+  const query = `
+    query GetVariasPosts($pageSize: Int, $offset: Int) {
+      categories(where: { slug: "programas" }) {
+        nodes {
+          databaseId
+          name
+          slug
+          count
+          posts(
+            where: {
+              offsetPagination: { size: $pageSize, offset: $offset }
+              taxQuery: {
+                taxArray: [
+                  {
+                    taxonomy: CATEGORY
+                    field: SLUG
+                    terms: ["locales", "desayuno-pymes", "cadena-verdeamarilla"]
+                    operator: NOT_IN
+                  }
+                ]
+              }
+            }
+          ) {
+            nodes {
+              databaseId
+              title
+              slug
+              featuredImage {
+                node {
+                  sourceUrl
+                }
+              }
+              categories {
+                nodes {
+                  name
+                  slug
+                }
+              }
+            }
+            pageInfo {
+              offsetPagination {
+                total
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const variables = { pageSize, offset };
+
+  try {
+    const data = await fetchAPI(query, { variables });
+
+    const categoryNode = data?.categories?.nodes?.[0];
+    if (!categoryNode) {
+      return {
+        posts: [],
+        total: 0,
+        totalPages: 0,
+        category: null,
+      };
+    }
+
+    const postsNodes = categoryNode.posts.nodes ?? [];
+    const totalPosts = Number(
+      categoryNode?.posts?.pageInfo?.offsetPagination?.total ?? 0
+    );
+
+    const totalPages = Math.ceil(totalPosts / pageSize) || 0;
+
+    return {
+      posts: postsNodes.map(mapPostData),
+      total: totalPosts,
+      totalPages,
+      category: {
+        databaseId: categoryNode.databaseId,
+        name: categoryNode.name,
+        slug: categoryNode.slug,
+        count: categoryNode.count,
+      },
+    };
+  } catch (error) {
+    console.error("Error loading VARIAS posts:", error);
+    return {
+      posts: [],
+      total: 0,
+      totalPages: 0,
+      category: null,
+    };
+  }
+}
