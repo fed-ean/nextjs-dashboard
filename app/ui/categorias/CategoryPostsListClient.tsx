@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import CategoryGrid from './CategoryGrid';
 // 1. IMPORTAR EL TIPO POST OFICIAL
 import type { Post } from '@/app/lib/definitions'; 
+import { mapPostData } from '@/app/lib/data-fetcher';
+
 
 const PAGE_SIZE = 9;
 
@@ -98,9 +100,11 @@ export default function CategoryPostsListClient({ slug }: CategoryPostsListClien
 
   return (
     <section className="p-6">
-      {/* Ahora el `posts` que se pasa aquí tiene el tipo correcto y el error de compilación debería desaparecer */}
-      <CategoryGrid posts={posts} currentSectionSlug={slug} />
-
+      <CategoryGrid 
+        posts={posts.map(mapPostData)}   // ← CONVERSIÓN CORRECTA
+        currentSectionSlug={slug} 
+      />
+  
       <div className="mt-8 flex justify-center">
         {pageInfo?.hasNextPage && (
           <button onClick={handleLoadMore} disabled={loading} className="px-6 py-2 rounded-md bg-blue-600 text-white disabled:bg-blue-300">
@@ -110,4 +114,5 @@ export default function CategoryPostsListClient({ slug }: CategoryPostsListClien
       </div>
     </section>
   );
+  
 }
