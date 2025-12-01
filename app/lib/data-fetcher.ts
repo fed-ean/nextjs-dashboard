@@ -92,90 +92,111 @@ export async function getAllCategories(): Promise<Category[]> {
   return data?.categories?.nodes ?? [];
 }
 
-export async function getCachedPostsPage(slug: string, page: number): Promise<PagedPosts> {
-    noStore();
-    const pageSize = POSTS_PER_PAGE;
-    const offset = (page - 1) * pageSize;
+export async function getCachedPostsPage(
+  slug: string | null = null,
+  page: number = 1
+): Promise<PagedPosts> {
 
+  noStore();
+  const pageSize = POSTS_PER_PAGE;
+  const offset = (page - 1) * pageSize;
+
+  // -------------------------------------
+  // 🔵 1) MODO "SIN CATEGORÍA" → últimos posts
+  // -------------------------------------
+  if (!slug) {
     const query = `
-      query GetCategoryPosts($slug: [String], $pageSize: Int, $offset: Int) {
-        categories(where: { slug: $slug }) {
+      query GetLatestPosts($pageSize: Int, $offset: Int) {
+        posts(where: { offsetPagination: { size: $pageSize, offset: $offset } }) {
           nodes {
             databaseId
-            name
+            title
             slug
-            count
-            posts(where: { offsetPagination: { size: $pageSize, offset: $offset } }) {
+            featuredImage {
+              node {
+                sourceUrl
+              }
+            }
+            categories {
               nodes {
-                databaseId
-                title
+                name
                 slug
-                featuredImage {
-                  node {
-                    sourceUrl
-                  }
-                }
-                categories {
-                  nodes {
-                    name
-                    slug
-                  }
-                }
               }
-              pageInfo {
-                offsetPagination {
-                  total
-                }
-              }
+            }
+          }
+          pageInfo {
+            offsetPagination {
+              total
             }
           }
         }
       }
     `;
 
-    const variables = {
-      slug: [slug],
-      pageSize,
-      offset,
+    const variables = { pageSize, offset };
+
+    const data = await fetchAPI(query, { variables });
+
+    const postsNodes = data?.posts?.nodes ?? [];
+    const totalPosts = Number(
+      data?.posts?.pageInfo?.offsetPagination?.total ?? 0
+    );
+
+    return {
+      posts: postsNodes.map(mapPostData),
+      total: totalPosts,
+      totalPages: Math.ceil(totalPosts / pageSize),
+      category: null,
     };
+  }
 
-    try {
-      const data = await fetchAPI(query, { variables });
-
-      const categoryNode = data?.categories?.nodes?.[0];
-      const postsNodes = categoryNode?.posts?.nodes ?? [];
-      const totalPosts = Number(
-        categoryNode?.posts?.pageInfo?.offsetPagination?.total ?? 0
-      );
-      const totalPages = Math.ceil(totalPosts / pageSize) || 0;
-
-      // Si no se encuentra la categoría, devuelve un estado vacío pero válido
-      if (!categoryNode) {
-        return {
-          posts: [],
-          total: 0,
-          totalPages: 0,
-          category: null, // O un objeto de categoría por defecto
-        };
+  // -------------------------------------
+  // 🔵 2) MODO CATEGORÍA NORMAL
+  // -------------------------------------
+  const query = `
+    query GetCategoryPosts($slug: [String], $pageSize: Int, $offset: Int) {
+      categories(where: { slug: $slug }) {
+        nodes {
+          databaseId
+          name
+          slug
+          count
+          posts(where: { offsetPagination: { size: $pageSize, offset: $offset } }) {
+            nodes {
+              databaseId
+              title
+              slug
+              featuredImage {
+                node {
+                  sourceUrl
+                }
+              }
+              categories {
+                nodes {
+                  name
+                  slug
+                }
+              }
+            }
+            pageInfo {
+              offsetPagination {
+                total
+              }
+            }
+          }
+        }
       }
+    }
+  `;
 
-      return {
-        posts: postsNodes.map(mapPostData),
-        total: totalPosts,
-        totalPages,
-        // --- CORRECCIÓN ---
-        // Se utilizan los datos de la categoría obtenidos de la API
-        // en lugar de valores hardcodeados.
-        category: {
-          databaseId: categoryNode.databaseId,
-          name: categoryNode.name,
-          slug: categoryNode.slug,
-          count: categoryNode.count,
-        },
-      };
-    } catch (error) {
-      console.error(`Error fetching posts for category ${slug}:`, error);
-      // En caso de error, devolver un estado vacío para que la página no se rompa
+  const variables = { slug: [slug], pageSize, offset };
+
+  try {
+    const data = await fetchAPI(query, { variables });
+
+    const categoryNode = data?.categories?.nodes?.[0];
+
+    if (!categoryNode) {
       return {
         posts: [],
         total: 0,
@@ -183,7 +204,35 @@ export async function getCachedPostsPage(slug: string, page: number): Promise<Pa
         category: null,
       };
     }
+
+    const postsNodes = categoryNode.posts.nodes ?? [];
+    const totalPosts = Number(
+      categoryNode.posts.pageInfo.offsetPagination.total ?? 0
+    );
+
+    return {
+      posts: postsNodes.map(mapPostData),
+      total: totalPosts,
+      totalPages: Math.ceil(totalPosts / pageSize),
+      category: {
+        databaseId: categoryNode.databaseId,
+        name: categoryNode.name,
+        slug: categoryNode.slug,
+        count: categoryNode.count,
+      },
+    };
+  } catch (error) {
+    console.error(`Error fetching posts for category ${slug}:`, error);
+
+    return {
+      posts: [],
+      total: 0,
+      totalPages: 0,
+      category: null,
+    };
+  }
 }
+
 
 // ============================
 // ✔️ FUNCIÓN NUEVA: VARIAS
