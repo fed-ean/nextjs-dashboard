@@ -116,14 +116,23 @@ export type Post = {
 // --- NUEVO TIPO AÑADIDO ---
 // Este tipo representa la forma de los datos de un post después de ser mapeado
 // por la función `mapPostData`.
-export type MappedPost = {
+export interface MappedPost {
   databaseId: number;
   title: string;
+  excerpt: string | null;   // ← AGREGAR ESTO
   slug: string;
-  featuredImage: string;
-  category: string;
-  categorySlug: string;
-};
+  date: string;
+  featuredImage: string | null;
+  categories: {
+    databaseId: number;
+    name: string;
+    slug: string;
+    count: number;
+  }[];
+  category: string | null;
+  categorySlug: string | null;
+}
+
 
 export type PagedPosts = {
   posts: MappedPost[]; // Modificado para usar MappedPost

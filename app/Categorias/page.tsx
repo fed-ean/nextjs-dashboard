@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 // Se importa la función correcta para obtener todos los posts
-import { getAllPosts } from "@/app/lib/data-fetcher"; 
+import { getAllPosts } from "@/app/lib/data-fetcher";
 import NoticiasVarias from "../ui/dashboard/noticias-varias";
 import SidenavServer from '../ui/Page_Index/SidenavServer';
 import { SidenavSkeleton } from '../ui/skeletons';

@@ -1,83 +1,66 @@
-
-import { POSTS_PER_PAGE, WP_API_URL } from '@/app/lib/constants';
-import { Post, Category, PagedPosts, MappedPost } from './definitions';
-import { unstable_noStore as noStore } from 'next/cache';
+// app/lib/data-fetcher.ts
+import { POSTS_PER_PAGE, WP_API_URL } from "@/app/lib/constants";
+import type { Post, Category, PagedPosts, MappedPost } from "./definitions";
+import { unstable_noStore as noStore } from "next/cache";
 
 const API_TOKEN = process.env.WORDPRESS_API_TOKEN;
 
-async function fetchAPI(query = '', { variables }: Record<string, any> = {}) {
-  const headers = { 'Content-Type': 'application/json' } as any;
-
-  if (API_TOKEN) {
-    headers[
-      'Authorization'
-    ] = `Bearer ${API_TOKEN}`;
-  }
+// -----------------------------
+// Helper fetch genérico
+// -----------------------------
+async function fetchAPI(query = "", variables: Record<string, any> = {}) {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (API_TOKEN) headers["Authorization"] = `Bearer ${API_TOKEN}`;
 
   const res = await fetch(WP_API_URL, {
-    method: 'POST',
+    method: "POST",
     headers,
-    body: JSON.stringify({
-      query,
-      variables,
-    }),
-    // next: { revalidate: 60 } // Revalidate every 60 seconds
+    body: JSON.stringify({ query, variables }),
+    // next: { revalidate: 60 } // opcional
   });
 
-  const json = await res.json();
-  if (json.errors) {
-    console.error("GraphQL Errors:", JSON.stringify(json.errors, null, 2));
-    throw new Error('Failed to fetch API');
+  const json = await res.json().catch(() => null);
+
+  if (!res.ok || json?.errors) {
+    console.error("GraphQL Error:", json?.errors ?? res.statusText);
+    return null;
   }
+
   return json.data;
 }
 
-// Helper para mapear los datos del post
-export function mapPostData(post: Post): MappedPost {
+// -----------------------------
+// Export: mapPostData (Post -> MappedPost)
+// -----------------------------
+export function mapPostData(node: any): MappedPost {
+  const mainCat = node?.categories?.nodes?.[0] ?? null;
+
   return {
-    databaseId: post.databaseId,
-    title: post.title,
-    slug: post.slug,
-    featuredImage: post.featuredImage?.node.sourceUrl ?? '/placeholder.jpg',
-    category: post.categories?.nodes[0]?.name ?? 'Sin categoría',
-    categorySlug: post.categories?.nodes[0]?.slug ?? 'general',
+    databaseId: Number(node?.databaseId ?? 0),
+    title: node?.title ?? "",
+    excerpt: node?.excerpt ?? "",
+    slug: node?.slug ?? "",
+    date: node?.date ?? "",
+    featuredImage: node?.featuredImage?.node?.sourceUrl ?? null,
+    categories: node?.categories?.nodes?.map((c: any) => ({
+      databaseId: Number(c.databaseId ?? 0),
+      name: c.name ?? "",
+      slug: c.slug ?? "",
+      count: Number(c.count ?? 0),
+    })) ?? [],
+
+    // Campos útiles para UI (CategoryGrid / Sidenav / etc)
+    category: mainCat?.name ?? null,
+    categorySlug: mainCat?.slug ?? null,
   };
 }
 
-
-export async function getAllPosts() {
-  noStore();
-  const data = await fetchAPI(
-    `
-    query AllPosts {
-      posts(first: 20, where: { orderby: { field: DATE, order: DESC } }) {
-        nodes {
-          databaseId
-          title
-          slug
-          featuredImage {
-            node {
-              sourceUrl
-            }
-          }
-          categories {
-            nodes {
-              name
-              slug
-            }
-          }
-        }
-      }
-    }
-    `
-  );
-
-  return (data?.posts?.nodes ?? []).map(mapPostData);
-}
-
+// -----------------------------
+// getAllCategories
+// -----------------------------
 export async function getAllCategories(): Promise<Category[]> {
   noStore();
-  const data = await fetchAPI(`
+  const query = `
     query GetAllCategories {
       categories(first: 100) {
         nodes {
@@ -88,162 +71,131 @@ export async function getAllCategories(): Promise<Category[]> {
         }
       }
     }
-  `);
-  return data?.categories?.nodes ?? [];
+  `;
+
+  const data = await fetchAPI(query);
+  return data?.categories?.nodes?.map((c: any) => ({
+    databaseId: Number(c.databaseId ?? 0),
+    name: c.name ?? "",
+    slug: c.slug ?? "",
+    count: Number(c.count ?? 0),
+  })) ?? [];
 }
 
+// -----------------------------
+// getCachedPostsPage(slug | null, page, pageSize)
+// - si slug === null => trae últimos posts (modo "All")
+// - si slug provided => posts de la categoría
+// -----------------------------
 export async function getCachedPostsPage(
   slug: string | null = null,
-  page: number = 1
+  page: number = 1,
+  pageSize: number = POSTS_PER_PAGE
 ): Promise<PagedPosts> {
-
   noStore();
-  const pageSize = POSTS_PER_PAGE;
   const offset = (page - 1) * pageSize;
 
-  // -------------------------------------
-  // 🔵 1) MODO "SIN CATEGORÍA" → últimos posts
-  // -------------------------------------
+  // -------------------------
+  // Sin categoría -> últimos posts
+  // -------------------------
   if (!slug) {
     const query = `
-      query GetLatestPosts($pageSize: Int, $offset: Int) {
-        posts(where: { offsetPagination: { size: $pageSize, offset: $offset } }) {
+      query GetLatestPosts($size: Int!, $offset: Int!) {
+        posts(where: { offsetPagination: { size: $size, offset: $offset } }) {
           nodes {
             databaseId
             title
+            excerpt
             slug
-            featuredImage {
-              node {
-                sourceUrl
-              }
-            }
-            categories {
-              nodes {
-                name
-                slug
-              }
-            }
+            date
+            featuredImage { node { sourceUrl } }
+            categories { nodes { databaseId name slug count } }
           }
-          pageInfo {
-            offsetPagination {
-              total
-            }
-          }
+          pageInfo { offsetPagination { total } }
         }
       }
     `;
 
-    const variables = { pageSize, offset };
-
-    const data = await fetchAPI(query, { variables });
-
+    const data = await fetchAPI(query, { size: pageSize, offset });
     const postsNodes = data?.posts?.nodes ?? [];
-    const totalPosts = Number(
-      data?.posts?.pageInfo?.offsetPagination?.total ?? 0
-    );
+    const total = Number(data?.posts?.pageInfo?.offsetPagination?.total ?? 0);
 
     return {
       posts: postsNodes.map(mapPostData),
-      total: totalPosts,
-      totalPages: Math.ceil(totalPosts / pageSize),
+      total,
+      totalPages: Math.ceil(total / pageSize) || 0,
       category: null,
     };
   }
 
-  // -------------------------------------
-  // 🔵 2) MODO CATEGORÍA NORMAL
-  // -------------------------------------
+  // -------------------------
+  // Con categoría -> posts de category
+  // -------------------------
   const query = `
-    query GetCategoryPosts($slug: [String], $pageSize: Int, $offset: Int) {
+    query GetCategoryPosts($slug: [String], $size: Int!, $offset: Int!) {
       categories(where: { slug: $slug }) {
         nodes {
           databaseId
           name
           slug
           count
-          posts(where: { offsetPagination: { size: $pageSize, offset: $offset } }) {
+          posts(where: { offsetPagination: { size: $size, offset: $offset } }) {
             nodes {
               databaseId
               title
+              excerpt
               slug
-              featuredImage {
-                node {
-                  sourceUrl
-                }
-              }
-              categories {
-                nodes {
-                  name
-                  slug
-                }
-              }
+              date
+              featuredImage { node { sourceUrl } }
+              categories { nodes { databaseId name slug count } }
             }
-            pageInfo {
-              offsetPagination {
-                total
-              }
-            }
+            pageInfo { offsetPagination { total } }
           }
         }
       }
     }
   `;
 
-  const variables = { slug: [slug], pageSize, offset };
+  const data = await fetchAPI(query, { slug: [slug], size: pageSize, offset });
 
   try {
-    const data = await fetchAPI(query, { variables });
-
-    const categoryNode = data?.categories?.nodes?.[0];
-
+    const categoryNode = data?.categories?.nodes?.[0] ?? null;
     if (!categoryNode) {
-      return {
-        posts: [],
-        total: 0,
-        totalPages: 0,
-        category: null,
-      };
+      return { posts: [], total: 0, totalPages: 0, category: null };
     }
 
-    const postsNodes = categoryNode.posts.nodes ?? [];
-    const totalPosts = Number(
-      categoryNode.posts.pageInfo.offsetPagination.total ?? 0
-    );
+    const postsNodes = categoryNode?.posts?.nodes ?? [];
+    const total = Number(categoryNode?.posts?.pageInfo?.offsetPagination?.total ?? 0);
 
     return {
       posts: postsNodes.map(mapPostData),
-      total: totalPosts,
-      totalPages: Math.ceil(totalPosts / pageSize),
+      total,
+      totalPages: Math.ceil(total / pageSize) || 0,
       category: {
-        databaseId: categoryNode.databaseId,
-        name: categoryNode.name,
-        slug: categoryNode.slug,
-        count: categoryNode.count,
+        databaseId: Number(categoryNode.databaseId ?? 0),
+        name: categoryNode.name ?? "",
+        slug: categoryNode.slug ?? "",
+        count: Number(categoryNode.count ?? 0),
       },
     };
-  } catch (error) {
-    console.error(`Error fetching posts for category ${slug}:`, error);
-
-    return {
-      posts: [],
-      total: 0,
-      totalPages: 0,
-      category: null,
-    };
+  } catch (err) {
+    console.error("Error parsing category posts:", err);
+    return { posts: [], total: 0, totalPages: 0, category: null };
   }
 }
 
-
-// ============================
-// ✔️ FUNCIÓN NUEVA: VARIAS
-// ============================
-export async function getVariasPostsPage(page: number): Promise<PagedPosts> {
+// -----------------------------
+// getVariasPostsPage(page) -> posts en programas EXCLUYENDO slugs dados
+// -----------------------------
+export async function getVariasPostsPage(
+  page: number = 1,
+  pageSize: number = POSTS_PER_PAGE
+): Promise<PagedPosts> {
   noStore();
-  const pageSize = POSTS_PER_PAGE;
   const offset = (page - 1) * pageSize;
 
   const query = `
-    query GetVariasPosts($pageSize: Int, $offset: Int) {
+    query GetVariasPosts($size: Int!, $offset: Int!) {
       categories(where: { slug: "programas" }) {
         nodes {
           databaseId
@@ -252,7 +204,7 @@ export async function getVariasPostsPage(page: number): Promise<PagedPosts> {
           count
           posts(
             where: {
-              offsetPagination: { size: $pageSize, offset: $offset }
+              offsetPagination: { size: $size, offset: $offset }
               taxQuery: {
                 taxArray: [
                   {
@@ -268,70 +220,89 @@ export async function getVariasPostsPage(page: number): Promise<PagedPosts> {
             nodes {
               databaseId
               title
+              excerpt
               slug
-              featuredImage {
-                node {
-                  sourceUrl
-                }
-              }
-              categories {
-                nodes {
-                  name
-                  slug
-                }
-              }
+              date
+              featuredImage { node { sourceUrl } }
+              categories { nodes { databaseId name slug count } }
             }
-            pageInfo {
-              offsetPagination {
-                total
-              }
-            }
+            pageInfo { offsetPagination { total } }
           }
         }
       }
     }
   `;
 
-  const variables = { pageSize, offset };
+  const data = await fetchAPI(query, { size: pageSize, offset });
+
+  const categoryNode = data?.categories?.nodes?.[0] ?? null;
+  if (!categoryNode) {
+    return { posts: [], total: 0, totalPages: 0, category: null };
+  }
+
+  const postsNodes = categoryNode.posts?.nodes ?? [];
+  const total = Number(categoryNode.posts?.pageInfo?.offsetPagination?.total ?? 0);
+
+  return {
+    posts: postsNodes.map(mapPostData),
+    total,
+    totalPages: Math.ceil(total / pageSize) || 0,
+    category: {
+      databaseId: Number(categoryNode.databaseId ?? 0),
+      name: categoryNode.name ?? "",
+      slug: categoryNode.slug ?? "",
+      count: Number(categoryNode.count ?? 0),
+    },
+  };
+}
+
+// -----------------------------
+// getAllPosts (raw, mapped)
+// -----------------------------
+export async function getAllPostsMapped(): Promise<MappedPost[]> {
+  noStore();
+  const query = `
+    query AllPosts($first: Int) {
+      posts(first: $first) {
+        nodes {
+          databaseId
+          title
+          excerpt
+          slug
+          date
+          featuredImage { node { sourceUrl } }
+          categories { nodes { databaseId name slug count } }
+        }
+      }
+    }
+  `;
+
+  const data = await fetchAPI(query, { first: 50 });
+  const nodes = data?.posts?.nodes ?? [];
+  return nodes.map(mapPostData);
+}
+// ✔ Agregar en data-fetcher.ts
+import { print } from "graphql";
+import { GET_ALL_POSTS_SIMPLE } from "./queries";
+
+export async function getAllPosts(pageSize: number = 50, offset: number = 0) {
+  noStore();
 
   try {
-    const data = await fetchAPI(query, { variables });
+    const queryString = print(GET_ALL_POSTS_SIMPLE);
 
-    const categoryNode = data?.categories?.nodes?.[0];
-    if (!categoryNode) {
-      return {
-        posts: [],
-        total: 0,
-        totalPages: 0,
-        category: null,
-      };
-    }
-
-    const postsNodes = categoryNode.posts.nodes ?? [];
-    const totalPosts = Number(
-      categoryNode?.posts?.pageInfo?.offsetPagination?.total ?? 0
-    );
-
-    const totalPages = Math.ceil(totalPosts / pageSize) || 0;
-
-    return {
-      posts: postsNodes.map(mapPostData),
-      total: totalPosts,
-      totalPages,
-      category: {
-        databaseId: categoryNode.databaseId,
-        name: categoryNode.name,
-        slug: categoryNode.slug,
-        count: categoryNode.count,
+    const data = await fetchAPI(queryString, {
+      variables: {
+        size: pageSize,
+        offset,
       },
-    };
+    });
+
+    const nodes = data?.posts?.nodes ?? [];
+    return nodes.map(mapPostData);
+
   } catch (error) {
-    console.error("Error loading VARIAS posts:", error);
-    return {
-      posts: [],
-      total: 0,
-      totalPages: 0,
-      category: null,
-    };
+    console.error("Error en getAllPosts():", error);
+    return [];
   }
 }
