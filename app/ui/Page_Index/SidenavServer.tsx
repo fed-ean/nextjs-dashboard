@@ -1,4 +1,3 @@
-
 import { getAllCategories, getCachedPostsPage } from '../../lib/data-fetcher';
 import Sidenav from './sidenav';
 import type { Post, Category } from '@/app/lib/definitions';
@@ -9,7 +8,7 @@ export default async function SidenavServer() {
   // Obtenemos categorías y posts simultáneamente
   const [categoriesData, postsData] = await Promise.all([
     getAllCategories(),
-    getCachedPostsPage(null) // `null` para obtener los posts más recientes
+    getCachedPostsPage(1, undefined) // Página 1, sin categoría → últimos posts
   ]);
 
   // Aseguramos que los datos no sean nulos
