@@ -1,6 +1,5 @@
 // app/Categorias/[slug]/page.tsx
 import React from "react";
-import type { Metadata } from "next";
 import {
   getCachedPostsPage,
   getAllCategories,
@@ -11,11 +10,6 @@ import type { Category, MappedPost } from "@/app/lib/definitions";
 
 export const dynamic = "force-dynamic";
 
-type Props = {
-  params: { slug: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
-};
-
 // Normaliza slugs: quita tildes y pone en minúsculas para evitar mismatch con WP
 function normalizeSlug(str: string) {
   return String(str || "")
@@ -24,8 +18,8 @@ function normalizeSlug(str: string) {
     .toLowerCase();
 }
 
-export default async function CategoriaPage({ params, searchParams }: Props) {
-  const rawSlug = params.slug ?? "";
+export default async function CategoriaPage({ params, searchParams }: any) {
+  const rawSlug = params?.slug ?? "";
   const slug = normalizeSlug(rawSlug);
   const page = Number(searchParams?.page ?? 1) || 1;
 
@@ -35,7 +29,6 @@ export default async function CategoriaPage({ params, searchParams }: Props) {
     allCategories = await getAllCategories();
   } catch (err) {
     console.error("Error cargando categorías:", err);
-    // seguimos: no es crítico bloquear la página por esto
     allCategories = [];
   }
 
@@ -45,7 +38,6 @@ export default async function CategoriaPage({ params, searchParams }: Props) {
   let categoryName = rawSlug;
 
   try {
-    // getCachedPostsPage acepta (slug|null, page, pageSize?)
     const result = await getCachedPostsPage(slug || null, page);
 
     // Protecciones si la función devolvió null o estructura inesperada
@@ -53,14 +45,16 @@ export default async function CategoriaPage({ params, searchParams }: Props) {
       posts = [];
       totalPages = 0;
     } else {
-      posts = result.posts as MappedPost[]; // data-fetcher ya mapea a MappedPost
-      totalPages = Number(result.totalPages ?? result.total ? Math.ceil((result.total ?? 0) / (result.posts?.length || 1)) : 0) || 0;
+      posts = result.posts as MappedPost[];
+      // Preferimos totalPages si lo devuelve la función; si no, intentamos calcularlo desde total
+      totalPages =
+        Number(result.totalPages ?? 0) ||
+        Math.ceil((Number(result.total ?? 0) || posts.length) / (posts.length || 1));
     }
 
     // Si result.category tiene nombre preferimos ese
     if (result?.category?.name) categoryName = result.category.name;
     else {
-      // intentar encontrar nombre real en allCategories (por si slug fue ingresado en mayúsculas o con tilde)
       const matched = allCategories.find((c) => normalizeSlug(c.slug) === slug);
       if (matched) categoryName = matched.name;
     }
