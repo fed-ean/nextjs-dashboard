@@ -115,10 +115,13 @@ export async function getCachedPostsPage(
         }
       }
     `;
+    console.log("📌 Buscando categoría con slug:", slug);
 
     const data = await fetchAPI(query, { size: pageSize, offset });
     const postsNodes = data?.posts?.nodes ?? [];
     const total = Number(data?.posts?.pageInfo?.offsetPagination?.total ?? 0);
+
+    console.log("📌 Resultado categorías:", JSON.stringify(data?.categories?.nodes, null, 2));
 
     return {
       posts: postsNodes.map(mapPostData),
