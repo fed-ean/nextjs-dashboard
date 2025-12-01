@@ -33,17 +33,17 @@ async function fetchAPI(query = '', { variables }: Record<string, any> = {}) {
 }
 
 // Helper para mapear los datos del post
-function mapPostData(post: Post): MappedPost {
-    return {
-      databaseId: post.databaseId,
-      title: post.title,
-      slug: post.slug,
-      featuredImage: post.featuredImage?.node.sourceUrl ?? '/placeholder.jpg',
-      // Asegúrate de que las categorías existen y tienen al menos un elemento.
-      category: post.categories?.nodes[0]?.name ?? 'Sin categoría',
-      categorySlug: post.categories?.nodes[0]?.slug ?? 'general',
-    };
+export function mapPostData(post: Post): MappedPost {
+  return {
+    databaseId: post.databaseId,
+    title: post.title,
+    slug: post.slug,
+    featuredImage: post.featuredImage?.node.sourceUrl ?? '/placeholder.jpg',
+    category: post.categories?.nodes[0]?.name ?? 'Sin categoría',
+    categorySlug: post.categories?.nodes[0]?.slug ?? 'general',
+  };
 }
+
 
 export async function getAllPosts() {
   noStore();
