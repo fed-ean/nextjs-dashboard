@@ -1,18 +1,28 @@
-import { getAllCategories, getCachedPostsPage } from '../../lib/data-fetcher';
+// app/ui/Page_Index/SidenavServer.tsx
+import React from 'react';
+import { getAllCategories, getCachedPostsPage } from '@/app/lib/data-fetcher';
+import type { Category } from '@/app/lib/definitions';
 import Sidenav from './sidenav';
-import type { Category, MappedPost } from '@/app/lib/definitions';
 
 export default async function SidenavServer() {
+  // Cargar categorías y últimas noticias (1ª página)
+  let categories: Category[] = [];
+  let posts: any[] = [];
 
-  const [categoriesData, postsData] = await Promise.all([
-    getAllCategories(),
-    getCachedPostsPage(null)
-  ]);
+  try {
+    categories = await getAllCategories();
+  } catch (err) {
+    console.error('Error getAllCategories', err);
+    categories = [];
+  }
 
-  const allCategories: Category[] = categoriesData || [];
+  try {
+    const res = await getCachedPostsPage(null, 1); // últimos posts
+    posts = res.posts ?? [];
+  } catch (err) {
+    console.error('Error getCachedPostsPage', err);
+    posts = [];
+  }
 
-  // ⬅️ ARREGLO: usar MappedPost en lugar de Post
-  const latestPosts: MappedPost[] = postsData?.posts?.slice(0, 5) || [];
-
-  return <Sidenav categories={allCategories} latestPosts={latestPosts} />;
+  return <Sidenav categories={categories} latestPosts={posts} />;
 }

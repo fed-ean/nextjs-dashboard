@@ -1,33 +1,25 @@
 // app/programas/varias/page.tsx
-export const dynamic = "force-dynamic";
+import React from 'react';
+import { getCachedPostsPage } from '@/app/lib/data-fetcher';
+import CategoryGrid from '@/app/ui/categorias/CategoryGrid';
+import CategoryPagination from '@/app/ui/categorias/CategoryPagination';
+import type { MappedPost } from '@/app/lib/definitions';
 
-import React from "react";
-import { getVariasPostsPage } from "@/app/lib/data-fetcher";
-import CategoryPagination from "@/app/ui/categorias/CategoryPagination";
-import CategoryGrid from "@/app/ui/categorias/CategoryGrid";
+export const dynamic = 'force-dynamic';
 
-const PER_PAGE = 9;
+type Props = { searchParams?: { page?: string } };
 
-type Props = {
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
-};
-
-export default async function VariasPage(props: Props) {
-  const searchParams = await props.searchParams;
-  const page = Number(searchParams?.page ?? 1);
-
-  // ✔ Llamada correcta: Posts de "programas" excluyendo otras subcategorías
-  const result = await getVariasPostsPage(page);
-
-  const { posts, totalPages } = result;
+export default async function VariasPage({ searchParams }: Props) {
+  const page = Number(searchParams?.page ?? '1') || 1;
+  const res = await getCachedPostsPage('programas', page);
+  const posts: MappedPost[] = res.posts ?? [];
+  const totalPages = res.totalPages ?? 1;
 
   if (!posts || posts.length === 0) {
     return (
       <div className="text-center py-10">
-        <h1 className="text-2xl font-semibold mb-3">No hay publicaciones</h1>
-        <p className="text-gray-500">
-          Todavía no se ha publicado ningún artículo.
-        </p>
+        <h1 className="text-2xl font-semibold">No hay publicaciones</h1>
+        <p>Todavía no se ha publicado ningún artículo.</p>
       </div>
     );
   }
@@ -39,11 +31,7 @@ export default async function VariasPage(props: Props) {
       <CategoryGrid posts={posts} currentSectionSlug="programas/varias" />
 
       <div className="mt-8">
-        <CategoryPagination
-          basePath="/programas/varias"
-          current={page}
-          totalPages={totalPages}
-        />
+        <CategoryPagination basePath="/programas/varias" current={page} totalPages={totalPages} />
       </div>
     </div>
   );

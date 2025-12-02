@@ -1,43 +1,47 @@
 // app/ui/categorias/CategoryGrid.tsx
+'use client';
+
 import React from "react";
-// Importamos el tipo MappedPost en lugar de Post
+import Link from "next/link";
 import type { MappedPost } from "@/app/lib/definitions";
 
 interface CategoryGridProps {
-  // La prop posts ahora espera un array de MappedPost
   posts: MappedPost[];
-  currentSectionSlug?: string; // opcional
+  currentSectionSlug?: string;
 }
 
 export default function CategoryGrid({ posts, currentSectionSlug }: CategoryGridProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {posts.map((post) => {
-        const isCurrentSection = currentSectionSlug && post.slug.includes(currentSectionSlug);
+        const isCurrentSection = !!currentSectionSlug && post.slug.includes(currentSectionSlug);
         return (
           <article
             key={post.slug}
-            className={`border rounded p-4 shadow-sm transition hover:shadow-md ${
-              isCurrentSection ? "bg-yellow-50 border-yellow-400" : ""
+            className={`border rounded p-4 shadow-sm transition hover:shadow-md overflow-hidden ${
+              isCurrentSection ? "bg-yellow-50 border-yellow-400" : "bg-white"
             }`}
           >
-            <a href={`/Noticias/${post.slug}`} className="block">
-              <h2 className="text-lg font-semibold">{post.title}</h2>
-            </a>
+            <Link href={`/Noticias/${post.slug}`} className="block">
+              <h2 className="text-lg font-semibold line-clamp-2">{post.title}</h2>
+            </Link>
 
-            {/* Se ajusta la ruta a la imagen para que coincida con la estructura de MappedPost */}
-            {post.featuredImage && (
-              <img
-                src={post.featuredImage}
-                alt={post.title}
-                className="mt-2 rounded w-full h-48 object-cover"
-              />
+            { /* imagen: usamos `post.image` según definitions.ts */ }
+            {post.image ? (
+              <div className="mt-3">
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="w-full h-48 object-cover rounded-md transition-opacity hover:opacity-90"
+                />
+              </div>
+            ) : (
+              <div className="mt-3 bg-gray-100 w-full h-48 rounded-md flex items-center justify-center text-gray-500">
+                Sin imagen
+              </div>
             )}
 
-            {/* 
-              El campo 'excerpt' no existe en MappedPost, por lo que se elimina temporalmente.
-              Esto es necesario para solucionar el error de tipos.
-            */}
+            { /* Si en el futuro quieres mostrar excerpt, añadilo al MappedPost y mostrar aquí */ }
           </article>
         );
       })}
