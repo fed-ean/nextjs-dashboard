@@ -1,277 +1,153 @@
 // app/lib/data-fetcher.ts
-import fs from "fs";
-import path from "path";
-import { POSTS_PER_PAGE, WP_API_URL } from "@/app/lib/constants";
-import type { Post, Category, PagedPosts, MappedPost } from "./definitions";
-import { unstable_noStore as noStore } from "next/cache";
+import { GraphQLClient } from "graphql-request";
+import {
+  GET_ALL_CATEGORIES,
+  GET_POSTS_BY_CATEGORY,
+  GET_ALL_POSTS_SIMPLE,
+} from "./queries";
+import type {
+  Category,
+  RawPost,
+  MappedPost,
+  PagedPosts,
+} from "./definitions";
+import { cache } from "react";
 
-const CACHE_TTL_MS = 1000 * 60 * 5; // 5 minutos
-const CACHE_DIR = process.env.NODE_ENV === "production" ? "/tmp" : path.join(process.cwd(), ".next", "cache");
+// ======================================================================================
+// CONFIG CLIENTE
+// ======================================================================================
+const GQL_ENDPOINT = "https://radioempresaria.com.ar/graphql";
 
-// helper: ensure cache dir exists
-function ensureCacheDir() {
-  try {
-    if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
-  } catch (e) {
-    // ignore; fallback will be in-memory or fresh fetches
-    console.warn("No se pudo crear cache dir:", CACHE_DIR, e);
-  }
+const client = new GraphQLClient(GQL_ENDPOINT, {
+  headers: { "Content-Type": "application/json" },
+});
+
+// ======================================================================================
+// HELPERS
+// ======================================================================================
+
+export function normalizeSlug(str: string): string {
+  return String(str || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
 }
 
-async function doFetchGraphQL(query: string, variables: Record<string, any> = {}) {
-  const res = await fetch(WP_API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query, variables }),
-  });
-
-  const json = await res.json();
-  if (!res.ok || json.errors) {
-    console.error("GraphQL error:", json.errors ?? res.statusText);
-    return null;
-  }
-  return json.data;
-}
-
-// ---------------- mapPostData (simple, compatible)
-export function mapPostData(node: any): MappedPost {
-  const mainCat = node?.categories?.nodes?.[0] ?? null;
+// Convierte RawPost → MappedPost
+function mapPost(p: RawPost): MappedPost {
   return {
-    databaseId: Number(node.databaseId ?? 0),
-    title: node.title ?? "",
-    excerpt: node.excerpt ?? "",
-    slug: node.slug ?? "",
-    date: node.date ?? "",
-    featuredImage: node.featuredImage?.node?.sourceUrl ?? null,
-    categories: (node.categories?.nodes ?? []).map((c: any) => ({
-      databaseId: Number(c.databaseId ?? 0),
-      name: c.name ?? "",
-      slug: c.slug ?? "",
-      count: Number(c.count ?? 0),
-    })),
-    category: mainCat?.name ?? null,
-    categorySlug: mainCat?.slug ?? null,
+    id: Number(p.databaseId),
+    title: p.title ?? "",
+    slug: p.slug ?? "",
+    excerpt: p.excerpt ?? "",
+    date: p.date ?? "",
+    featuredImage:
+      p.featuredImage?.node?.sourceUrl ??
+      p.featuredImage?.node?.mediaItemUrl ??
+      null,
   };
 }
 
-// ---------------- Cache helpers (file)
-function cacheFileForSlug(slug: string) {
-  ensureCacheDir();
-  // sanitize slug for filename
-  const safe = slug.replace(/[^a-z0-9-_]/gi, "_");
-  return path.join(CACHE_DIR, `category-cursors-${safe}.json`);
-}
+// ======================================================================================
+// CATEGORÍAS
+// ======================================================================================
 
-function writeCacheFile(slug: string, obj: any) {
+export async function getAllCategories(): Promise<Category[]> {
   try {
-    const file = cacheFileForSlug(slug);
-    fs.writeFileSync(file, JSON.stringify({ ts: Date.now(), data: obj }), "utf-8");
-  } catch (e) {
-    console.warn("Error escribiendo cache:", e);
+    const data = await client.request(GET_ALL_CATEGORIES);
+
+    return data?.categories?.nodes?.map((c: any) => ({
+      name: c.name,
+      slug: normalizeSlug(c.slug),
+    }));
+  } catch (err) {
+    console.error("Error getAllCategories:", err);
+    return [];
   }
 }
 
-function readCacheFile(slug: string) {
+// ======================================================================================
+// POSTS: LISTA SIMPLE (sin paginación del servidor)
+// ======================================================================================
+
+export async function getAllPosts(): Promise<MappedPost[]> {
   try {
-    const file = cacheFileForSlug(slug);
-    if (!fs.existsSync(file)) return null;
-    const raw = fs.readFileSync(file, "utf-8");
-    const parsed = JSON.parse(raw);
-    if (Date.now() - (parsed.ts ?? 0) > CACHE_TTL_MS) return null;
-    return parsed.data;
-  } catch (e) {
-    return null;
+    const data = await client.request(GET_ALL_POSTS_SIMPLE);
+
+    const posts: RawPost[] = data?.posts?.nodes ?? [];
+    return posts.map(mapPost);
+  } catch (err) {
+    console.error("Error getAllPosts:", err);
+    return [];
   }
 }
 
-// ---------------- Fetch cursors (collect minimal metadata)
-// Se trae edges { cursor } y total count (pageInfo.totalCount or length)
-async function fetchCategoryCursors(slug: string) {
-  // Vamos a paginar internamente por bloques de 100 para no pedir todo a la vez
-  const perBatch = 100;
-  let after: string | null = null;
-  const cursors: string[] = [];
-  let total = 0;
-  while (true) {
-    const q = `
-      query CategoryCursors($slug: String!, $first: Int!, $after: String) {
-        posts(
-          where: { categoryName: $slug }
-          first: $first
-          after: $after
-        ) {
-          edges {
-            cursor
-          }
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-        }
-      }
-    `;
-    const variables: any = { slug, first: perBatch };
-    if (after) variables.after = after;
+// ======================================================================================
+// POSTS POR CATEGORÍA
+// ======================================================================================
 
-    const data = await doFetchGraphQL(q, variables);
-    if (!data || !data.posts) break;
+export async function getPostsByCategory(
+  slug: string | null
+): Promise<MappedPost[]> {
+  try {
+    if (!slug) return getAllPosts();
 
-    const edges = data.posts.edges ?? [];
-    for (const e of edges) {
-      if (e?.cursor) cursors.push(e.cursor);
-    }
+    const data = await client.request(GET_POSTS_BY_CATEGORY, { slug });
 
-    total = cursors.length;
-
-    const pageInfo = data.posts.pageInfo ?? {};
-    if (!pageInfo.hasNextPage) break;
-    after = pageInfo.endCursor;
-    // small safety: if no endCursor break
-    if (!after) break;
+    const posts: RawPost[] = data?.posts?.nodes ?? [];
+    return posts.map(mapPost);
+  } catch (err) {
+    console.error("Error getPostsByCategory:", err);
+    return [];
   }
-
-  return { cursors, total };
 }
 
-// ---------------- Cached wrapper
-export async function getCategoryCursorsCached(slug: string) {
-  // try cache
-  const cached = readCacheFile(slug);
-  if (cached && Array.isArray(cached.cursors)) {
-    return cached;
-  }
+// ======================================================================================
+// PAGINADO FAKE (10 por página)
+// ======================================================================================
 
-  // fetch fresh
-  const fresh = await fetchCategoryCursors(slug);
-  writeCacheFile(slug, fresh);
-  return fresh;
-}
+const PAGE_SIZE = 10;
 
-// ---------------- Build page by cursor (page numbered, pageSize)
-export async function getCategoryPageByCursor(
-  slug: string,
-  page: number = 1,
-  pageSize: number = 10
+export async function getPostsPage(
+  slug: string | null,
+  page: number
 ): Promise<PagedPosts> {
-  noStore();
-  // get cursors (cached)
-  const { cursors, total } = await getCategoryCursorsCached(slug);
+  const list = await getPostsByCategory(slug);
 
-  // compute after cursor for requested page
-  // page 1 -> after = null
-  // page N -> after = cursor at index (pageStartIndex - 1)
-  const pageStartIndex = (page - 1) * pageSize; // 0-based index of first item in this page
-  let after: string | null = null;
-  if (pageStartIndex > 0) {
-    const prevIndex = pageStartIndex - 1;
-    after = cursors[prevIndex] ?? null;
-    if (!after) {
-      // requested page beyond available items
-      return { posts: [], totalPages: Math.ceil(total / pageSize), total, category: { databaseId: 0, name: slug, slug, count: total } };
-    }
-  }
+  const total = list.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const safePage = Math.min(Math.max(1, page), totalPages);
 
-  const q = `
-    query CategoryPage($slug: String!, $first: Int!, $after: String) {
-      posts(
-        where: { categoryName: $slug }
-        first: $first
-        after: $after
-      ) {
-        nodes {
-          databaseId
-          title
-          excerpt
-          slug
-          date
-          featuredImage { node { sourceUrl } }
-          categories { nodes { databaseId name slug count } }
-        }
-        pageInfo { hasNextPage endCursor }
-      }
-    }
-  `;
+  const start = (safePage - 1) * PAGE_SIZE;
+  const end = start + PAGE_SIZE;
 
-  const variables: any = { slug, first: pageSize };
-  if (after) variables.after = after;
-
-  const data = await doFetchGraphQL(q, variables);
-  const nodes = data?.posts?.nodes ?? [];
-
-  const posts = nodes.map(mapPostData);
+  const slice = list.slice(start, end);
 
   return {
-    posts,
+    posts: slice,
     total,
-    totalPages: Math.ceil(total / pageSize),
-    category: { databaseId: 0, name: slug, slug, count: total },
+    totalPages,
+    category:
+      slug && list.length > 0
+        ? { name: list[0].title ?? slug, slug }
+        : { name: slug ?? "Todas", slug: slug ?? "" },
   };
 }
 
-// ---------------- Public primary function: getCachedPostsPage compatible
-// If slug === null => return latest posts using cursor-based global listing
-export async function getCachedPostsPage(
-  slug: string | null = null,
-  page: number = 1,
-  pageSize: number = 10
-): Promise<PagedPosts> {
-  noStore();
+// ======================================================================================
+// CACHE SERVER (NEXT 14 PRO)
+// ======================================================================================
 
-  if (!slug) {
-    // fetch latest posts (global) using cursor-based simple fetch (no precomputed cursors)
-    const q = `
-      query LatestPage($first: Int!, $after: String) {
-        posts(first: $first, after: $after) {
-          nodes {
-            databaseId
-            title
-            excerpt
-            slug
-            date
-            featuredImage { node { sourceUrl } }
-            categories { nodes { databaseId name slug count } }
-          }
-          pageInfo { hasNextPage endCursor }
-        }
-      }
-    `;
-    // For simplicity, treat page 1 as after=null and page>1 use an optimization:
-    // We'll precompute cursors for "all posts" if page > 1 (similar to category),
-    // but simpler: fetch (page * pageSize) items and slice — acceptable for moderate pages.
-    const itemsToFetch = page === 1 ? pageSize : page * pageSize;
-    const variables = { first: itemsToFetch };
-    const data = await doFetchGraphQL(q, variables);
-    const nodes = data?.posts?.nodes ?? [];
-    const totalFetched = nodes.length;
-    const start = (page - 1) * pageSize;
-    const pageNodes = nodes.slice(start, start + pageSize);
-    return {
-      posts: pageNodes.map(mapPostData),
-      total: totalFetched,
-      totalPages: Math.ceil(totalFetched / pageSize),
-      category: null,
-    };
+export const getCachedPostsPage = cache(
+  async (slug: string | null, page: number): Promise<PagedPosts> => {
+    return await getPostsPage(slug, page);
+  },
+  {
+    tags: (slug: string | null, page: number) => [
+      "category-page",
+      slug ? normalizeSlug(slug) : "all",
+      String(page),
+    ],
   }
-
-  // If slug provided -> use cursor approach with cached cursors
-  return getCategoryPageByCursor(slug, page, pageSize);
-}
-
-// ---------------- Optional: getVariasPostsPage (ejemplo usando category 'programas' and NOT_IN)
-// You can adapt this to use cursor logic as well, omitted for brevity
-export async function getVariasPostsPage(page: number = 1, pageSize: number = 10): Promise<PagedPosts> {
-  // Simple approach: call getCachedPostsPage with slug = 'programas' and then filter on categories server-side
-  // But the best is to create a custom GraphQL query with taxQuery (cursor-based)
-  // For now, fetch page of programas and filter server-side:
-  const res = await getCachedPostsPage("programas", page, pageSize);
-  // Filter out posts that belong to excluded categories (locales, desayuno-pymes, cadena-verdeamarilla)
-  const excluded = ["locales", "desayuno-pymes", "cadena-verdeamarilla"];
-  const filtered = res.posts.filter(p => !(p.categories?.nodes ?? []).some(c => excluded.includes(c.slug)));
-  // Note: total/totalPages become approximate; for perfect counts you'd need cursor collection with taxQuery
-  return {
-    posts: filtered,
-    total: filtered.length,
-    totalPages: Math.ceil(filtered.length / pageSize),
-    category: res.category,
-  };
-}
+);

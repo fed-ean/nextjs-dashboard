@@ -1,49 +1,52 @@
+// app/Categorias/page.tsx
 import React, { Suspense } from "react";
-// Se importa la función correcta para obtener todos los posts
 import { getAllPosts } from "@/app/lib/data-fetcher";
-import NoticiasVarias from "../ui/dashboard/noticias-varias";
-import SidenavServer from '../ui/Page_Index/SidenavServer';
-import { SidenavSkeleton } from '../ui/skeletons';
+import NoticiasVarias from "@/app/ui/dashboard/noticias-varias";
+import SidenavServer from "@/app/ui/Page_Index/SidenavServer";
+import { SidenavSkeleton } from "@/app/ui/skeletons";
+import type { MappedPost } from "@/app/lib/definitions";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
-// Componente para cuando no hay noticias
-const NoPostsDisplay = () => (
-  <div className="text-center py-10">
-    <h1 className="text-2xl font-bold mb-4">No hay noticias disponibles</h1>
-    <p>No se encontraron noticias para mostrar en este momento.</p>
-  </div>
-);
+export default async function CategoriasHomePage() {
+  let posts: MappedPost[] = [];
 
-export default async function NoticiasPage() {
-  // Se llama a la función correcta (getAllPosts) y se recibe el array directamente
-  const posts = await getAllPosts();
+  try {
+    posts = await getAllPosts();
+  } catch (error) {
+    console.error("Error obteniendo posts:", error);
+    posts = [];
+  }
 
   if (!posts || posts.length === 0) {
     return (
-        <div className="max-w-7xl mx-auto">
-            <NoPostsDisplay />
+      <div className="max-w-7xl mx-auto p-4">
+        <h1 className="text-3xl font-bold mb-8">Todas las noticias</h1>
+        <div className="text-center py-10 text-gray-600">
+          No hay noticias para mostrar en este momento.
         </div>
+      </div>
     );
   }
 
   return (
-    <div className="flex flex-col md:flex-row-reverse max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
-      
-      {/* --- CONTENIDO PRINCIPAL (derecha en desktop) --- */}
-      <main className="w-full">
+    <div className="flex flex-col md:flex-row-reverse max-w-7xl mx-auto p-4 gap-8">
+
+      {/* Contenido principal */}
+      <main className="flex-1">
         <h1 className="text-3xl font-bold mb-8">Todas las Noticias</h1>
+
         <NoticiasVarias
           posts={posts}
-          page={1} // La paginación podría ser un siguiente paso, por ahora se deja en 1
+          page={1}
           categoriaSlug=""
-          categoriaNombre=""
+          categoriaNombre="Todas"
         />
       </main>
 
-      {/* --- BARRA LATERAL (izquierda en desktop) --- */}
-      <aside className="w-full md:w-72 md:mr-8 flex-shrink-0 mt-8 md:mt-0">
-        <div className="sticky top-32">
+      {/* Sidebar */}
+      <aside className="w-full md:w-72 flex-shrink-0">
+        <div className="sticky top-24">
           <Suspense fallback={<SidenavSkeleton />}>
             <SidenavServer />
           </Suspense>

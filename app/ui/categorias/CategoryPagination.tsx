@@ -1,42 +1,35 @@
 // app/ui/categorias/CategoryPagination.tsx
-'use client';
+import Link from "next/link";
 
-import Link from 'next/link';
-import React from 'react';
-
-type Props = {
-  basePath: string;
+interface Props {
   current: number;
   totalPages: number;
-};
+  basePath: string; // /Categorias/politica
+}
 
-export default function CategoryPagination({ basePath, current, totalPages }: Props) {
-  if (!totalPages || totalPages <= 1) return null;
+export default function CategoryPagination({ current, totalPages, basePath }: Props) {
+  if (totalPages <= 1) return null;
 
-  const normalize = (p: string) => p.replace(/\/+$/, '');
-
-  const prevPage = current > 1 ? current - 1 : null;
-  const nextPage = current < totalPages ? current + 1 : null;
+  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
-    <div className="flex items-center justify-center gap-4 mt-6">
-      {prevPage ? (
-        <Link href={`${normalize(basePath)}?page=${prevPage}`} className="px-4 py-2 bg-gray-700 text-white rounded-md">
-          Anterior
-        </Link>
-      ) : (
-        <span className="px-4 py-2 bg-gray-300 text-gray-500 rounded-md cursor-not-allowed">Anterior</span>
-      )}
-
-      <span className="text-lg font-semibold">Página {current} de {totalPages}</span>
-
-      {nextPage ? (
-        <Link href={`${normalize(basePath)}?page=${nextPage}`} className="px-4 py-2 bg-gray-700 text-white rounded-md">
-          Siguiente
-        </Link>
-      ) : (
-        <span className="px-4 py-2 bg-gray-300 text-gray-500 rounded-md cursor-not-allowed">Siguiente</span>
-      )}
-    </div>
+    <nav className="flex justify-center gap-2 mt-6">
+      {pages.map((num) => {
+        const isActive = num === current;
+        return (
+          <Link
+            key={num}
+            href={`${basePath}?page=${num}`}
+            className={`px-4 py-2 rounded border text-sm ${
+              isActive
+                ? "bg-blue-600 text-white border-blue-600"
+                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+            }`}
+          >
+            {num}
+          </Link>
+        );
+      })}
+    </nav>
   );
 }
