@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 const PER_PAGE = 9;
 
 type Props = {
-  params: { page: string };
+  params: Promise<{ page: string }>;
 };
 
 const NoPostsDisplay = () => (
@@ -23,7 +23,8 @@ const NoPostsDisplay = () => (
 );
 
 export default async function InteresGeneralPagePaginada({ params }: Props) {
-  const pageNum = Number(params.page) || 1;
+  const { page } = await params;
+  const pageNum = Number(page) || 1;
 
   const { posts, totalPages } = await getCachedPostsPage(null, pageNum, PER_PAGE);
 
@@ -43,7 +44,7 @@ export default async function InteresGeneralPagePaginada({ params }: Props) {
           <h1 className="text-3xl font-bold mb-6 border-b pb-4">Interés General</h1>
 
           <CategoryGrid posts={posts} currentSectionSlug="interes-general" />
-          
+
           <div className="mt-8">
             <CategoryPagination
               basePath="/interes-general"
@@ -52,7 +53,6 @@ export default async function InteresGeneralPagePaginada({ params }: Props) {
             />
           </div>
         </main>
-
       </div>
     </div>
   );
