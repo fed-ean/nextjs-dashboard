@@ -7,10 +7,9 @@ import type { Category } from "@/app/lib/definitions";
 
 const PER_PAGE = 9;
 
-// --- generateStaticParams para SSG ---
+// --- SSG: generar todas las rutas ---
 export async function generateStaticParams() {
   const allCategories: Category[] = await getAllCategories();
-
   const allParams = await Promise.all(
     allCategories.map(async (category) => {
       const { totalPages } = await getCachedPostsPage(category.slug, 1, PER_PAGE);
@@ -18,15 +17,13 @@ export async function generateStaticParams() {
       return pages.map((page) => ({ slug: category.slug, page: page.toString() }));
     })
   );
-
   return allParams.flat();
 }
 
-type Props = {
-  params: { slug: string; page: string };
-};
+// --- Props tipadas correctamente ---
+type Props = { params: { slug: string; page: string } };
 
-export default async function CategoriaPagePaginada({ params }: Props) {
+export default async function CategoriaPage({ params }: Props) {
   const { slug, page } = params;
   const pageNum = Math.max(1, Number(page));
 
