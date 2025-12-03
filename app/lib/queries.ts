@@ -41,38 +41,35 @@ export const GET_ALL_CATEGORIES = gql`
       🔥 Convertido a "edges" para que coincida
 ------------------------------------------------------- */
 export const GET_POSTS_BY_CATEGORY = gql`
-  query GetPostsByCategory($slug: String!, $first: Int, $after: String) {
-    posts(
-      where: { categorySlug: $slug }  # <- filtramos por slug ahora
-      first: $first
-      after: $after
-    ) {
-      edges {
-        node {
-          databaseId
-          title
-          slug
-          date
-          excerpt
-          featuredImage {
-            node {
-              sourceUrl
-            }
+ query GetPostsByCategory($slug: String!, $first: Int, $after: String) {
+  posts(where: { categoryName: $slug }, first: $first, after: $after) {
+    edges {
+      node {
+        databaseId
+        title
+        slug
+        date
+        excerpt
+        featuredImage {
+          node {
+            sourceUrl
           }
         }
       }
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
     }
-
-    category(id: $slug, idType: SLUG) {
-      name
-      slug
-      databaseId
+    pageInfo {
+      hasNextPage
+      endCursor
     }
   }
+
+  category(id: $slug, idType: SLUG) {
+    name
+    slug
+    databaseId
+  }
+}
+
 `;
 
 
