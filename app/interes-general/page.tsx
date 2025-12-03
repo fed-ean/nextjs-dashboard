@@ -1,3 +1,4 @@
+// app/interes-general/page.tsx
 import React from 'react';
 import { getCachedPostsPage } from '../lib/data-fetcher';
 import CategoryGrid from '../ui/categorias/CategoryGrid';
@@ -21,15 +22,10 @@ const NoPostsDisplay = () => (
   </div>
 );
 
-export default async function InteresGeneralPage({ searchParams }: PageProps) {
-  const search = await searchParams;
-  const page = Number(search?.page || '1');
+export default async function InteresGeneralPage() {
+  const page = 1; // Siempre página 1 para /interes-general
 
-  const { posts, totalPages } = await getCachedPostsPage(
-    null,
-    page,
-    PER_PAGE
-  );
+  const { posts, totalPages } = await getCachedPostsPage(null, page, PER_PAGE);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -48,16 +44,12 @@ export default async function InteresGeneralPage({ searchParams }: PageProps) {
 
           {posts && posts.length > 0 ? (
             <>
-              <CategoryGrid
-                posts={posts}
-                currentSectionSlug="interes-general"
-              />
+              <CategoryGrid posts={posts} currentSectionSlug="interes-general" />
               <div className="mt-8">
                 <CategoryPagination
                   basePath="/interes-general"
                   current={page}
                   totalPages={totalPages}
-                  perPage={PER_PAGE}
                 />
               </div>
             </>

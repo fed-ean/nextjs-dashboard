@@ -1,12 +1,16 @@
-// app/programas/varias/page.tsx
+// app/programas/varias/page/[page]/page.tsx
 import React from "react";
-import { getCachedPostsPage } from "../../lib/data-fetcher";
-import CategoryPagination from "../../ui/categorias/CategoryPagination";
-import CategoryGrid from "../../ui/categorias/CategoryGrid";
+import { getCachedPostsPage } from "../../../../lib/data-fetcher";
+import CategoryPagination from "../../../../ui/categorias/CategoryPagination";
+import CategoryGrid from "../../../../ui/categorias/CategoryGrid";
 
 export const dynamic = 'force-dynamic';
 
 const PER_PAGE = 9;
+
+type Props = {
+  params: { page: string };
+};
 
 const NoPostsDisplay = () => (
   <div className="text-center py-10">
@@ -17,10 +21,10 @@ const NoPostsDisplay = () => (
   </div>
 );
 
-export default async function VariasPage() {
-  const page = 1; // siempre primera página
+export default async function VariasPagePaginada({ params }: Props) {
+  const pageNum = Number(params.page) || 1;
 
-  const { posts, totalPages } = await getCachedPostsPage(null, page, PER_PAGE);
+  const { posts, totalPages } = await getCachedPostsPage(null, pageNum, PER_PAGE);
 
   if (!posts || posts.length === 0) return <NoPostsDisplay />;
 
@@ -33,7 +37,7 @@ export default async function VariasPage() {
       <div className="mt-8">
         <CategoryPagination
           basePath="/programas/varias"
-          current={page}
+          current={pageNum}
           totalPages={totalPages}
         />
       </div>
