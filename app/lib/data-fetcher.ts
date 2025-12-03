@@ -72,16 +72,23 @@ export async function getAllPosts(): Promise<MappedPost[]> {
 }
 
 // Posts por categoría
-export async function getPostsByCategory(
-  slug: string | null
-): Promise<MappedPost[]> {
+export async function getPostsByCategory(slug: string | null): Promise<MappedPost[]> {
   try {
     if (!slug) return getAllPosts();
 
+    console.log("[getPostsByCategory] RECIBIDO SLUG:", slug);
+
     const data = await client.request(GET_POSTS_BY_CATEGORY, { slug });
+
+    console.log(
+      "[getPostsByCategory] RESPONSE COMPLETO:",
+      JSON.stringify(data, null, 2)
+    );
 
     const posts: RawPost[] =
       data?.posts?.edges?.map((e: any) => e.node) ?? [];
+
+    console.log("[getPostsByCategory] POSTS DETECTADOS:", posts.length);
 
     return posts.map(mapPost);
   } catch (err) {
