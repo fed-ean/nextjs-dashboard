@@ -3,7 +3,7 @@ import { GraphQLClient } from "graphql-request";
 import {
   GET_ALL_CATEGORIES,
   GET_POSTS_BY_CATEGORY,
-  GET_ALL_POSTS_SIMPLE,
+  GET_ALL_POSTS, // ← CORRECTO
 } from "./queries";
 import type {
   Category,
@@ -13,18 +13,11 @@ import type {
 } from "./definitions";
 import { cache } from "react";
 
-// ======================================================================================
-// CONFIG CLIENTE
-// ======================================================================================
 const GQL_ENDPOINT = "https://radioempresaria.com.ar/graphql";
 
 const client = new GraphQLClient(GQL_ENDPOINT, {
   headers: { "Content-Type": "application/json" },
 });
-
-// ======================================================================================
-// HELPERS
-// ======================================================================================
 
 export function normalizeSlug(str: string): string {
   return String(str || "")
@@ -34,7 +27,6 @@ export function normalizeSlug(str: string): string {
     .trim();
 }
 
-// Convierte RawPost → MappedPost
 function mapPost(p: RawPost): MappedPost {
   return {
     id: Number(p.databaseId),
@@ -49,10 +41,7 @@ function mapPost(p: RawPost): MappedPost {
   };
 }
 
-// ======================================================================================
-// CATEGORÍAS
-// ======================================================================================
-
+// Categorías
 export async function getAllCategories(): Promise<Category[]> {
   try {
     const data = await client.request(GET_ALL_CATEGORIES);
@@ -67,13 +56,10 @@ export async function getAllCategories(): Promise<Category[]> {
   }
 }
 
-// ======================================================================================
-// POSTS: LISTA SIMPLE (sin paginación del servidor)
-// ======================================================================================
-
+// Posts simple
 export async function getAllPosts(): Promise<MappedPost[]> {
   try {
-    const data = await client.request(GET_ALL_POSTS_SIMPLE);
+    const data = await client.request(GET_ALL_POSTS);
 
     const posts: RawPost[] =
       data?.posts?.edges?.map((e: any) => e.node) ?? [];
@@ -85,10 +71,7 @@ export async function getAllPosts(): Promise<MappedPost[]> {
   }
 }
 
-// ======================================================================================
-// POSTS POR CATEGORÍA
-// ======================================================================================
-
+// Posts por categoría
 export async function getPostsByCategory(
   slug: string | null
 ): Promise<MappedPost[]> {
@@ -107,10 +90,7 @@ export async function getPostsByCategory(
   }
 }
 
-// ======================================================================================
-// PAGINADO FAKE (10 por página)
-// ======================================================================================
-
+// Paginado fake
 const PAGE_SIZE = 10;
 
 export async function getPostsPage(
@@ -139,19 +119,9 @@ export async function getPostsPage(
   };
 }
 
-// ======================================================================================
-// CACHE SERVER (NEXT 14 PRO)
-// ======================================================================================
-
+// Cache sin segundo argumento (solución correcta)
 export const getCachedPostsPage = cache(
   async (slug: string | null, page: number): Promise<PagedPosts> => {
     return await getPostsPage(slug, page);
-  },
-  {
-    tags: (slug: string | null, page: number) => [
-      "category-page",
-      slug ? normalizeSlug(slug) : "all",
-      String(page),
-    ],
   }
 );
