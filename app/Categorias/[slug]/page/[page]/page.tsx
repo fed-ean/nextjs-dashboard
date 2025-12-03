@@ -7,7 +7,7 @@ import type { Category } from "@/app/lib/definitions";
 
 const PER_PAGE = 9;
 
-// --- SSG: generar todas las rutas ---
+// --- Generar rutas dinámicas para SSG ---
 export async function generateStaticParams() {
   const allCategories: Category[] = await getAllCategories();
   const allParams = await Promise.all(
@@ -20,11 +20,12 @@ export async function generateStaticParams() {
   return allParams.flat();
 }
 
-// --- Props tipadas correctamente ---
-type Props = { params: { slug: string; page: string } };
+type Props = {
+  params: Promise<{ slug: string; page: string }>;
+};
 
 export default async function CategoriaPage({ params }: Props) {
-  const { slug, page } = params;
+  const { slug, page } = await params;
   const pageNum = Math.max(1, Number(page));
 
   const { posts, totalPages, category } = await getCachedPostsPage(slug, pageNum, PER_PAGE);
