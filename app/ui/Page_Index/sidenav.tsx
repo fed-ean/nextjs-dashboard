@@ -20,13 +20,20 @@ export default function Sidenav({ categories, latestPosts }: Props) {
         <div className="space-y-3">
           {latestPosts.map((p) => (
             <div key={p.slug} className="flex gap-3">
-              <Link href={`/Noticias/${p.slug}`} className="shrink-0">
-                {p.image ? (
-                  <img src={p.image} alt={p.title} className="w-16 h-12 object-cover rounded" />
-                ) : (
-                  <div className="w-16 h-12 bg-gray-100 rounded flex items-center justify-center text-xs text-gray-400">Sin imagen</div>
-                )}
-              </Link>
+             <Link href={`/Noticias/${p.slug}`} className="shrink-0">
+               {p.featuredImage ? (
+                <img
+                src={p.featuredImage}
+                alt={p.title}
+                  className="w-16 h-12 object-cover rounded"
+                    />
+         ) : (
+           <div className="w-16 h-12 bg-gray-100 rounded flex items-center justify-center text-xs text-gray-400">
+            Sin imagen
+          </div>
+       )}
+                  </Link>
+
               <div>
                 <Link href={`/Categorias/Noticias/${p.slug}`} className="font-medium line-clamp-2">
                   {p.title}
