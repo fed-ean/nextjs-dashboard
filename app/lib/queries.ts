@@ -43,7 +43,7 @@ export const GET_ALL_CATEGORIES = gql`
 export const GET_POSTS_BY_CATEGORY = gql`
   query GetPostsByCategory($slug: String!, $first: Int, $after: String) {
     posts(
-      where: { categoryName: $slug }
+      where: { categorySlug: $slug }  # <- filtramos por slug ahora
       first: $first
       after: $after
     ) {
@@ -74,6 +74,7 @@ export const GET_POSTS_BY_CATEGORY = gql`
     }
   }
 `;
+
 
 /* -------------------------------------------------------
    3) OBTENER TODO (SIN FILTRO)
