@@ -1,6 +1,24 @@
 // app/lib/queries.ts
 import { gql } from "@apollo/client";
 
+export const GET_ALL_POSTS_SIMPLE = gql`
+  query GetAllPostsSimple($first: Int, $after: String) {
+    posts(first: $first, after: $after) {
+      edges {
+        node {
+          slug
+          title
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
+
 /* -------------------------------------------------------
    1) OBTENER TODAS LAS CATEGORÍAS
 ------------------------------------------------------- */
