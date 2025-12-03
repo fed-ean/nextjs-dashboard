@@ -73,7 +73,7 @@ export default async function CategoriaPagePaginada({ params }: Props) {
 
       <div className="mt-8">
         <CategoryPagination
-          basePath={`/Categorias/${slug}`}
+          basePath={`/Categorias/${slug}/page/$[page]`}
           current={pageNum}
           totalPages={totalPages}
           perPage={PER_PAGE}
