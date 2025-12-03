@@ -27,19 +27,16 @@ export default function CategoryGrid({ posts, currentSectionSlug }: CategoryGrid
             </Link>
 
             { /* imagen: usamos `post.image` según definitions.ts */ }
-            {post.image ? (
-              <div className="mt-3">
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  className="w-full h-48 object-cover rounded-md transition-opacity hover:opacity-90"
-                />
-              </div>
-            ) : (
-              <div className="mt-3 bg-gray-100 w-full h-48 rounded-md flex items-center justify-center text-gray-500">
-                Sin imagen
-              </div>
-            )}
+            {post.featuredImage ? (
+  <div className="mt-3">
+    <img
+      src={post.featuredImage}
+      alt={post.title}
+      className="w-full h-auto rounded"
+    />
+  </div>
+) : null}
+
 
             { /* Si en el futuro quieres mostrar excerpt, añadilo al MappedPost y mostrar aquí */ }
           </article>
