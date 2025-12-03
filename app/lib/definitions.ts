@@ -22,10 +22,12 @@ export type MappedPost = {
   featuredImage: string | null;
 };
 
-export type Category = {
+export interface Category {
   name: string;
   slug: string;
-};
+  count?: number; // <-- agregar esta línea
+}
+
 
 export type PagedPosts = {
   posts: MappedPost[];
