@@ -75,7 +75,9 @@ export async function getAllPosts(): Promise<MappedPost[]> {
   try {
     const data = await client.request(GET_ALL_POSTS_SIMPLE);
 
-    const posts: RawPost[] = data?.posts?.nodes ?? [];
+    const posts: RawPost[] =
+      data?.posts?.edges?.map((e: any) => e.node) ?? [];
+
     return posts.map(mapPost);
   } catch (err) {
     console.error("Error getAllPosts:", err);
@@ -95,7 +97,9 @@ export async function getPostsByCategory(
 
     const data = await client.request(GET_POSTS_BY_CATEGORY, { slug });
 
-    const posts: RawPost[] = data?.posts?.nodes ?? [];
+    const posts: RawPost[] =
+      data?.posts?.edges?.map((e: any) => e.node) ?? [];
+
     return posts.map(mapPost);
   } catch (err) {
     console.error("Error getPostsByCategory:", err);
@@ -151,4 +155,3 @@ export const getCachedPostsPage = cache(
     ],
   }
 );
-

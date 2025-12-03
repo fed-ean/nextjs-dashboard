@@ -1,6 +1,8 @@
-// app/lib/queries.ts
 import { gql } from "@apollo/client";
 
+/* -------------------------------------------------------
+   0) GET_ALL_POSTS_SIMPLE (ya lo agregamos)
+------------------------------------------------------- */
 export const GET_ALL_POSTS_SIMPLE = gql`
   query GetAllPostsSimple($first: Int, $after: String) {
     posts(first: $first, after: $after) {
@@ -18,7 +20,6 @@ export const GET_ALL_POSTS_SIMPLE = gql`
   }
 `;
 
-
 /* -------------------------------------------------------
    1) OBTENER TODAS LAS CATEGORÍAS
 ------------------------------------------------------- */
@@ -35,26 +36,27 @@ export const GET_ALL_CATEGORIES = gql`
 `;
 
 /* -------------------------------------------------------
-   2) OBTENER POSTS POR CATEGORÍA (CON PAGINACIÓN)
-      - first: cantidad de posts por página
-      - after: cursor (para la página siguiente)
+   2) OBTENER POSTS POR CATEGORÍA (PAGINACIÓN)
+      🔥 Convertido a "edges" para que coincida
 ------------------------------------------------------- */
 export const GET_POSTS_BY_CATEGORY = gql`
-  query GetPostsByCategory($slug: String!, $first: Int!, $after: String) {
+  query GetPostsByCategory($slug: String!, $first: Int, $after: String) {
     posts(
       where: { categoryName: $slug }
       first: $first
       after: $after
     ) {
-      nodes {
-        databaseId
-        title
-        slug
-        date
-        excerpt
-        featuredImage {
-          node {
-            sourceUrl
+      edges {
+        node {
+          databaseId
+          title
+          slug
+          date
+          excerpt
+          featuredImage {
+            node {
+              sourceUrl
+            }
           }
         }
       }
@@ -73,21 +75,23 @@ export const GET_POSTS_BY_CATEGORY = gql`
 `;
 
 /* -------------------------------------------------------
-   3) OBTENER TODOS LOS POSTS (SIN FILTRO)
-      - También paginable si algún día lo necesitás
+   3) OBTENER TODO (SIN FILTRO)
+      🔥 Convertido a "edges" también
 ------------------------------------------------------- */
 export const GET_ALL_POSTS = gql`
-  query GetAllPosts($first: Int!, $after: String) {
+  query GetAllPosts($first: Int, $after: String) {
     posts(first: $first, after: $after) {
-      nodes {
-        databaseId
-        title
-        slug
-        date
-        excerpt
-        featuredImage {
-          node {
-            sourceUrl
+      edges {
+        node {
+          databaseId
+          title
+          slug
+          date
+          excerpt
+          featuredImage {
+            node {
+              sourceUrl
+            }
           }
         }
       }
