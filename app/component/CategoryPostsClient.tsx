@@ -23,6 +23,18 @@ type Props = {
   initialPageInfo: PageInfo;
 };
 
+// 🔥 TIPADO del resultado del query (esto corrige el error)
+type QueryResult = {
+  postsByCategory?: {
+    edges: { node: Post }[];
+    pageInfo: PageInfo;
+  };
+  allPosts?: {
+    edges: { node: Post }[];
+    pageInfo: PageInfo;
+  };
+};
+
 export default function CategoryPostsClient({
   categoriaSlug,
   initialPosts,
@@ -42,7 +54,8 @@ export default function CategoryPostsClient({
         ? { slug: categoriaSlug, after: pageInfo.endCursor }
         : { slug: categoriaSlug, before: pageInfo.startCursor };
 
-    const { data } = await client.query({
+    // ✔️ Le decimos a TS qué estructura tiene "data"
+    const { data } = await client.query<QueryResult>({
       query,
       variables,
       fetchPolicy: "network-only",
@@ -62,7 +75,7 @@ export default function CategoryPostsClient({
       : data?.allPosts?.pageInfo;
 
     setPosts(newPosts);
-    setPageInfo(newPageInfo);
+    setPageInfo(newPageInfo!);
   };
 
   return (
