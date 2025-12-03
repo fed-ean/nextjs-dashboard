@@ -1,5 +1,5 @@
 // app/interes-general/page/[page]/page.tsx
-import React from 'react';
+import React, { Suspense } from 'react';
 import { getCachedPostsPage } from '../../../lib/data-fetcher';
 import CategoryGrid from '../../../ui/categorias/CategoryGrid';
 import CategoryPagination from '../../../ui/categorias/CategoryPagination';
@@ -22,7 +22,9 @@ export default async function InteresGeneralPage({ params }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
         <aside className="lg:col-span-3 space-y-8">
           <div className="sticky top-24">
-            <SidenavServer />
+            <Suspense fallback={<div className="p-4 text-sm text-gray-500">Cargando menú…</div>}>
+              <SidenavServer />
+            </Suspense>
           </div>
         </aside>
 
@@ -32,18 +34,16 @@ export default async function InteresGeneralPage({ params }: Props) {
           {posts && posts.length > 0 ? (
             <>
               <CategoryGrid posts={posts} currentSectionSlug="interes-general" />
-              <CategoryPagination
-                basePath="/interes-general"
-                current={pageNum}
-                totalPages={totalPages || 1}
-              />
+              <div className="mt-8">
+                <Suspense fallback={<div className="text-sm text-gray-500">Cargando paginación…</div>}>
+                  <CategoryPagination basePath="/interes-general" current={pageNum} totalPages={totalPages || 1} />
+                </Suspense>
+              </div>
             </>
           ) : (
             <div className="text-center py-10">
               <h1 className="text-2xl font-semibold mb-3">No hay publicaciones</h1>
-              <p className="text-gray-500">
-                Todavía no se ha publicado ningún artículo en esta sección.
-              </p>
+              <p className="text-gray-500">Todavía no se ha publicado ningún artículo en esta sección.</p>
             </div>
           )}
         </main>
