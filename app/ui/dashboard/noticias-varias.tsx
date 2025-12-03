@@ -13,16 +13,17 @@ export default function NoticiasVarias({ posts, page, categoriaSlug, categoriaNo
   return (
     <div>
       {posts.map((post) => (
-        <div key={post.databaseId} className="relative overflow-hidden rounded-lg shadow-lg mx-4 card">
-            <Link href={`/Categorias/Noticias/${post.slug}`}>
-                <img src={post.featuredImage || '/placeholder.png'} className="w-full h-auto" alt={post.title} />
-                <div className="absolute inset-0 flex flex-col justify-end">
-                    <h5 className="text-white text-xl px-4 py-1 titillium-web-regular card-title">
+        <div key={post.id} className="relative overflow-hidden rounded-lg shadow-lg mx-4 card">
+        <Link href={`/Categorias/Noticias/${post.slug}`}>
+            <img src={post.featuredImage || '/placeholder.png'} className="w-full h-auto" alt={post.title} />
+            <div className="absolute inset-0 flex flex-col justify-end">
+                <h5 className="text-white text-xl px-4 py-1 titillium-web-regular card-title">
                     {post.title}
-                    </h5>
-                </div>
-            </Link>
-        </div>
+                </h5>
+            </div>
+        </Link>
+    </div>
+    
       ))}
     </div>
   );
