@@ -1,49 +1,42 @@
 // app/lib/definitions.ts
-
-/* -------------------------------------------------------
-   POST CRUDOS QUE VIENEN DE WPGRAPHQL (RAW)
-------------------------------------------------------- */
-export interface RawPost {
-  databaseId: number;
-  title: string | null;
-  slug: string | null;
-  date: string | null;
-  excerpt: string | null;
+export type RawPost = {
+  databaseId?: number | string;
+  title?: string;
+  slug?: string;
+  excerpt?: string;
+  date?: string;
   featuredImage?: {
     node?: {
       sourceUrl?: string | null;
+      mediaItemUrl?: string | null;
     } | null;
   } | null;
-  categories?: {
-    nodes: Array<{
-      databaseId: number;
-      name: string | null;
-      slug: string | null;
-    }>;
-  } | null;
-}
+};
 
-/* -------------------------------------------------------
-   POST MAPEADO (FORMATO QUE USA TU APP)
-------------------------------------------------------- */
-export interface MappedPost {
+export type MappedPost = {
   id: number;
   title: string;
   slug: string;
-  date: string;
   excerpt: string;
-  image: string;
-}
+  date: string;
+  featuredImage: string | null;
+};
 
-/* -------------------------------------------------------
-   CATEGORÍAS
-------------------------------------------------------- */
-export interface Category {
-  databaseId: number;
+export type Category = {
   name: string;
   slug: string;
-  count?: number | null;
-}
+};
+
+export type PagedPosts = {
+  posts: MappedPost[];
+  total: number;
+  totalPages: number;
+  category: {
+    name: string;
+    slug: string;
+  };
+};
+
 
 /* -------------------------------------------------------
    PAGEINFO PARA CURSOR PAGINATION
@@ -51,24 +44,6 @@ export interface Category {
 export interface CursorPageInfo {
   hasNextPage: boolean;
   endCursor: string | null;
-}
-
-/* -------------------------------------------------------
-   RESULTADO DE PÁGINA DE POSTS (PARA getCachedPostsPage)
-------------------------------------------------------- */
-export interface PagedPosts {
-  posts: MappedPost[];
-  pageInfo: CursorPageInfo;
-    totalPages: number;       // <-- ESTA PROPIEDAD FALTABA
-    totalPosts: number;       // <-- Probablemente también la necesites
-  
-
-  // Este objeto se usa para mostrar el nombre correcto de la categoría
-  category?: {
-    databaseId?: number;
-    name?: string | null;
-    slug?: string | null;
-  } | null;
 }
 
 /* -------------------------------------------------------
