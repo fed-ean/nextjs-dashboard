@@ -1,3 +1,4 @@
+// app/Categorias/[slug]/page.tsx
 import React from 'react';
 import { getCachedPostsPage } from '@/app/lib/data-fetcher';
 import CategoryGrid from '@/app/ui/categorias/CategoryGrid';
@@ -22,11 +23,11 @@ const NoPostsDisplay = () => (
   </div>
 );
 
-export default async function CategoriaPage({ params, searchParams }: PageProps) {
+export default async function CategoriaPage({ params }: PageProps) {
   const { slug } = await params;
-  const search = await searchParams;
 
-  const page = Number(search?.page || '1');
+  // Siempre página 1 para la ruta /Categorias/[slug]
+  const page = 1;
 
   const { posts, totalPages, category } = await getCachedPostsPage(
     slug,
@@ -57,7 +58,6 @@ export default async function CategoriaPage({ params, searchParams }: PageProps)
                   basePath={`/Categorias/${slug}`}
                   current={page}
                   totalPages={totalPages}
-                  perPage={PER_PAGE}
                 />
               </div>
             </>
