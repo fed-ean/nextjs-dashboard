@@ -1,63 +1,72 @@
-// app/interes-general/page.tsx
-import React, { Suspense } from "react";
-import { getCachedPostsPage } from "@/app/lib/data-fetcher";
-import NoticiasVarias from "@/app/ui/dashboard/noticias-varias";
+import React from 'react';
+import { getCachedPostsPage } from '../lib/data-fetcher';
+import CategoryGrid from '../ui/categorias/CategoryGrid';
+import CategoryPagination from '../ui/categorias/CategoryPagination';
 import SidenavServer from '@/app/ui/Page_Index/SidenavServer';
-import { SidenavSkeleton } from '@/app/ui/skeletons';
-import CategoryPagination from "@/app/ui/categorias/CategoryPagination";
 
 export const dynamic = 'force-dynamic';
 
-const NoPostsDisplay = ({ categoryName }: { categoryName: string }) => (
+const PER_PAGE = 9;
+
+type PageProps = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+const NoPostsDisplay = () => (
   <div className="text-center py-10">
-    <h1 className="text-2xl font-bold mb-4">No hay noticias en {categoryName}</h1>
-    <p>No se encontraron noticias para mostrar en este momento.</p>
+    <h1 className="text-2xl font-semibold mb-3">No hay publicaciones</h1>
+    <p className="text-gray-500">
+      Todavía no se ha publicado ningún artículo en esta sección.
+    </p>
   </div>
 );
 
-export default async function InteresGeneralPage({ searchParams }: any) {
-  const page = Number(searchParams?.page) || 1;
-  const slug = 'interes-general';
+export default async function InteresGeneralPage({ searchParams }: PageProps) {
+  const search = await searchParams;
+  const page = Number(search?.page || '1');
 
-  const { posts, totalPages, category } = await getCachedPostsPage(slug, page);
-
-  const categoryName = category?.name || 'Interés General';
-
-  if (!posts || posts.length === 0) {
-    return (
-      <div className="max-w-7xl mx-auto">
-        <NoPostsDisplay categoryName={categoryName} />
-      </div>
-    );
-  }
+  const { posts, totalPages } = await getCachedPostsPage(
+    null,
+    page,
+    PER_PAGE
+  );
 
   return (
-    <div className="flex flex-col md:flex-row-reverse max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
-      <main className="w-full">
-        <h1 className="text-3xl font-bold mb-8">{categoryName}</h1>
-        
-        <NoticiasVarias 
-          posts={posts} 
-          page={page} 
-          categoriaSlug={slug} 
-          categoriaNombre={categoryName} 
-        />
+    <div className="container mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
-        {/* CORRECCIÓN: Se usa 'totalPages' en lugar de 'total' */}
-        <CategoryPagination
-            current={page}
-            totalPages={totalPages} // <--- Propiedad corregida
-            basePath={`/interes-general`}
-        />
-      </main>
-
-      <aside className="w-full md:w-72 md:mr-8 flex-shrink-0 mt-8 md:mt-0">
-        <div className="sticky top-32">
-          <Suspense fallback={<SidenavSkeleton />}>
+        <aside className="lg:col-span-3 space-y-8">
+          <div className="sticky top-24">
             <SidenavServer />
-          </Suspense>
-        </div>
-      </aside>
+          </div>
+        </aside>
+
+        <main className="lg:col-span-9">
+          <h1 className="text-3xl font-bold mb-6 border-b pb-4">
+            Interés General
+          </h1>
+
+          {posts && posts.length > 0 ? (
+            <>
+              <CategoryGrid
+                posts={posts}
+                currentSectionSlug="interes-general"
+              />
+              <div className="mt-8">
+                <CategoryPagination
+                  basePath="/interes-general"
+                  current={page}
+                  totalPages={totalPages}
+                  perPage={PER_PAGE}
+                />
+              </div>
+            </>
+          ) : (
+            <NoPostsDisplay />
+          )}
+        </main>
+
+      </div>
     </div>
   );
 }

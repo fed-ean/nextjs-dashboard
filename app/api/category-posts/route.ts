@@ -1,41 +1,11 @@
 
 import { NextResponse } from 'next/server';
 
-const GQL_ENDPOINT = process.env.WORDPRESS_API_URL || "https://radioempresaria.com.ar/graphql";
+const GQL_ENDPOINT = "/graphql";
 
-// Se deja la consulta base sin el filtro de tags, que se añadirá dinámicamente
-const QUERY_POSTS_BASE = `
-  query GetCategoryPosts($slug: String!, $first: Int!, $after: String) {
-    categories(where: { slug: $slug }) {
-      nodes {
-        posts(first: $first, after: $after) {
-          nodes {
-            databaseId
-            title
-            excerpt
-            date
-            slug
-            featuredImage { node { sourceUrl } }
-            tags { nodes { name slug } }
-            categories { 
-              nodes { 
-                databaseId
-                name 
-                slug
-                count
-              } 
-            }
-          }
-          pageInfo { endCursor hasNextPage }
-        }
-      }
-    }
-  }
-`;
-
-// La consulta con filtro de Tags
-const QUERY_POSTS_WITH_TAGS = `
-  query GetCategoryPostsWithTags($slug: String!, $first: Int!, $after: String, $tagSlugs: [String!]) {
+// Las consultas GQL como cadenas de texto sin formato
+const QUERY_POSTS_BY_CATEGORY = `
+  query GetCategoryPosts($slug: String!, $first: Int!, $after: String, $tagSlugs: [String!]) {
     categories(where: { slug: $slug }) {
       nodes {
         posts(first: $first, after: $after, where: { tagSlugIn: $tagSlugs }) {
@@ -47,24 +17,17 @@ const QUERY_POSTS_WITH_TAGS = `
             slug
             featuredImage { node { sourceUrl } }
             tags { nodes { name slug } }
-            categories { 
-              nodes { 
-                databaseId
-                name 
-                slug
-                count
-              } 
-            }
+            categories { nodes { name slug } }
           }
           pageInfo { endCursor hasNextPage }
+          totalCount
         }
       }
     }
   }
 `;
 
-// Se mantiene la consulta por tags sin cambios, ya que esta siempre requiere los tags.
-const QUERY_POSTS_BY_TAGS_ONLY = `
+const QUERY_POSTS_BY_TAGS = `
   query PostsByTagSlugs($tagSlugs: [String!]!, $first: Int!, $after: String) {
     posts(where: { tagSlugIn: $tagSlugs }, first: $first, after: $after) {
       nodes {
@@ -75,21 +38,15 @@ const QUERY_POSTS_BY_TAGS_ONLY = `
         slug
         featuredImage { node { sourceUrl } }
         tags { nodes { name slug } }
-        categories { 
-          nodes { 
-            databaseId
-            name 
-            slug
-            count
-          } 
-        }
+        categories { nodes { name slug } }
       }
       pageInfo { endCursor hasNextPage }
+      totalCount
     }
   }
 `;
 
-
+// Función auxiliar para realizar la petición fetch a la API de GraphQL
 async function fetchGraphQL(query: string, variables: Record<string, any>) {
     const response = await fetch(GQL_ENDPOINT, {
         method: 'POST',
@@ -128,29 +85,25 @@ export async function POST(req: Request) {
             return NextResponse.json({ ok: false, error: "Falta el slug de la categoría" }, { status: 400 });
         }
         
-        // Lógica para elegir la consulta correcta
-        const useTagFilter = tagSlugs && Array.isArray(tagSlugs) && tagSlugs.length > 0;
-        const query = useTagFilter ? QUERY_POSTS_WITH_TAGS : QUERY_POSTS_BASE;
-        const variables = {
+        const data = await fetchGraphQL(QUERY_POSTS_BY_CATEGORY, {
             slug,
             first,
             after,
-            ...(useTagFilter && { tagSlugs })
-        };
-        
-        const data = await fetchGraphQL(query, variables);
+            tagSlugs: tagSlugs && tagSlugs.length ? tagSlugs : null
+        });
         
         const posts = data?.categories?.nodes?.[0]?.posts?.nodes || [];
         const pageInfo = data?.categories?.nodes?.[0]?.posts?.pageInfo || { endCursor: null, hasNextPage: false };
-        
-        return NextResponse.json({ ok: true, posts, pageInfo });
+        const totalCount = data?.categories?.nodes?.[0]?.posts?.totalCount || 0;
+
+        return NextResponse.json({ ok: true, posts, pageInfo, totalCount });
 
     } else if (mode === "byTags") {
         if (!tagSlugs || !Array.isArray(tagSlugs) || tagSlugs.length === 0) {
-            return NextResponse.json({ ok: true, posts: [], pageInfo: { endCursor: null, hasNextPage: false } });
+            return NextResponse.json({ ok: true, posts: [], pageInfo: { endCursor: null, hasNextPage: false }, totalCount: 0 });
         }
         
-        const data = await fetchGraphQL(QUERY_POSTS_BY_TAGS_ONLY, {
+        const data = await fetchGraphQL(QUERY_POSTS_BY_TAGS, {
             tagSlugs,
             first,
             after
@@ -158,8 +111,9 @@ export async function POST(req: Request) {
 
         const posts = data?.posts?.nodes || [];
         const pageInfo = data?.posts?.pageInfo || { endCursor: null, hasNextPage: false };
+        const totalCount = data?.posts?.totalCount || 0;
         
-        return NextResponse.json({ ok: true, posts, pageInfo });
+        return NextResponse.json({ ok: true, posts, pageInfo, totalCount });
     }
 
     return NextResponse.json({ ok: false, error: "Modo no soportado" }, { status: 400 });

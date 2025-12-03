@@ -1,134 +1,125 @@
-// app/lib/data-fetcher.ts
-import { GraphQLClient } from "graphql-request";
 import {
-  GET_ALL_CATEGORIES,
-  GET_POSTS_BY_CATEGORY,
-  GET_ALL_POSTS, // ← CORRECTO
-} from "./queries";
-import type {
-  Category,
-  RawPost,
-  MappedPost,
-  PagedPosts,
-} from "./definitions";
-import { cache } from "react";
-
-const GQL_ENDPOINT = "https://radioempresaria.com.ar/graphql";
-
-const client = new GraphQLClient(GQL_ENDPOINT, {
-  headers: { "Content-Type": "application/json" },
-});
-
-export function normalizeSlug(str: string): string {
-  return String(str || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim();
-}
-
-function mapPost(p: RawPost): MappedPost {
-  return {
-    id: Number(p.databaseId),
-    title: p.title ?? "",
-    slug: p.slug ?? "",
-    excerpt: p.excerpt ?? "",
-    date: p.date ?? "",
-    featuredImage:
-      p.featuredImage?.node?.sourceUrl ??
-      p.featuredImage?.node?.mediaItemUrl ??
-      null,
-  };
-}
-
-// Categorías
-export async function getAllCategories(): Promise<Category[]> {
-  try {
-    const data = await client.request(GET_ALL_CATEGORIES);
-
-    return data?.categories?.nodes?.map((c: any) => ({
-      name: c.name,
-      slug: normalizeSlug(c.slug),
+    GET_ALL_CATEGORIES,
+    GET_POSTS_BY_CATEGORY_SIMPLE,
+    GET_ALL_POSTS_SIMPLE
+  } from './queries';
+  import type { Post, Category, PagedPosts } from './definitions';
+  
+  const GQL_ENDPOINT = "https://radioempresaria.com.ar/graphql";
+  
+  async function fetchGraphQL(query: any, variables: Record<string, any> = {}): Promise<any> {
+    const response = await fetch(GQL_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      next: { revalidate: 60 },
+      body: JSON.stringify({
+        query: query.loc.source.body,
+        variables
+      }),
+    });
+  
+    if (!response.ok) {
+      console.error("GraphQL Network Error:", await response.text());
+      return null;
+    }
+  
+    const json = await response.json();
+    if (json.errors) {
+      console.error("GraphQL query failed:", json.errors);
+      return null;
+    }
+  
+    return json.data;
+  }
+  
+  // ✅ Normaliza los posts para que coincidan SIEMPRE con definitions.ts
+  const mapPostData = (p: any): Post => ({
+    databaseId: Number(p.databaseId),
+    title: p.title ?? '',
+    excerpt: p.excerpt ?? '',
+    slug: p.slug ?? '',
+    date: p.date ?? '',
+  
+    featuredImage: {
+      node: {
+        sourceUrl: p.featuredImage?.node?.sourceUrl ?? null
+      }
+    },
+  
+    categories: {
+      nodes: (p.categories?.nodes || []).map((c: any) => ({
+        databaseId: Number(c.databaseId),
+        name: c.name ?? '',
+        slug: c.slug ?? '',
+        count: Number(c.count ?? 0),
+      }))
+    }
+  });
+  
+  async function getCategoryDetails(slug: string): Promise<Category | null> {
+    const data = await fetchGraphQL(GET_ALL_CATEGORIES);
+  
+    const category = data?.categories?.nodes?.find((c: any) => c.slug === slug);
+  
+    if (!category) return null;
+  
+    return {
+      databaseId: Number(category.databaseId),
+      name: category.name ?? '',
+      slug: category.slug ?? '',
+      count: Number(category.count ?? 0)
+    };
+  }
+  
+  export async function getAllCategories(): Promise<Category[]> {
+    const data = await fetchGraphQL(GET_ALL_CATEGORIES);
+  
+    if (!data?.categories?.nodes) return [];
+  
+    return data.categories.nodes.map((c: any): Category => ({
+      databaseId: Number(c.databaseId),
+      name: c.name ?? '',
+      slug: c.slug ?? '',
+      count: Number(c.count ?? 0)
     }));
-  } catch (err) {
-    console.error("Error getAllCategories:", err);
-    return [];
   }
-}
-
-// Posts simple
-export async function getAllPosts(): Promise<MappedPost[]> {
-  try {
-    const data = await client.request(GET_ALL_POSTS);
-
-    const posts: RawPost[] =
-      data?.posts?.edges?.map((e: any) => e.node) ?? [];
-
-    return posts.map(mapPost);
-  } catch (err) {
-    console.error("Error getAllPosts:", err);
-    return [];
+  
+  export async function getCachedPostsPage(
+    slug: string | null,
+    page: number = 1,
+    pageSize: number = 10
+  ): Promise<PagedPosts> {
+    const isCategoryPage = !!slug;
+  
+    const query = isCategoryPage
+      ? GET_POSTS_BY_CATEGORY_SIMPLE
+      : GET_ALL_POSTS_SIMPLE;
+  
+    const variables = isCategoryPage
+      ? { categoryName: slug, size: pageSize, offset: (page - 1) * pageSize }
+      : { size: pageSize, offset: (page - 1) * pageSize };
+  
+    const data = await fetchGraphQL(query, variables);
+  
+    if (!data?.posts) {
+      return {
+        posts: [],
+        totalPages: 0,
+        total: 0,
+        category: null
+      };
+    }
+  
+    const categoryInfo = isCategoryPage ? await getCategoryDetails(slug!) : null;
+  
+    const totalPosts = Number(data.posts.pageInfo?.offsetPagination?.total ?? 0);
+    const totalPages = Math.ceil(totalPosts / pageSize);
+  
+    return {
+      posts: data.posts.nodes.map(mapPostData),
+      totalPages,
+      total: totalPosts,
+      category: categoryInfo
+    };
   }
-}
-
-// Posts por categoría
-export async function getPostsByCategory(slug: string | null): Promise<MappedPost[]> {
-  try {
-    if (!slug) return getAllPosts();
-
-    console.log("[getPostsByCategory] RECIBIDO SLUG:", slug);
-
-    const data = await client.request(GET_POSTS_BY_CATEGORY, { slug });
-
-    console.log(
-      "[getPostsByCategory] RESPONSE COMPLETO:",
-      JSON.stringify(data, null, 2)
-    );
-
-    const posts: RawPost[] =
-      data?.posts?.edges?.map((e: any) => e.node) ?? [];
-
-    console.log("[getPostsByCategory] POSTS DETECTADOS:", posts.length);
-
-    return posts.map(mapPost);
-  } catch (err) {
-    console.error("Error getPostsByCategory:", err);
-    return [];
-  }
-}
-
-// Paginado fake
-const PAGE_SIZE = 10;
-
-export async function getPostsPage(
-  slug: string | null,
-  page: number
-): Promise<PagedPosts> {
-  const list = await getPostsByCategory(slug);
-
-  const total = list.length;
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const safePage = Math.min(Math.max(1, page), totalPages);
-
-  const start = (safePage - 1) * PAGE_SIZE;
-  const end = start + PAGE_SIZE;
-
-  const slice = list.slice(start, end);
-
-  return {
-    posts: slice,
-    total,
-    totalPages,
-    category:
-      slug && list.length > 0
-        ? { name: list[0].title ?? slug, slug }
-        : { name: slug ?? "Todas", slug: slug ?? "" },
-  };
-}
-
-// Cache sin segundo argumento (solución correcta)
-export const getCachedPostsPage = cache(
-  async (slug: string | null, page: number): Promise<PagedPosts> => {
-    return await getPostsPage(slug, page);
-  }
-);
+  

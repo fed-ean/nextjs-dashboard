@@ -1,28 +1,21 @@
-// app/ui/Page_Index/SidenavServer.tsx
-import React from 'react';
-import { getAllCategories, getCachedPostsPage } from '@/app/lib/data-fetcher';
-import type { Category } from '@/app/lib/definitions';
+
+import { getAllCategories, getCachedPostsPage } from '../../lib/data-fetcher';
 import Sidenav from './sidenav';
+import type { Post, Category } from '@/app/lib/definitions';
 
+// Este componente se encarga de obtener los datos del servidor
 export default async function SidenavServer() {
-  // Cargar categorías y últimas noticias (1ª página)
-  let categories: Category[] = [];
-  let posts: any[] = [];
+  
+  // Obtenemos categorías y posts simultáneamente
+  const [categoriesData, postsData] = await Promise.all([
+    getAllCategories(),
+    getCachedPostsPage(null) // `null` para obtener los posts más recientes
+  ]);
 
-  try {
-    categories = await getAllCategories();
-  } catch (err) {
-    console.error('Error getAllCategories', err);
-    categories = [];
-  }
+  // Aseguramos que los datos no sean nulos
+  const allCategories: Category[] = categoriesData || [];
+  const latestPosts: Post[] = postsData?.posts?.slice(0, 5) || [];
 
-  try {
-    const res = await getCachedPostsPage(null, 1); // últimos posts
-    posts = res.posts ?? [];
-  } catch (err) {
-    console.error('Error getCachedPostsPage', err);
-    posts = [];
-  }
-
-  return <Sidenav categories={categories} latestPosts={posts} />;
+  // Renderizamos el componente de UI (`Sidenav`) y le pasamos los datos como props
+  return <Sidenav categories={allCategories} latestPosts={latestPosts} />;
 }

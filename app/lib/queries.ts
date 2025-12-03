@@ -1,11 +1,40 @@
 // app/lib/queries.ts
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
-/* -------------------------------------------------------
-   1) OBTENER TODAS LAS CATEGORÍAS
-------------------------------------------------------- */
+export const GET_POSTS_BY_CATEGORY_SIMPLE = gql`
+  query GetPostsByCategorySimple($categoryName: String!) {
+    posts(first: 9, where: { categoryName: $categoryName }) {
+      nodes {
+        databaseId
+        title
+        excerpt
+        date
+        slug
+        featuredImage { node { sourceUrl } }
+        categories { nodes { name slug } }
+      }
+    }
+  }
+`;
+
+export const GET_ALL_POSTS_SIMPLE = gql`
+  query GetAllPostsSimple {
+    posts(first: 9) {
+      nodes {
+        databaseId
+        title
+        excerpt
+        date
+        slug
+        featuredImage { node { sourceUrl } }
+        categories { nodes { name slug } }
+      }
+    }
+  }
+`;
+
 export const GET_ALL_CATEGORIES = gql`
-  query GetAllCategories {
+  query AllCategories {
     categories(first: 100) {
       nodes {
         databaseId
@@ -16,128 +45,132 @@ export const GET_ALL_CATEGORIES = gql`
   }
 `;
 
-/* -------------------------------------------------------
-   2) OBTENER POSTS POR CATEGORÍA (CON PAGINACIÓN)
-      - first: cantidad de posts por página
-      - after: cursor (para la página siguiente)
-------------------------------------------------------- */
-export const GET_POSTS_BY_CATEGORY = gql`
-  query GetPostsByCategory($slug: String!, $first: Int!, $after: String) {
-    posts(
-      where: { categoryName: $slug }
-      first: $first
-      after: $after
-    ) {
-      nodes {
-        databaseId
-        title
-        slug
-        date
-        excerpt
-        featuredImage {
-          node {
-            sourceUrl
-          }
-        }
-      }
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-    }
-
-    category(id: $slug, idType: SLUG) {
-      name
-      slug
-      databaseId
-    }
-  }
-`;
-
-/* -------------------------------------------------------
-   3) OBTENER TODOS LOS POSTS (SIN FILTRO)
-      - También paginable si algún día lo necesitás
-------------------------------------------------------- */
+// El resto de queries para el dashboard se mantienen intactas
 export const GET_ALL_POSTS = gql`
-  query GetAllPosts($first: Int!, $after: String) {
+  query AllPosts($first: Int, $after: String) {
     posts(first: $first, after: $after) {
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
       nodes {
         databaseId
         title
-        slug
-        date
         excerpt
-        featuredImage {
-          node {
-            sourceUrl
-          }
-        }
-      }
-      pageInfo {
-        hasNextPage
-        endCursor
+        date
+        slug
+        featuredImage { node { sourceUrl } }
+        tags { nodes { name slug } }
+        categories { nodes { name slug } }
       }
     }
   }
 `;
 
-/**
- * Trae posts por categoría usando categoryName (compatible con tu WPGraphQL)
- */
-export const GET_POSTS_BY_CATEGORY_SIMPLE = gql`
-  query GetPostsByCategory(
-    $slug: String!,
-    $first: Int,
-    $after: String
-  ) {
-    posts(
-      where: { categoryName: $slug }
-      first: $first
-      after: $after
-    ) {
-      edges {
-        node {
-          databaseId
-          title
-          slug
-          date
-          excerpt
-          featuredImage {
-            node {
-              sourceUrl
+export const SEARCH_POSTS = gql`
+  query SearchPosts($search: String!) {
+    posts(where: { search: $search }) {
+      nodes {
+        databaseId
+        title
+        excerpt
+        slug
+        date
+        featuredImage { node { sourceUrl } }
+        categories { nodes { name slug } }
+      }
+    }
+  }
+`;
+
+// CONSULTA PARA EL BUILD
+export const GET_ALL_POST_DATA_COMBINED = gql`
+  query GetAllPostDataCombined {
+    posts(first: 9999) {
+      nodes {
+        databaseId
+      }
+    }
+  }
+`;
+
+// NUEVA CONSULTA: Para obtener todos los slugs para generateStaticParams
+export const GET_ALL_POST_SLUGS = gql`
+  query GetAllPostSlugs {
+    posts(first: 10000) {
+      nodes {
+        slug
+      }
+    }
+  }
+`;
+
+
+export const GET_CATEGORY_POSTS_BY_SLUG_ARRAY = gql`
+  query GetCategoryPostsBySlugArray($slugs: [String], $first: Int, $after: String) {
+    categories(where: { slug: $slugs }) {
+      nodes {
+        id
+        name
+        slug
+        posts(first: $first, after: $after) {
+          nodes {
+            id
+            title
+            slug
+            featuredImage {
+              node {
+                sourceUrl
+              }
             }
           }
         }
       }
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-    }
-
-    category(id: $slug, idType: SLUG) {
-      name
-      slug
-      databaseId
     }
   }
 `;
 
-/**
- * Trae todos los posts simplificados
- */
-export const GET_ALL_POSTS_SIMPLE = gql`
-  query GetAllPostsSimple {
-    posts(first: 200) {
+export const GET_CATEGORY_POSTS_BY_SLUG = gql`
+  query GetCategoryPostsBySlug($slug: String, $first: Int, $after: String) {
+    categories(where: { slug: $slug }) {
       nodes {
-        databaseId
-        title
+        id
+        name
         slug
-        date
-        excerpt
-        featuredImage {
-          node {
-            sourceUrl
+        posts(first: $first, after: $after) {
+          nodes {
+            id
+            title
+            slug
+            featuredImage {
+              node {
+                sourceUrl
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_CATEGORY_POSTS_BY_SLUGIN = gql`
+  query GetCategoryPostsBySlugIn($slugIn: [String], $first: Int, $after: String) {
+    categories(where: { slugIn: $slugIn }) {
+      nodes {
+        id
+        name
+        slug
+        posts(first: $first, after: $after) {
+          nodes {
+            id
+            title
+            slug
+            featuredImage {
+              node {
+                sourceUrl
+              }
+            }
           }
         }
       }
