@@ -1,5 +1,6 @@
 
 import React from 'react';
+import Image from 'next/image';
 import './SponsorsCarousel.css';
 
 const sponsors = [
@@ -55,7 +56,13 @@ const SponsorsCarousel = () => {
           {sponsors.map((sponsor) => (
             <div className="sponsor-slide" key={sponsor.id}>
               <a href={sponsor.href} target="_blank" rel="noopener noreferrer">
-                <img src={sponsor.src} alt={sponsor.alt} />
+                <Image 
+                  src={sponsor.src} 
+                  alt={sponsor.alt} 
+                  width={150} 
+                  height={100}
+                  style={{ objectFit: 'contain' }}
+                />
               </a>
             </div>
           ))}

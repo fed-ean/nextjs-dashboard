@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 
 export default function RadioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -55,8 +56,7 @@ export default function RadioPlayer() {
       {/* 🎵 Versión Móvil */}
       <div className="fixed top-0 left-0 w-full bg-white shadow-md border-b-2 border-red-600 flex items-center justify-between px-3 py-2 md:hidden z-50">
         <div className="w-12 h-12 flex items-center justify-center">
-          <img alt="Logo" className="w-8 h-8" />
-          <img src="#" alt="imagen" />
+          <Image src="/logo-removebg-preview.png" alt="Logo" width={32} height={32} />
         </div>
 
         <div className="flex flex-col items-center">
