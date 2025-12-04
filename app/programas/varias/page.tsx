@@ -7,7 +7,7 @@ import SidenavServer from "@/app/ui/Page_Index/SidenavServer";
 
 export const dynamic = 'force-dynamic';
 
-const PER_PAGE = 9;
+const PER_PAGE = 10;
 
 const NoPostsDisplay = () => (
   <div className="text-center py-10">

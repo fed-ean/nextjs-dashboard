@@ -5,7 +5,7 @@ import CategoryGrid from "../../../../ui/categorias/CategoryGrid";
 import CategoryPagination from "../../../../ui/categorias/CategoryPagination";
 import SidenavServer from "@/app/ui/Page_Index/SidenavServer";
 
-const PER_PAGE = 9;
+const PER_PAGE = 10;
 
 type Props = { params: Promise<{ page: string }> };
 
