@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from "next/image";
 import {
   FaYoutube, 
   FaFacebookSquare, 
@@ -50,7 +51,7 @@ export default function Footer() {
           
           {/* Columna 1: Sobre nosotros */}
           <div className="flex flex-col">
-            <img src="/RadioAColor.png" alt="Radio Empresaria Logo" className="h-12 w-auto mb-4 self-start"/>
+             <Image src="/RadioAColor1.png" alt="Logo" />
             <p className="text-gray-400 text-sm">
               Radio online de la Fundación Pro Buenos Aires, dedicada a pymes, comercios, emprendedores y grandes empresas de nuestra región.
             </p>
