@@ -1,14 +1,6 @@
-//app/ui/categorias/CategoryGrid.tsx
-'use client';
-import React from 'react';
-import TarjetaNoticia from '../components/TarjetaNoticia';
+import TarjetaNoticia from "../components/TarjetaNoticia";
 
-export default function CategoryGrid({
-  posts
-}: {
-  posts: any[];
-  currentSectionSlug?: string;
-}) {
+export default function CategoryGridServer({ posts }: { posts: any[] }) {
   if (!posts || posts.length === 0) {
     return <div className="text-center py-12 text-gray-600">No hay noticias</div>;
   }
