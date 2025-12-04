@@ -2,8 +2,13 @@
 import { gql } from '@apollo/client';
 
 export const GET_POSTS_BY_CATEGORY_SIMPLE = gql`
-  query GetPostsByCategorySimple($categoryName: String!) {
-    posts(first: 9, where: { categoryName: $categoryName }) {
+  query GetPostsByCategorySimple($categoryName: String!, $size: Int!, $offset: Int!) {
+    posts(
+      where: {
+        categoryName: $categoryName
+        offsetPagination: { size: $size, offset: $offset }
+      }
+    ) {
       nodes {
         databaseId
         title
@@ -12,14 +17,24 @@ export const GET_POSTS_BY_CATEGORY_SIMPLE = gql`
         slug
         featuredImage { node { sourceUrl } }
         categories { nodes { name slug } }
+      }
+      pageInfo {
+        offsetPagination {
+          total
+        }
       }
     }
   }
 `;
 
+
 export const GET_ALL_POSTS_SIMPLE = gql`
-  query GetAllPostsSimple {
-    posts(first: 9) {
+  query GetAllPostsSimple($size: Int!, $offset: Int!) {
+    posts(
+      where: {
+        offsetPagination: { size: $size, offset: $offset }
+      }
+    ) {
       nodes {
         databaseId
         title
@@ -29,9 +44,15 @@ export const GET_ALL_POSTS_SIMPLE = gql`
         featuredImage { node { sourceUrl } }
         categories { nodes { name slug } }
       }
+      pageInfo {
+        offsetPagination {
+          total
+        }
+      }
     }
   }
 `;
+
 
 export const GET_ALL_CATEGORIES = gql`
   query AllCategories {
