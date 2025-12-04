@@ -8,30 +8,32 @@ import type { Category } from "@/app/lib/definitions";
 
 const PER_PAGE = 9;
 
-// GENERATE STATIC PARAMS: solo generamos páginas > 1
+// --- GENERATE STATIC PARAMS: SOLO generar páginas > 1 ---
 export async function generateStaticParams() {
-  const categories = await getAllCategories();
-  const params: { slug: string; page: string }[] = [];
+  const allCategories: Category[] = await getAllCategories();
+  const allParams = await Promise.all(
+    allCategories.map(async (category) => {
+      try {
+        const { totalPages } = await getCachedPostsPage(category.slug, 1, PER_PAGE);
+        const tp = Number(totalPages || 0);
+        if (!tp || tp <= 1) return []; // NO generar páginas si solo hay 1 o 0
+        return Array.from({ length: tp }, (_, i) => i + 1)
+          .filter(n => n > 1) // solo páginas > 1
+          .map(n => ({ slug: category.slug, page: n.toString() }));
+      } catch (err) {
+        // si algo falla, no abortamos la build: no generamos páginas extra para esa categoría
+        // eslint-disable-next-line no-console
+        console.error('[generateStaticParams] error for category', category.slug, err);
+        return [];
+      }
+    })
+  );
 
-  for (const cat of categories) {
-    const { totalPages } = await getCachedPostsPage(cat.slug, 1, 10);
-
-    // Sólo generar páginas que realmente existan
-    for (let p = 1; p <= totalPages; p++) {
-      params.push({
-        slug: cat.slug,
-        page: String(p)
-      });
-    }
-  }
-
-  return params;
+  return allParams.flat();
 }
 
-
-
 type Props = {
-  params: Promise<{ slug: string; page: string }>; // <-- CORRECCIÓN: Promise
+  params: Promise<{ slug: string; page: string }>;
 };
 
 const NoPostsDisplay = ({ title }: { title: string }) => (
@@ -42,11 +44,29 @@ const NoPostsDisplay = ({ title }: { title: string }) => (
 );
 
 export default async function CategoriaPaged({ params }: Props) {
-  // Resolvemos la promesa de params (obligatorio en Next 15.5.6)
-  const { slug, page } = await params;
-  const pageNum = Math.max(1, Number(page));
+  const { slug, page } = await params; // Next 15: params puede ser Promise
+  const pageNum = Math.max(1, Number(page || 1));
 
-  const { posts, totalPages, category } = await getCachedPostsPage(slug, pageNum, PER_PAGE);
+  // TRY/CATCH para que la build no falle si la API devuelve algo raro en /page/X
+  let posts = [];
+  let totalPages = 1;
+  let category = null;
+  try {
+    const res = await getCachedPostsPage(slug, pageNum, PER_PAGE);
+    posts = res.posts ?? [];
+    totalPages = Math.max(1, Number(res.totalPages ?? 1));
+    category = res.category ?? null;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('[CategoriaPaged] fetch error', { slug, pageNum, err });
+    // fallback: mostrar mensaje y no abortar build
+    return (
+      <div className="max-w-5xl mx-auto px-4 py-10 text-center">
+        <h1 className="text-2xl font-bold mb-2">{slug}</h1>
+        <p className="text-gray-500">No se pudo cargar esta página en el build — revisá la consola.</p>
+      </div>
+    );
+  }
 
   const title = category?.name ?? slug;
 
@@ -69,7 +89,7 @@ export default async function CategoriaPaged({ params }: Props) {
 
         <div className="mt-8">
           <Suspense fallback={<div className="text-sm text-gray-500">Cargando paginación…</div>}>
-            <CategoryPagination basePath={`/Categorias/${slug}`} current={pageNum} totalPages={totalPages || 1} />
+            <CategoryPagination basePath={`/Categorias/${slug}`} current={pageNum} totalPages={totalPages} />
           </Suspense>
         </div>
       </main>
