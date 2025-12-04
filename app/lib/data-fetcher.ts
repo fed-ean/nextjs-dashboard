@@ -123,13 +123,12 @@ export async function getCachedPostsPage(
 ): Promise<PagedPosts> {
   try {
     const isCategoryPage = !!slug;
-
     const query = isCategoryPage ? GET_POSTS_BY_CATEGORY_SIMPLE : GET_ALL_POSTS_SIMPLE;
-
     const variables = isCategoryPage
       ? { categoryName: slug, size: pageSize, offset: (page - 1) * pageSize }
       : { size: pageSize, offset: (page - 1) * pageSize };
 
+    // Primera petición: la página solicitada
     const data = await fetchGraphQL(query, variables);
 
     // fallback si no hay data
@@ -142,20 +141,66 @@ export async function getCachedPostsPage(
       };
     }
 
-    const nodes = Array.isArray(data.posts.nodes) ? data.posts.nodes : [];
+    let nodes = Array.isArray(data.posts.nodes) ? data.posts.nodes : [];
 
     // Intentamos leer total desde la API
     const totalFromApi = Number(data.posts.pageInfo?.offsetPagination?.total ?? NaN);
     let totalPosts = Number.isFinite(totalFromApi) ? totalFromApi : NaN;
 
-    // Si la API no da total válido, hacemos probeo (solo si la página actual está completa)
+    // --- Caso frecuente: backend no respeta offset ---
+    // Si pedimos página > 1 y recibimos la misma lista que la página 1,
+    // entonces hacemos fallback: fetch grande y sliceamos.
+    if (page > 1) {
+      // pedimos la primera página para comparar (rápido)
+      const varsPage1 = isCategoryPage
+        ? { categoryName: slug, size: pageSize, offset: 0 }
+        : { size: pageSize, offset: 0 };
+      const dataPage1 = await fetchGraphQL(query, varsPage1);
+      const nodesPage1 = Array.isArray(dataPage1?.posts?.nodes) ? dataPage1.posts.nodes : [];
+
+      // Comparamos por identificador/slug de los primeros items (si existen)
+      const firstIdCurrent = nodes[0]?.slug ?? nodes[0]?.databaseId ?? null;
+      const firstIdPage1 = nodesPage1[0]?.slug ?? nodesPage1[0]?.databaseId ?? null;
+
+      // Si parecen iguales (probable que offset no se aplicó), hacemos fetch grande y sliceamos
+      if (firstIdCurrent && firstIdPage1 && String(firstIdCurrent) === String(firstIdPage1)) {
+        // Fetch grande (N páginas) y slice
+        const MAX_PAGES_FETCH = 10; // configurable: 10 * pageSize posts máximo (ej. 90)
+        const maxFetchSize = Math.min(MAX_PAGES_FETCH * pageSize, 200); // tope absoluto 200
+        const bigVars = isCategoryPage
+          ? { categoryName: slug, size: maxFetchSize, offset: 0 }
+          : { size: maxFetchSize, offset: 0 };
+
+        const bigData = await fetchGraphQL(query, bigVars);
+        const bigNodes = Array.isArray(bigData?.posts?.nodes) ? bigData.posts.nodes : [];
+
+        // Usamos bigNodes para slicear la página correcta
+        const sliceStart = (page - 1) * pageSize;
+        const sliceEnd = sliceStart + pageSize;
+        const sliced = bigNodes.slice(sliceStart, sliceEnd);
+
+        // totalPosts lo calculamos a partir de bigNodes (si la API no entregó total)
+        const inferredTotal = bigNodes.length;
+        totalPosts = Number.isFinite(totalFromApi) ? totalFromApi : inferredTotal;
+
+        return {
+          posts: sliced.map(mapPostData),
+          totalPages: Math.max(1, Math.ceil(totalPosts / pageSize)),
+          total: Number.isFinite(totalPosts) ? totalPosts : inferredTotal,
+          category: isCategoryPage ? await getCategoryDetails(slug!) : null,
+        };
+      }
+    }
+
+    // --- Si llegamos acá: comportamiento "normal" o probeo para total ---
+    // Si la API no da total válido, usamos probeo (limitado) para estimarlo
     if (!Number.isFinite(totalPosts)) {
       if (nodes.length < pageSize) {
-        // la primera (o la solicitada) viene incompleta => asumimos no hay más
-        totalPosts = nodes.length;
+        // la página actual viene incompleta => asumimos no hay más
+        totalPosts = (page - 1) * pageSize + nodes.length;
       } else {
-        // probable que haya más: probeamos páginas siguientes hasta tope
-        const MAX_PROBE_PAGES = 5; // ajustable (evita llamar muchas veces en build)
+        // nodes.length === pageSize -> puede haber más. Probeamos hasta MAX_PROBE_PAGES.
+        const MAX_PROBE_PAGES = 5; // evita demasiadas llamadas en build
         let probed = nodes.length;
         let probePage = 2;
         while (probePage <= MAX_PROBE_PAGES) {
@@ -166,21 +211,16 @@ export async function getCachedPostsPage(
 
           const probeData = await fetchGraphQL(query, probeVars);
           if (!probeData || !probeData.posts) break;
-
           const probeNodes = Array.isArray(probeData.posts.nodes) ? probeData.posts.nodes : [];
           probed += probeNodes.length;
-
-          // si la página probeada no viene completa, terminamos
           if (probeNodes.length < pageSize) break;
-
-          // si probeNodes.length == pageSize, puede haber más — seguimos
           probePage += 1;
         }
-        totalPosts = probed;
+        totalPosts = probed + (page - 1 - 1) * pageSize > 0 ? probed + (page - 1 - 1) * pageSize : probed;
+        // (la fórmula anterior es conservadora; el objetivo es no subestimar mucho)
       }
     }
 
-    // Calculamos totalPages de forma segura
     const totalPagesCalc = Number.isFinite(totalPosts) ? Math.max(1, Math.ceil(totalPosts / pageSize)) : 1;
     const categoryInfo = isCategoryPage ? await getCategoryDetails(slug!) : null;
 
