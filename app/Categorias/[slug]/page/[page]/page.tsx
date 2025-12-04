@@ -5,7 +5,7 @@ import CategoryGridServer from "../../../../ui/categorias/CategoryGridServer";
 import CategoryPagination from "../../../../ui/categorias/CategoryPagination";
 import SidenavServer from "@/app/ui/Page_Index/SidenavServer";
 
-const PER_PAGE = 9;
+const PER_PAGE = 12;
 
 // ❌ Eliminamos generateStaticParams: esto evita errores en build
 // Next ahora renderiza bajo demanda sin romper nada.
