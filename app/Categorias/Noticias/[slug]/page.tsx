@@ -24,6 +24,7 @@ const GET_LAST_POSTS = gql`
         id
         slug
         title
+        date
         featuredImage {
           node {
             sourceUrl
@@ -87,6 +88,19 @@ type Post = {
 
 type PostData = { post: Post | null };
 
+/* Tipo para los últimos posts (query GET_LAST_POSTS) */
+type LastPostsData = {
+  posts: {
+    nodes: Array<{
+      id: string;
+      slug: string;
+      title: string;
+      date?: string;
+      featuredImage?: { node?: { sourceUrl?: string } };
+    }>;
+  };
+};
+
 /* =============================
    HELPERS
    ============================= */
@@ -105,10 +119,16 @@ async function getPost(slug: string): Promise<Post | null> {
   }
 }
 
-async function getLastPosts() {
+async function getLastPosts(): Promise<LastPostsData["posts"]["nodes"]> {
   const client = getServerSideClient();
-  const { data } = await client.query({ query: GET_LAST_POSTS });
-  return data.posts.nodes;
+  try {
+    const { data } = await client.query<LastPostsData>({ query: GET_LAST_POSTS });
+    // ahora `data` está tipado correctamente
+    return data?.posts?.nodes ?? [];
+  } catch (err) {
+    console.error("Error fetching last posts:", err);
+    return [];
+  }
 }
 
 const getColorForCategory = (name: string) => {
@@ -154,6 +174,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function Page({ params }: PageProps) {
   const { slug } = await params;
+
+  // Fetch post y últimos posts (tipados)
   const post = await getPost(slug);
   const lastPosts = await getLastPosts();
 
