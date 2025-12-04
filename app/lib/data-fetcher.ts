@@ -116,11 +116,10 @@ export async function getAllCategories(): Promise<Category[]> {
   }
 }
 
-
 export async function getCachedPostsPage(
   slug: string | null,
   page: number = 1,
-  pageSize: number = 10 // <-- default 9 to match PER_PAGE in pages
+  pageSize: number = 12 // <-- default 9 to match PER_PAGE in pages
 ): Promise<PagedPosts> {
   try {
     const isCategoryPage = !!slug;
