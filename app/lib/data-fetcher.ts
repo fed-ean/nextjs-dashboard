@@ -134,33 +134,72 @@ export async function getCachedPostsPage(
 
     const data = await fetchGraphQL(query, variables);
 
-    // If fetch failed or data missing, return a safe fallback
+    // fallback seguro si falla el fetch
     if (!data || !data.posts) {
       return {
         posts: [],
-        totalPages: 1, // mínimo 1 para evitar problemas en generateStaticParams/paginación
+        totalPages: 1,
         total: 0,
         category: isCategoryPage ? await getCategoryDetails(slug!) : null
       };
     }
 
     const nodes = Array.isArray(data.posts.nodes) ? data.posts.nodes : [];
-    const totalPosts = Number(data.posts.pageInfo?.offsetPagination?.total ?? 0);
-    const totalPagesCalc = Number.isFinite(totalPosts) ? Math.ceil(totalPosts / pageSize) : 0;
-    const totalPages = Math.max(1, totalPagesCalc);
 
+    // intentamos obtener total desde la API
+    const totalFromApiRaw = data.posts.pageInfo?.offsetPagination?.total;
+    const totalFromApi = Number.isFinite(Number(totalFromApiRaw)) ? Number(totalFromApiRaw) : NaN;
+
+    let totalPosts: number;
+
+    if (Number.isFinite(totalFromApi) && totalFromApi > 0) {
+      // API nos dio un total válido
+      totalPosts = totalFromApi;
+    } else {
+      // API no devolvió total. Inferimos:
+      if (nodes.length < pageSize) {
+        // si la página actual viene incompleta, asumimos que ese es el total
+        totalPosts = (page - 1) * pageSize + nodes.length;
+      } else {
+        // página actual completa -> puede haber más. Probeamos algunas páginas siguientes.
+        const MAX_PROBE_PAGES = 5; // <-- ajusta según tolerancia de build (5 es razonable)
+        let probedTotal = (page - 1) * pageSize + nodes.length;
+        let probePage = page + 1;
+
+        while (probePage <= page + MAX_PROBE_PAGES) {
+          const probeOffset = (probePage - 1) * pageSize;
+          const probeVars = isCategoryPage
+            ? { categoryName: slug, size: pageSize, offset: probeOffset }
+            : { size: pageSize, offset: probeOffset };
+
+          const probeData = await fetchGraphQL(query, probeVars);
+          if (!probeData || !probeData.posts) break;
+
+          const probeNodes = Array.isArray(probeData.posts.nodes) ? probeData.posts.nodes : [];
+          probedTotal += probeNodes.length;
+
+          // si encontramos una página incompleta, terminamos probeo
+          if (probeNodes.length < pageSize) break;
+
+          probePage += 1;
+        }
+
+        totalPosts = probedTotal;
+      }
+    }
+
+    const totalPagesCalc = Math.max(1, Math.ceil(totalPosts / pageSize));
     const categoryInfo = isCategoryPage ? await getCategoryDetails(slug!) : null;
 
     return {
       posts: nodes.map(mapPostData),
-      totalPages,
+      totalPages: totalPagesCalc,
       total: totalPosts,
       category: categoryInfo
     };
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error('[getCachedPostsPage] unexpected error', { slug, page, pageSize, err });
-    // fallback seguro para que la build no falle
     return {
       posts: [],
       totalPages: 1,

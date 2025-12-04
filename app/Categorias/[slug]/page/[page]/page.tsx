@@ -11,26 +11,24 @@ const PER_PAGE = 9;
 // GENERATE STATIC PARAMS: solo generamos páginas > 1
 export async function generateStaticParams() {
   const allCategories: Category[] = await getAllCategories();
-  const allParams: Array<{ slug: string; page: string }[]> = await Promise.all(
+  const allParams = await Promise.all(
     allCategories.map(async (category) => {
       try {
         const { totalPages } = await getCachedPostsPage(category.slug, 1, PER_PAGE);
         const tp = Math.max(0, Number(totalPages || 0));
-        if (tp <= 1) return []; // no generar /page/1 ni nada si solo hay 1 página o 0
-        const pages = Array.from({ length: tp }, (_, i) => i + 1)
-          .filter((n) => n > 1) // SOLO páginas > 1
-          .map((n) => ({ slug: category.slug, page: n.toString() }));
-        return pages;
+        if (tp <= 1) return []; // no generar /page/1
+        return Array.from({ length: tp }, (_, i) => i + 1)
+          .filter(n => n > 1)
+          .map(n => ({ slug: category.slug, page: n.toString() }));
       } catch (err) {
-        // eslint-disable-next-line no-console
         console.error('[generateStaticParams] error for category', category.slug, err);
         return [];
       }
     })
   );
-
   return allParams.flat();
 }
+
 
 type Props = {
   params: Promise<{ slug: string; page: string }>; // <-- CORRECCIÓN: Promise
