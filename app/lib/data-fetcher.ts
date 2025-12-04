@@ -119,14 +119,12 @@ export async function getAllCategories(): Promise<Category[]> {
 export async function getCachedPostsPage(
   slug: string | null,
   page: number = 1,
-  pageSize: number = 10
+  pageSize: number = 9 // <-- default 9 to match PER_PAGE in pages
 ): Promise<PagedPosts> {
   try {
     const isCategoryPage = !!slug;
 
-    const query = isCategoryPage
-      ? GET_POSTS_BY_CATEGORY_SIMPLE
-      : GET_ALL_POSTS_SIMPLE;
+    const query = isCategoryPage ? GET_POSTS_BY_CATEGORY_SIMPLE : GET_ALL_POSTS_SIMPLE;
 
     const variables = isCategoryPage
       ? { categoryName: slug, size: pageSize, offset: (page - 1) * pageSize }
@@ -134,39 +132,33 @@ export async function getCachedPostsPage(
 
     const data = await fetchGraphQL(query, variables);
 
-    // fallback seguro si falla el fetch
+    // fallback si no hay data
     if (!data || !data.posts) {
       return {
         posts: [],
         totalPages: 1,
         total: 0,
-        category: isCategoryPage ? await getCategoryDetails(slug!) : null
+        category: isCategoryPage ? await getCategoryDetails(slug!) : null,
       };
     }
 
     const nodes = Array.isArray(data.posts.nodes) ? data.posts.nodes : [];
 
-    // intentamos obtener total desde la API
-    const totalFromApiRaw = data.posts.pageInfo?.offsetPagination?.total;
-    const totalFromApi = Number.isFinite(Number(totalFromApiRaw)) ? Number(totalFromApiRaw) : NaN;
+    // Intentamos leer total desde la API
+    const totalFromApi = Number(data.posts.pageInfo?.offsetPagination?.total ?? NaN);
+    let totalPosts = Number.isFinite(totalFromApi) ? totalFromApi : NaN;
 
-    let totalPosts: number;
-
-    if (Number.isFinite(totalFromApi) && totalFromApi > 0) {
-      // API nos dio un total válido
-      totalPosts = totalFromApi;
-    } else {
-      // API no devolvió total. Inferimos:
+    // Si la API no da total válido, hacemos probeo (solo si la página actual está completa)
+    if (!Number.isFinite(totalPosts)) {
       if (nodes.length < pageSize) {
-        // si la página actual viene incompleta, asumimos que ese es el total
-        totalPosts = (page - 1) * pageSize + nodes.length;
+        // la primera (o la solicitada) viene incompleta => asumimos no hay más
+        totalPosts = nodes.length;
       } else {
-        // página actual completa -> puede haber más. Probeamos algunas páginas siguientes.
-        const MAX_PROBE_PAGES = 5; // <-- ajusta según tolerancia de build (5 es razonable)
-        let probedTotal = (page - 1) * pageSize + nodes.length;
-        let probePage = page + 1;
-
-        while (probePage <= page + MAX_PROBE_PAGES) {
+        // probable que haya más: probeamos páginas siguientes hasta tope
+        const MAX_PROBE_PAGES = 5; // ajustable (evita llamar muchas veces en build)
+        let probed = nodes.length;
+        let probePage = 2;
+        while (probePage <= MAX_PROBE_PAGES) {
           const probeOffset = (probePage - 1) * pageSize;
           const probeVars = isCategoryPage
             ? { categoryName: slug, size: pageSize, offset: probeOffset }
@@ -176,26 +168,27 @@ export async function getCachedPostsPage(
           if (!probeData || !probeData.posts) break;
 
           const probeNodes = Array.isArray(probeData.posts.nodes) ? probeData.posts.nodes : [];
-          probedTotal += probeNodes.length;
+          probed += probeNodes.length;
 
-          // si encontramos una página incompleta, terminamos probeo
+          // si la página probeada no viene completa, terminamos
           if (probeNodes.length < pageSize) break;
 
+          // si probeNodes.length == pageSize, puede haber más — seguimos
           probePage += 1;
         }
-
-        totalPosts = probedTotal;
+        totalPosts = probed;
       }
     }
 
-    const totalPagesCalc = Math.max(1, Math.ceil(totalPosts / pageSize));
+    // Calculamos totalPages de forma segura
+    const totalPagesCalc = Number.isFinite(totalPosts) ? Math.max(1, Math.ceil(totalPosts / pageSize)) : 1;
     const categoryInfo = isCategoryPage ? await getCategoryDetails(slug!) : null;
 
     return {
       posts: nodes.map(mapPostData),
       totalPages: totalPagesCalc,
-      total: totalPosts,
-      category: categoryInfo
+      total: Number.isFinite(totalPosts) ? totalPosts : 0,
+      category: categoryInfo,
     };
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -204,7 +197,7 @@ export async function getCachedPostsPage(
       posts: [],
       totalPages: 1,
       total: 0,
-      category: null
+      category: null,
     };
   }
 }
