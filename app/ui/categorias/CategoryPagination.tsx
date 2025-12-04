@@ -22,6 +22,7 @@ export default function CategoryPagination({
   // Calculamos rango de botones
   let start = Math.max(1, current - Math.floor(maxButtons / 2));
   let end = start + maxButtons - 1;
+
   if (end > totalPages) {
     end = totalPages;
     start = Math.max(1, end - maxButtons + 1);
@@ -40,7 +41,9 @@ export default function CategoryPagination({
         <Link
           href={pageUrl(1)}
           className={`px-3 py-1 rounded border ${
-            current === 1 ? 'bg-gray-200 text-gray-500 pointer-events-none' : 'bg-white hover:bg-gray-100'
+            current === 1
+              ? "bg-gray-200 text-gray-500 pointer-events-none"
+              : "bg-white hover:bg-gray-100"
           }`}
         >
           « Primero
@@ -50,33 +53,41 @@ export default function CategoryPagination({
         <Link
           href={pageUrl(Math.max(1, current - 1))}
           className={`px-3 py-1 rounded border ${
-            current === 1 ? 'bg-gray-200 text-gray-500 pointer-events-none' : 'bg-white hover:bg-gray-100'
+            current === 1
+              ? "bg-gray-200 text-gray-500 pointer-events-none"
+              : "bg-white hover:bg-gray-100"
           }`}
         >
           Anterior
         </Link>
 
-        {/* Páginas numeradas */}
+        {/* Números */}
         {start > 1 && <span className="px-2 text-gray-500">…</span>}
+
         {pages.map((p) => (
           <Link
             key={p}
             href={pageUrl(p)}
-            aria-current={p === current ? 'page' : undefined}
+            aria-current={p === current ? "page" : undefined}
             className={`px-3 py-1 rounded border ${
-              p === current ? 'bg-blue-600 text-white' : 'bg-white hover:bg-gray-100'
+              p === current
+                ? "bg-blue-600 text-white"
+                : "bg-white hover:bg-gray-100"
             }`}
           >
             {p}
           </Link>
         ))}
+
         {end < totalPages && <span className="px-2 text-gray-500">…</span>}
 
         {/* Siguiente */}
         <Link
           href={pageUrl(Math.min(totalPages, current + 1))}
           className={`px-3 py-1 rounded border ${
-            current === totalPages ? 'bg-gray-200 text-gray-500 pointer-events-none' : 'bg-white hover:bg-gray-100'
+            current === totalPages
+              ? "bg-gray-200 text-gray-500 pointer-events-none"
+              : "bg-white hover:bg-gray-100"
           }`}
         >
           Siguiente
@@ -86,7 +97,9 @@ export default function CategoryPagination({
         <Link
           href={pageUrl(totalPages)}
           className={`px-3 py-1 rounded border ${
-            current === totalPages ? 'bg-gray-200 text-gray-500 pointer-events-none' : 'bg-white hover:bg-gray-100'
+            current === totalPages
+              ? "bg-gray-200 text-gray-500 pointer-events-none"
+              : "bg-white hover:bg-gray-100"
           }`}
         >
           Último »
