@@ -18,7 +18,7 @@ export default function CategoryPagination({
   // Aseguramos mínimo 1 página
   totalPages = Math.max(totalPages, 1);
   current = Math.max(1, Math.min(current, totalPages));
-
+  if (totalPages <= 1) return null
   // Calculamos rango de botones
   let start = Math.max(1, current - Math.floor(maxButtons / 2));
   let end = start + maxButtons - 1;
