@@ -116,6 +116,7 @@ export async function getAllCategories(): Promise<Category[]> {
   }
 }
 
+
 export async function getCachedPostsPage(
   slug: string | null,
   page: number = 1,
