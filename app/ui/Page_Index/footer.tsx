@@ -51,7 +51,7 @@ export default function Footer() {
           {/* Columna 1: Sobre nosotros */}
           <div className="flex flex-col lg:col-span-2 md:col-span-3">
             
-            <Image src="/RadioAColor.png" alt="Radio Empresaria Logo" width={250} height={64} className="h-16 w-auto mb-6 self-start"/>
+            <Image src="/RadioAColor1.png" alt="Radio Empresaria Logo" width={250} height={64} className="h-16 w-auto mb-6 self-start"/>
             <p className="text-gray-400 text-sm leading-relaxed">
               Radio online de la Fundación Pro Buenos Aires, dedicada a pymes, comercios, emprendedores y grandes empresas de nuestra región.
             </p>
