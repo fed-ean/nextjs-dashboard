@@ -43,7 +43,7 @@ export default function FooterCarousel({ posts }: { posts: Post[] }) {
             transition={{ duration: 0.4 }}
             className="bg-white rounded-xl shadow p-3 cursor-pointer hover:shadow-lg transition"
           >
-            <Link href={`/Noticias/${post.slug}`}>
+            <Link href={`/Categorias/Noticias/${post.slug}`}>
               <div>
                 {post.featuredImage?.node?.sourceUrl && (
                   <Image
