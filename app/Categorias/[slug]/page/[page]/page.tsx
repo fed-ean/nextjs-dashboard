@@ -8,29 +8,40 @@ import type { Category } from "@/app/lib/definitions";
 
 const PER_PAGE = 9;
 
-// --- GENERATE STATIC PARAMS: SOLO generar páginas > 1 ---
+// GENERATE STATIC PARAMS: solo generamos páginas > 1
 export async function generateStaticParams() {
   const allCategories: Category[] = await getAllCategories();
-  const allParams = await Promise.all(
-    allCategories.map(async (category) => {
-      try {
-        const { totalPages } = await getCachedPostsPage(category.slug, 1, PER_PAGE);
-        const tp = Number(totalPages || 0);
-        if (!tp || tp <= 1) return []; // NO generar páginas si solo hay 1 o 0
-        return Array.from({ length: tp }, (_, i) => i + 1)
-          .filter(n => n > 1) // solo páginas > 1
-          .map(n => ({ slug: category.slug, page: n.toString() }));
-      } catch (err) {
-        // si algo falla, no abortamos la build: no generamos páginas extra para esa categoría
-        // eslint-disable-next-line no-console
-        console.error('[generateStaticParams] error for category', category.slug, err);
-        return [];
-      }
-    })
-  );
+  const result: Array<{ slug: string; page: string }>[] = [];
 
-  return allParams.flat();
+  for (const category of allCategories) {
+    try {
+      const info = await getCachedPostsPage(category.slug, 1, PER_PAGE);
+      const tp = Number(info?.totalPages ?? 0);
+      // log para saber qué devuelve la API durante la build
+      // eslint-disable-next-line no-console
+      console.log(`[generateStaticParams] category=${category.slug} totalPages=${tp}`);
+
+      if (!tp || tp <= 1) {
+        // no generamos /page/1 ni páginas adicionales si solo hay 1 o 0 páginas
+        continue;
+      }
+
+      const pages = Array.from({ length: tp }, (_, i) => i + 1)
+        .filter(n => n > 1)
+        .map(n => ({ slug: category.slug, page: n.toString() }));
+
+      result.push(pages);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('[generateStaticParams] error for category', category.slug, err);
+      // no agregamos rutas extra para esta categoría
+    }
+  }
+
+  // aplanar
+  return result.flat();
 }
+
 
 type Props = {
   params: Promise<{ slug: string; page: string }>;

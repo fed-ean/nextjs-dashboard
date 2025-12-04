@@ -1,3 +1,4 @@
+//app/ui/categorias/CategoryPagination.tsx
 "use client";
 import React from "react";
 import Link from "next/link";
