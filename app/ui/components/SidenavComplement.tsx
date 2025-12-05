@@ -113,7 +113,7 @@ export default function SidenavComplement({
         }
 
         @keyframes marquee-vertical {
-          0% { trtranslateYranslateY(0); }
+          0% { transform: translateY(0); }
           100% { transform: translateY(-50%); }
         }
           100% { transform: translateY(-50%); }
