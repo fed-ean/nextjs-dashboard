@@ -26,15 +26,21 @@ export default function SidenavComplement({
   socialLinks?: SocialLink[];
   className?: string;
 }) {
-  // duplicate sponsors to create a seamless horizontal marquee-vertical
-  const items = sponsors.length ? [...sponsors, ...sponsors] : [];
+  // LIMIT: máximo 16 sponsors
+  const sponsorsToUse = (sponsors || []).slice(0, 16);
 
-  // automatic animation duration based on number of logos (keeps speed reasonable)
-  const durationSeconds = Math.max(10, Math.round((sponsors.length || 4) * 3));
+  // duplicate sponsors to create a seamless vertical marquee (only if hay sponsors)
+  const items = sponsorsToUse.length ? [...sponsorsToUse, ...sponsorsToUse] : [];
+
+  // duración automática (ajustable): más logos -> un poco más de tiempo para mantener la velocidad
+  const durationSeconds = Math.max(8, Math.round((sponsorsToUse.length || 4) * 2.5));
+
+  // altura visible del carrusel — cambiala si querés más/menos ítems visibles
+  const visibleHeight = "240px"; // default: 240px (aprox 3-4 logos)
+
   const marqueeStyle: React.CSSProperties = {
-    // expose a CSS variable that the stylesheet below uses
-    // TypeScript accepts this as a CSSProperties object
     ["--marquee-duration" as any]: `${durationSeconds}s`,
+    ["--marquee-visible-height" as any]: visibleHeight,
   };
 
   return (
@@ -65,24 +71,27 @@ export default function SidenavComplement({
       {/* Título pequeño */}
       <div className="text-center text-xs tracking-wider text-gray-600 mb-3">SPONSORS</div>
 
-      {/* Horizontal marquee carousel (renders only if hay sponsors) */}
-      <div className="relative overflow-hidden">
-        <div
-          className="marquee will-change-transform"
-          style={marqueeStyle}
-          aria-hidden={items.length === 0}
-        >
-          {items.map((s, idx) => (
-            <a
-              key={`${s.image}-${idx}`}
-              href={s.href || "#"}
-              className="flex-shrink-0 w-28 h-28 rounded-full overflow-hidden flex items-center justify-center bg-white shadow-md"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <img src={s.image} alt={s.alt || "sponsor"} className="object-contain w-full h-full p-3" />
-            </a>
-          ))}
+      {/* VISTA del carrusel con altura fija para evitar que crezca demasiado */}
+      <div className="relative" style={marqueeStyle}>
+        <div className="marquee-viewport" style={{ height: visibleHeight, overflow: "hidden" }}>
+          {/* Renderizamos solo si hay items */}
+          {items.length > 0 ? (
+            <div className="marquee-vertical will-change-transform" aria-hidden>
+              {items.map((s, idx) => (
+                <a
+                  key={`${s.image}-${idx}`}
+                  href={s.href || "#"}
+                  className="flex-shrink-0 w-full h-20 flex items-center justify-center bg-white shadow-md py-2"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <img src={s.image} alt={s.alt || "sponsor"} className="object-contain h-full" />
+                </a>
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-24 text-xs text-gray-400">No hay sponsors</div>
+          )}
         </div>
       </div>
 
@@ -91,64 +100,34 @@ export default function SidenavComplement({
 
       {/* styles */}
       <style>{`
-        .marquee {
-          display: flex; flex-direction: column;
-          gap: 1rem;
-          padding-bottom: 0.5rem;
-          align-items: center;
+        .marquee-vertical {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
 
-          /* use CSS variable for easy overrides */
+          /* CSS vars (inicial valor) */
           --marquee-duration: 18s;
-          animation: marquee var(--marquee-duration) linear infinite;
+          animation: marquee-vertical var(--marquee-duration) linear infinite;
         }
 
-        /* pause when hovered or focused for accessibility */
-        .marquee:hover,
-        .marquee:focus-within {
+        /* pause on hover/focus */
+        .marquee-vertical:hover,
+        .marquee-vertical:focus-within {
           animation-play-state: paused;
-        }
-
-        .marquee img {
-          display: block;
         }
 
         @keyframes marquee-vertical {
           0% { transform: translateY(0); }
           100% { transform: translateY(-50%); }
         }
-          100% { transform: translateY(-50%); }
-        }
 
-        /* Small responsive tweaks */
+        /* Ajustes responsive */
         @media (max-width: 640px) {
-          .marquee { gap: 0.75rem; }
+          .marquee-vertical { gap: 0.5rem; }
         }
       `}</style>
 
-      {/* Usage notes for developers (kept in file for convenience) */}
-      {/*
-        Para agregar más fotos: en el lugar donde importás este componente, pasale más objetos en el array `sponsors`.
-
-        Ejemplo:
-
-        <SidenavComplement
-          socialLinks={[
-            { type: 'facebook', href: 'https://facebook.com', label: 'Facebook' },
-            { type: 'twitter', href: 'https://twitter.com', label: 'Twitter' },
-            { type: 'instagram', href: 'https://instagram.com', label: 'Instagram' },
-            { type: 'email', href: 'mailto:info@radio.com', label: 'Email' },
-          ]}
-          sponsors={[
-            { image: '/sponsors/s1.png', alt: 'Sponsor 1', href: '#' },
-            { image: '/sponsors/s2.png', alt: 'Sponsor 2', href: '#' },
-            { image: '/sponsors/s3.png', alt: 'Sponsor 3', href: '#' },
-            { image: '/sponsors/s4.png', alt: 'Sponsor 4', href: '#' },
-            // agregá más objetos aquí y el carrusel los mostrará
-          ]}
-        />
-
-        Nota: colocá las imágenes en /public/sponsors/ o en URLs absolutas.
-      */}
+      {/* Developer notes: limitar a 16 sponsors y duplicación para scroll continuo */}
     </aside>
   );
 }
@@ -197,27 +176,9 @@ function renderSocialIcon(s: SocialLink) {
 }
 
 /*
-Usage:
-
-import SidenavComplement from './SidenavComplement';
-
-<SidenavComplement
-  socialLinks={[
-    { type: 'facebook', href: 'https://facebook.com/tuRadio', label: 'Facebook' },
-    { type: 'twitter', href: 'https://twitter.com/tuRadio', label: 'Twitter' },
-    { type: 'email', href: 'mailto:info@tuRadio.com', label: 'Email' },
-    { type: 'instagram', href: 'https://instagram.com/tuRadio', label: 'Instagram' },
-  ]}
-  sponsors={[
-    { image: '/sponsors/logo1.png', href: '#', alt: 'Sponsor 1' },
-    { image: '/sponsors/logo2.png', href: '#', alt: 'Sponsor 2' },
-    { image: '/sponsors/logo3.png', href: '#', alt: 'Sponsor 3' },
-  ]}
-/>
-
-Integration notes:
-- Poné este componente entre tu Sidenav y el contenido del artículo en la plantilla de la página de noticia.
-- Si querés usar el carrusel que ya tenés en el proyecto, reemplazá el bloque de "marquee" por tu componente y pasale `sponsors`.
-- Ajustá `animation-duration` en la regla `@keyframes marquee` para acelerar/ralentizar.
-- El carrusel pausa al pasar el ratón por accesibilidad.
+Usage notes:
+- El componente ahora limita a un máximo de 16 sponsors (slice(0,16)).
+- Para añadir más sponsors: agregá objetos al array `sponsors` en la llamada. Solo los primeros 16 se mostrarán.
+- Si querés cambiar la altura visible del carrusel, modificá la variable `visibleHeight` dentro del componente (ej. '180px', '300px').
+- Para ajustar la velocidad, modificá la formula que calcula `durationSeconds`.
 */
