@@ -337,7 +337,7 @@ export default async function Page({ params }: PageProps) {
           </aside>
 {/* ARTÍCULO: 1fr para ocupar todo el espacio restante */}
 <article className="min-w-0">
-      <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 prose prose-lg max-w-none text-gray-800">
+      <div className="bg-white w-full rounded-xl shadow-lg p-6 md:p-8 prose prose-lg max-w-none text-gray-800">
         <div className="post-content">{parse(post.content || "")}</div>
       </div>
     </article>
