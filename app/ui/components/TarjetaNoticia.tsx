@@ -1,9 +1,9 @@
-// app/ui/components/TarjetaNoticias.tsx
+
 import Link from 'next/link';
 import Image from 'next/image';
 import React from 'react';
 
-import { Noticia } from '@/app/lib/db';
+import { Noticia } from '@//app/lib/db';
 import '../../fonts.css';
 
 export default function TarjetaNoticia({ post }: { post: Noticia }) {
@@ -14,36 +14,17 @@ export default function TarjetaNoticia({ post }: { post: Noticia }) {
   const { title, slug, categories } = post;
   const urlNoticia = `/Categorias/Noticias/${slug}`;
 
-  const imageUrl =
-    post.featuredImage?.node?.sourceUrl || (post as any).sourceUrl;
-
-  // 🎨 GENERADOR DE COLORES POR CATEGORÍA
-  const getColorForCategory = (name: string) => {
-    const colors = [
-      "bg-indigo-600",
-      "bg-blue-600",
-      "bg-emerald-600",
-      "bg-rose-600",
-      "bg-purple-600",
-      "bg-orange-600",
-      "bg-yellow-600 text-black",
-      "bg-teal-600",
-      "bg-pink-600",
-      "bg-red-600",
-    ];
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-      hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const index = Math.abs(hash) % colors.length;
-    return colors[index];
-  };
+  // SOLUCIÓN DEFINITIVA: Se unifica la lógica para encontrar la imagen.
+  // Se busca primero en la estructura anidada (común en las noticias principales)
+  // y si no se encuentra, se busca en la propiedad `sourceUrl` (común en otras llamadas).
+  // El `(post as any)` es necesario para que TypeScript acepte la propiedad `sourceUrl` que no está en la definición estricta.
+  const imageUrl = post.featuredImage?.node?.sourceUrl || (post as any).sourceUrl;
+  const category = categories?.nodes?.[0];
 
   return (
     <article className="group flex flex-col h-full bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
       <Link href={urlNoticia} className="no-underline flex flex-col flex-grow">
 
-        {/* IMAGEN */}
         <div className="relative">
           <div className="w-full h-56 relative bg-gray-100">
             {imageUrl ? (
@@ -61,32 +42,23 @@ export default function TarjetaNoticia({ post }: { post: Noticia }) {
             )}
           </div>
 
-          {/* ⭐ TODAS LAS CATEGORÍAS (COLORES AUTOMÁTICOS) */}
-          {categories?.nodes && categories.nodes.length > 0 && (
-            <div className="absolute bottom-3 left-3 flex gap-2 flex-wrap">
-              {categories.nodes.map((cat: any) => (
-                <span
-                  key={cat.id || cat.slug}
-                  className={`text-white text-xs font-semibold px-3 py-1 rounded-md shadow-sm bg-opacity-90 ${getColorForCategory(cat.name)}`}
-                >
-                  {cat.name}
-                </span>
-              ))}
+          {category?.name && (
+            <div className="absolute bottom-3 left-3">
+              <span className="text-white text-xs font-semibold px-3 py-1 rounded-md shadow-sm bg-indigo-600 bg-opacity-90">
+                {category.name}
+              </span>
             </div>
           )}
         </div>
 
-        {/* CONTENIDO */}
         <div className="p-6 flex flex-col flex-grow">
           <h2 className="text-xl font-semibold text-gray-900 mb-3 leading-snug group-hover:text-blue-700 transition-colors flex-grow">
             {title}
           </h2>
-
-          {/* FOOTER */}
           <div className="mt-auto flex justify-between items-center text-xs text-gray-500 pt-3 border-t border-gray-100">
             <span>by RadioEmpresarial</span>
             <span className="font-semibold tracking-wider text-gray-600 group-hover:text-indigo-600 transition-colors duration-300">
-              LEER MÁS →
+              LEER MÁS &rarr;
             </span>
           </div>
         </div>
