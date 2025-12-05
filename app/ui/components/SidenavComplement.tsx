@@ -26,20 +26,28 @@ export default function SidenavComplement({
   socialLinks?: SocialLink[];
   className?: string;
 }) {
-  // duplicate sponsors to create a seamless marquee
-  const items = [...sponsors, ...sponsors];
+  // duplicate sponsors to create a seamless horizontal marquee
+  const items = sponsors.length ? [...sponsors, ...sponsors] : [];
+
+  // automatic animation duration based on number of logos (keeps speed reasonable)
+  const durationSeconds = Math.max(10, Math.round((sponsors.length || 4) * 3));
+  const marqueeStyle: React.CSSProperties = {
+    // expose a CSS variable that the stylesheet below uses
+    // TypeScript accepts this as a CSSProperties object
+    ["--marquee-duration" as any]: `${durationSeconds}s`,
+  };
 
   return (
     <aside className={`w-full max-w-[340px] ${className}`} aria-label="Complemento lateral">
       {/* Social "flecha de 4" */}
-      <div className="flex justify-center mb-6">
+      <div className="flex justify-center mb-4">
         <div className="grid grid-cols-2 gap-3 transform rotate-45">
           {socialLinks.slice(0, 4).map((s, i) => (
             <a
               key={i}
               href={s.href}
               aria-label={s.label || s.type}
-              className="w-12 h-12 flex items-center justify-center rounded-lg bg-white shadow-sm p-2 block rotate-[-45deg]"
+              className="w-10 h-10 flex items-center justify-center rounded-md bg-white shadow-sm p-2 block rotate-[-45deg]"
               target="_blank"
               rel="noreferrer"
             >
@@ -50,16 +58,20 @@ export default function SidenavComplement({
       </div>
 
       {/* Separator (decorative) */}
-      <div className="w-full flex justify-center mb-4">
+      <div className="w-full flex justify-center mb-3">
         <div className="w-3/4 border-t border-dashed border-gray-200" />
       </div>
 
       {/* Título pequeño */}
       <div className="text-center text-xs tracking-wider text-gray-600 mb-3">SPONSORS</div>
 
-      {/* Horizontal marquee carousel */}
+      {/* Horizontal marquee carousel (renders only if hay sponsors) */}
       <div className="relative overflow-hidden">
-        <div className="marquee will-change-transform">
+        <div
+          className="marquee will-change-transform"
+          style={marqueeStyle}
+          aria-hidden={items.length === 0}
+        >
           {items.map((s, idx) => (
             <a
               key={`${s.image}-${idx}`}
@@ -83,27 +95,58 @@ export default function SidenavComplement({
           display: flex;
           gap: 1rem;
           padding-bottom: 0.5rem;
-          animation: marquee 18s linear infinite;
           align-items: center;
+
+          /* use CSS variable for easy overrides */
+          --marquee-duration: 18s;
+          animation: marquee var(--marquee-duration) linear infinite;
         }
-        .marquee:hover {
+
+        /* pause when hovered or focused for accessibility */
+        .marquee:hover,
+        .marquee:focus-within {
           animation-play-state: paused;
         }
-        .marquee img { display: block; }
+
+        .marquee img {
+          display: block;
+        }
 
         @keyframes marquee {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
 
-        /* Make sure the container always hides overflow */
-        .marquee + * { }
-
         /* Small responsive tweaks */
         @media (max-width: 640px) {
           .marquee { gap: 0.75rem; }
         }
       `}</style>
+
+      {/* Usage notes for developers (kept in file for convenience) */}
+      {/*
+        Para agregar más fotos: en el lugar donde importás este componente, pasale más objetos en el array `sponsors`.
+
+        Ejemplo:
+
+        <SidenavComplement
+          socialLinks={[
+            { type: 'facebook', href: 'https://facebook.com', label: 'Facebook' },
+            { type: 'twitter', href: 'https://twitter.com', label: 'Twitter' },
+            { type: 'instagram', href: 'https://instagram.com', label: 'Instagram' },
+            { type: 'email', href: 'mailto:info@radio.com', label: 'Email' },
+          ]}
+          sponsors={[
+            { image: '/sponsors/s1.png', alt: 'Sponsor 1', href: '#' },
+            { image: '/sponsors/s2.png', alt: 'Sponsor 2', href: '#' },
+            { image: '/sponsors/s3.png', alt: 'Sponsor 3', href: '#' },
+            { image: '/sponsors/s4.png', alt: 'Sponsor 4', href: '#' },
+            // agregá más objetos aquí y el carrusel los mostrará
+          ]}
+        />
+
+        Nota: colocá las imágenes en /public/sponsors/ o en URLs absolutas.
+      */}
     </aside>
   );
 }
