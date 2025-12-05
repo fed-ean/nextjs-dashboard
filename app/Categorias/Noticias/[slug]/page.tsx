@@ -7,6 +7,7 @@ import React from "react";
 import parse from "html-react-parser";
 import SidenavServer from "@/app/ui/Page_Index/SidenavServer";
 import FooterCarousel from "@/app/ui/components/FooterCarousel";
+import SidenavComplement from "@/app/ui/components/SidenavComplement";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale/es";
 import "./styles.css";
@@ -88,7 +89,6 @@ type Post = {
 
 type PostData = { post: Post | null };
 
-/* Tipo para los últimos posts (query GET_LAST_POSTS) */
 type LastPostsData = {
   posts: {
     nodes: Array<{
@@ -122,8 +122,10 @@ async function getPost(slug: string): Promise<Post | null> {
 async function getLastPosts(): Promise<LastPostsData["posts"]["nodes"]> {
   const client = getServerSideClient();
   try {
-    const { data } = await client.query<LastPostsData>({ query: GET_LAST_POSTS });
-    // ahora `data` está tipado correctamente
+    const { data } = await client.query<LastPostsData>({
+      query: GET_LAST_POSTS,
+    });
+
     return data?.posts?.nodes ?? [];
   } catch (err) {
     console.error("Error fetching last posts:", err);
@@ -162,20 +164,21 @@ const estimateReadingTime = (htmlContent: string) => {
    METADATA
    ============================= */
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPost(slug);
   return { title: post?.title ?? "Post no encontrado" };
 }
 
 /* =============================
-   PAGE COMPONENT COMPLETO
+   PAGE COMPONENT
    ============================= */
 
 export default async function Page({ params }: PageProps) {
   const { slug } = await params;
 
-  // Fetch post y últimos posts (tipados)
   const post = await getPost(slug);
   const lastPosts = await getLastPosts();
 
@@ -189,9 +192,11 @@ export default async function Page({ params }: PageProps) {
 
   const featuredUrl = post.featuredImage?.node?.sourceUrl;
   const authorName = post.author?.node?.name ?? "RadioEmpresarial";
+
   const formattedDate = post.date
     ? format(parseISO(post.date), "d 'de' MMMM, yyyy", { locale: es })
     : "";
+
   const readingTime = estimateReadingTime(post.content || "");
 
   const categorias = post.categories?.nodes ?? [];
@@ -237,13 +242,13 @@ export default async function Page({ params }: PageProps) {
               ))}
             </div>
 
-            {/* TÍTULO */}
+            {/* TITULO */}
             <h1
               className="text-white text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight drop-shadow-lg"
               dangerouslySetInnerHTML={{ __html: post.title }}
             />
 
-            {/* AUTOR + FECHA */}
+            {/* AUTOR */}
             <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-gray-200">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-sm text-white font-semibold">
@@ -265,26 +270,31 @@ export default async function Page({ params }: PageProps) {
         </div>
       </header>
 
-      {/* MAIN LAYOUT */}
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      {/* MAIN */}
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* SIDENAV */}
-          <aside className="lg:col-span-4 lg:order-first">
+          <aside className="lg:col-span-3 lg:order-first">
             <div className="sticky top-24">
               <SidenavServer />
             </div>
           </aside>
 
+          {/* COMPONENTE NUEVO */}
+          <aside className="lg:col-span-3">
+            <SidenavComplement />
+          </aside>
+
           {/* ARTÍCULO */}
-          <article className="lg:col-span-8">
-            <div className="bg-white rounded-xl shadow-lg p-6 md:p-10 prose prose-lg max-w-none text-gray-800">
+          <article className="lg:col-span-6">
+            <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 prose prose-lg max-w-none text-gray-800">
               <div className="post-content">{parse(post.content || "")}</div>
             </div>
           </article>
         </div>
       </main>
 
-      {/* FOOTER CAROUSEL */}
+      {/* FOOTER (CARRUSEL DE NOTICIAS) */}
       <FooterCarousel posts={lastPosts} />
     </div>
   );
