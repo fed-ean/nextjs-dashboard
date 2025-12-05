@@ -271,7 +271,7 @@ export default async function Page({ params }: PageProps) {
       </header>
 
       {/* MAIN */}
-      <main className="container sm:px-6 lg:px-8 py-10">
+      <main className="container">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* SIDENAV */}
           <aside className="lg:col-span-3 lg:order-first">
