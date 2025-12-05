@@ -271,9 +271,10 @@ export default async function Page({ params }: PageProps) {
       </header>
 
       {/* MAIN */}
-      <main className="container w-full">
-      <div className="grid grid-cols-1 lg:grid-cols-[240px_340px_1fr]">
-    {/* SIDENAV (ancho fijo 240px en lg) */}
+      <main className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-[1600px]">
+  <div className="grid grid-cols-1 lg:grid-cols-[220px_300px_1fr] gap-8 w-full">
+    
+    {/* SIDENAV */}
     <aside className="lg:col-span-1">
       <div className="sticky top-24">
         <SidenavServer />
@@ -335,15 +336,15 @@ export default async function Page({ params }: PageProps) {
               ]}
             />
           </aside>
-{/* ARTÍCULO: 1fr para ocupar todo el espacio restante */}
-<article className="min-w-0">
-      <div className="bg-white w-full rounded-xl shadow-lg p-6 md:p-8 prose prose-lg max-w-none text-gray-800">
+{/* ARTÍCULO */}
+<article className="w-full min-w-0">
+      <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 prose prose-lg max-w-none text-gray-800">
         <div className="post-content">{parse(post.content || "")}</div>
       </div>
     </article>
 
-        </div>
-      </main>
+  </div>
+</main>
 
       {/* FOOTER (CARRUSEL DE NOTICIAS) */}
       <FooterCarousel posts={lastPosts} />
