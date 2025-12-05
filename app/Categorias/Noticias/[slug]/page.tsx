@@ -281,22 +281,23 @@ export default async function Page({ params }: PageProps) {
           </aside>
 
           {/* COMPONENTE NUEVO */}
-          <aside className="lg:col-span-3">
-  <SidenavComplement
-    socialLinks={{
-      facebook: "https://www.facebook.com",
-      twitter: "https://twitter.com",
-      instagram: "https://instagram.com",
-      email: "mailto:info@radioempresarial.com",
-    }}
-    sponsors={[
-      { src: "/sponsor/argennova.jpg", alt: "Sponsor 1" },
-      { src: "/sponsors/s2.png", alt: "Sponsor 2" },
-      { src: "/sponsors/s3.png", alt: "Sponsor 3" },
-      { src: "/sponsors/s4.png", alt: "Sponsor 4" },
-    ]}
-  />
-</aside>
+            <aside className="lg:col-span-3">
+              <SidenavComplement
+                socialLinks={[
+                { type: "facebook", href: "https://www.facebook.com", label: "Facebook" },
+                  { type: "twitter", href: "https://twitter.com", label: "Twitter" },
+                  { type: "instagram", href: "https://instagram.com", label: "Instagram" },
+                  { type: "email", href: "mailto:info@radioempresarial.com", label: "Email" },
+                ]}
+                sponsors={[
+                  { image: "/sponsors/s1.png", alt: "Sponsor 1", href: "#" },
+                  { image: "/sponsors/s2.png", alt: "Sponsor 2", href: "#" },
+                  { image: "/sponsors/s3.png", alt: "Sponsor 3", href: "#" },
+                  { image: "/sponsors/s4.png", alt: "Sponsor 4", href: "#" },
+                ]}
+              />
+            </aside>
+
 
 
           {/* ARTÍCULO */}
