@@ -282,7 +282,7 @@ export default async function Page({ params }: PageProps) {
     </aside>
 
           {/* COMPONENTE NUEVO */}
-          <aside className="hidden md:block lg:col-span-1">
+          <aside className="hidden md:block lg:col-span-1 my-1">
             <SidenavComplement
             className="hidden md:block"
               socialLinks={[
