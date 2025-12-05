@@ -19,65 +19,50 @@ export default function NavBar({ newsComponent }: { newsComponent?: ReactNode })
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
 
-  useEffect(() => {
-    closeMenu();
-  }, [pathname]);
+  useEffect(() => { closeMenu(); }, [pathname]);
 
   return (
     <>
-      <nav className="fixed top-14 lg:top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-md">
-        
-        {/* --- VISTA MÓVIL --- */}
-        <div className="lg:hidden grid grid-cols-3 items-center p-4">
+      <nav className="fixed top-14 lg:top-0 left-0 right-0 z-50 border-b border-transparent" >
+        {/* vista móvil */}
+        <div className="lg:hidden grid grid-cols-3 items-center p-3 bg-white">
           <div className="flex justify-start">
-            <button
-              className="text-black rounded-sm transition duration-300 ease-in-out hover:bg-gray-100 focus:outline-none"
-              onClick={toggleMenu}
-              aria-controls="offcanvas-menu"
-              aria-expanded={isMenuOpen}
-            >
-              <BsList className="w-9 h-9" />
+            <button onClick={toggleMenu} className="p-1 rounded">
+              <BsList className="w-8 h-8" />
             </button>
           </div>
           <div className="flex justify-center">
             <Link href="/">
-              <Image
-                src="/RadioAColor1.png"
-                alt="Logo Radio A Color"
-                width={180} 
-                height={50}
-                className="object-contain"
-                priority
-              />
+              <Image src="/RadioAColor1.png" alt="Logo" width={160} height={44} />
             </Link>
           </div>
           <div className="flex justify-end items-center">
             <Link href="/Login" className="flex items-center gap-2 text-black">
-              <HiOutlineMail className="h-8 w-8 text-black" />
+              <HiOutlineMail className="h-7 w-7 text-black" />
             </Link>
           </div>
         </div>
 
-        {/* --- VISTA ESCRITORIO --- */}
+        {/* vista escritorio: transparente, sin fondo gris */}
         <div className="hidden lg:block">
-          {/* --- Parte superior (Ahora blanca) --- */}
-          <div className="flex items-center justify-between md:px-6">
+          <div className="flex items-center justify-between md:px-6 py-2" style={{ background: 'transparent' }}>
               <div className='w-1/4'></div>
-              <div className="flex justify-center">
+
+              {/* reproductor (centro) */}
+              <div className="flex justify-center w-2/4">
                   <AlAireRadio />
               </div>
+
+              {/* derecha: solo icono (sin texto Suscribite) */}
               <div className="flex justify-end w-1/4">
                 <Link href="/Login" className="flex items-center gap-2 text-black transition-transform duration-300 ease-in-out hover:scale-105">
                   <HiOutlineMail className="h-8 w-8 text-black" />
-                  <span className="text-lg font-semibold bg-gradient-to-r from-orange-400 to-rose-500 text-transparent bg-clip-text">
-                    Suscribite
-                  </span>
                 </Link>
               </div>
           </div>
-          {/* --- Parte inferior (Se mantiene azul y ahora más delgada) --- */}
+
+          {/* parte inferior del navbar (puedes mantener tu barra azul) */}
           <div className="border-t border-blue-800 bg-blue-900">
-            {/* MODIFICADO: Padding vertical reducido de 'py-3' a 'py-1' para achicar la barra */}
             <div className="px-6 py-1">
               <div className="flex justify-center items-center gap-4">
                 <LinksNav />
@@ -90,22 +75,13 @@ export default function NavBar({ newsComponent }: { newsComponent?: ReactNode })
         </div>
       </nav>
 
-      {/* --- MENÚ LATERAL (Offcanvas) --- */}
-      <div
-        id="offcanvas-menu"
-        className={`fixed top-14 left-0 h-[calc(100vh-3.5rem)] lg:hidden w-[90%] sm:w-[70%] md:w-[50%] bg-blue-900 shadow-xl transform transition-transform duration-300 ease-in-out text-white ${
-          isMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        } z-[60] overflow-y-auto flex flex-col`}
-        role="dialog"
-        aria-modal="true"
-      >
+      {/* offcanvas mobile (igual que antes) */}
+      <div id="offcanvas-menu" className={`fixed top-14 left-0 h-[calc(100vh-3.5rem)] lg:hidden w-[90%] bg-blue-900 ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} z-[60] transition-transform duration-300`}>
         <div className="flex justify-end p-4">
-          <button onClick={closeMenu} className="text-gray-400 hover:text-white" aria-label="Cerrar menú">
-             <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
+          <button onClick={closeMenu} aria-label="Cerrar menú">✕</button>
         </div>
         <div className="p-4"><SearchForm placeholder="Buscar noticias..." /></div>
-        <div className="flex grow flex-col justify-between overflow-y-auto">
+        <div className="flex grow flex-col justify-between">
             <NavLinks onLinkClick={closeMenu} />
             <div className="flex-grow">{newsComponent}</div>
             <div className="flex justify-around mt-auto mb-6 px-2">

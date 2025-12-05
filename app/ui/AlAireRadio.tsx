@@ -22,7 +22,6 @@ export default function AlAireRadio(): React.ReactElement {
   const togglePlay = async () => {
     const audio = audioRef.current;
     if (!audio) return;
-
     try {
       if (isPlaying) {
         audio.pause();
@@ -49,63 +48,55 @@ export default function AlAireRadio(): React.ReactElement {
   };
 
   const toggleMute = () => setIsMuted((m) => !m);
-
-  const handleAudioError = () => {
-    setIsPlaying(false);
-    setIsLoading(false);
-    setRadioError(true);
-  };
+  const handleAudioError = () => { setIsPlaying(false); setIsLoading(false); setRadioError(true); };
 
   return (
     <>
-      {/* contenedor compacto (altura fijada) */}
-      <div className="w-full flex flex-col items-center">
+      {/* player-wrapper: hover sobre este contenedor muestra el marquee */}
+      <div className="player-wrapper" >
         <div
-          className="w-full max-w-screen-xl mx-auto flex items-center justify-between gap-4 px-4 py-2 h-20 rounded-lg"
-          style={{
-            background: 'rgba(13,13,22,0.6)',
-            border: '1px solid rgba(255,45,85,0.18)',
-            boxShadow: '0 4px 18px rgba(0,0,0,0.15)',
-          }}
+          className="player-inner"
+          role="region"
+          aria-label="Reproductor Radio Empresarial"
         >
-          {/* logo (ajustar tamaño para que entre en la franja) */}
-          <div className="flex items-center shrink-0">
-            <div className="hidden lg:block">
-              <Image src="/RadioAColor1.png" alt="Radio Empresarial" width={220} height={48} priority />
-            </div>
+          {/* LOGO izquierdo - ocupa lo máximo posible dentro de la franja */}
+          <div className="player-logo">
+            <Image
+              src="/RadioAColor1.png"
+              alt="Radio Empresarial"
+              width={420}      /* ancho "máximo" sugerido, será escalado por CSS */
+              height={80}
+              style={{ objectFit: 'contain' }}
+              priority
+            />
           </div>
 
-          {/* centro: badge + controls compactos */}
-          <div className="flex items-center gap-4 flex-1 justify-center">
-            {/* badge AL AIRE (compacto) */}
-            <div className="flex items-center px-3 py-1 rounded-md neon-badge">
-              <span className="text-white font-black text-sm tracking-wider">AL AIRE</span>
+          {/* CENTRO: badge + controles compactos */}
+          <div className="player-center">
+            {/* badge compact */}
+            <div className={`badge ${radioError ? 'badge-error' : ''}`} aria-hidden>
+              <span className="badge-text">{radioError ? 'NO DISPONIBLE' : 'AL AIRE'}</span>
             </div>
 
-            {/* controles compactos */}
-            <div className="flex items-center gap-3">
+            {/* controles */}
+            <div className="controls">
               <button
                 onClick={togglePlay}
                 disabled={isLoading}
                 aria-label={isPlaying ? 'Pausar radio' : 'Reproducir radio'}
-                className="w-11 h-11 rounded-full flex items-center justify-center play-compact"
-                style={{ boxShadow: '0 6px 16px rgba(255,45,85,0.28)' }}
+                className="btn-play"
               >
-                {isLoading ? (
-                  <span className="loader-small" />
-                ) : isPlaying ? (
-                  <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-                  </svg>
-                ) : (
-                  <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                )}
+                {isLoading ? <span className="loader-small" /> :
+                  isPlaying ? (
+                    <svg className="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" /></svg>
+                  ) : (
+                    <svg className="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                  )
+                }
               </button>
 
-              {/* icono mute (si quieres) */}
-              <button onClick={toggleMute} aria-label="Silenciar" className="hidden sm:flex items-center text-gray-200 hover:text-white">
+              {/* mute (oculto en XS) */}
+              <button onClick={toggleMute} className="btn-mute" aria-label="Silenciar">
                 {isMuted || volume === 0 ? (
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M11 5L6 9H2v6h4l5 4V5z" />
@@ -121,41 +112,40 @@ export default function AlAireRadio(): React.ReactElement {
               </button>
 
               {/* volumen (solo md+) */}
-              <div className="hidden md:flex items-center gap-2">
+              <div className="volume-box">
                 <input
                   type="range"
                   min={0}
                   max={100}
                   value={volume}
                   onChange={handleVolumeChange}
-                  className="w-36 appearance-none h-1 rounded-full bg-gray-600"
+                  className="volume-slider"
                   aria-label="Volumen"
                 />
-                <span className="text-xs text-gray-200 w-8 text-right">{isMuted ? 0 : volume}%</span>
+                <span className="vol-percent" aria-hidden>{isMuted ? 0 : volume}%</span>
               </div>
             </div>
           </div>
 
-          {/* espacio derecho reservado (puede usarse para iconos) */}
-          <div className="flex items-center gap-3 shrink-0">
-            {/* Suscribite icon (ejemplo) */}
-            <div className="hidden sm:flex items-center gap-2 text-sm text-[#ff9fb0]">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 8v13h18V8H3zm9 7.5L6 9h13l-7 6.5zM12 2l5 5h-3v4h-4V7H7l5-5z"/></svg>
-              <span className="hidden lg:inline">Suscribite</span>
-            </div>
+          {/* ESPACIO DERECHO (iconos pequeños) */}
+          <div className="player-right">
+            <a href="/Login" aria-label="Suscribite" className="icon-subscribe" title="Suscribite">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 8v13h18V8H3zm9 7.5L6 9h13l-7 6.5zM12 2l5 5h-3v4h-4V7H7l5-5z"/>
+              </svg>
+            </a>
           </div>
         </div>
 
-        {/* MARQUEE/SLIDER FINO (muy compacto) */}
-        <div className="w-full max-w-screen-xl mx-auto mt-2">
-          <div className="h-7 overflow-hidden rounded-md marquee-compact">
-            <p className="marquee-compact-text">
-              🎧 Escuchá la radio en vivo las 24Hs — Radio Empresarial — Música, información y más 🎶
-            </p>
+        {/* MARQUEE: oculto por defecto, aparece al hover sobre .player-wrapper */}
+        <div className="player-marquee" aria-hidden>
+          <div className="player-marquee-inner">
+            🎧 Escuchá la radio en vivo las 24Hs — Radio Empresarial — Música, información y más 🎶
           </div>
         </div>
       </div>
 
+      {/* audio element */}
       <audio
         ref={audioRef}
         src="https://ohradio.cc/8310/stream"
@@ -163,61 +153,112 @@ export default function AlAireRadio(): React.ReactElement {
         onError={handleAudioError}
       />
 
+      {/* estilos locales */}
       <style jsx>{`
-        /* play button */
-        .play-compact {
-          background: linear-gradient(135deg, #ff2d55 0%, #c41744 100%);
-          border: none;
-          color: white;
-        }
-        .loader-small {
-          width: 14px;
-          height: 14px;
-          border: 2px solid rgba(255,255,255,0.9);
-          border-top-color: transparent;
-          border-radius: 50%;
-          animation: spin 0.7s linear infinite;
+        /* --- wrapper / layout --- */
+        .player-wrapper { width: 100%; }
+        .player-inner {
+          display: flex;
+          align-items: center;
+          gap: 18px;
+          height: 64px;                 /* altura compacta y consistente */
+          padding: 6px 14px;
+          border-radius: 10px;
+          background: transparent;      /* transparente para apoyarse en el fondo blanco */
         }
 
-        /* neon badge compact */
-        .neon-badge {
-          border: 2px solid rgba(255,45,85,0.9);
+        /* Logo: ocupa lo máximo dentro de la franja, manteniendo proporción */
+        .player-logo { flex: 0 0 auto; display:flex; align-items:center; }
+        .player-logo img { height: 48px; width: auto; }
+
+        /* centro: badge + controles */
+        .player-center { display:flex; align-items:center; gap:12px; flex:1; justify-content:center; }
+
+        /* badge compact */
+        .badge {
+          border-radius: 8px;
+          padding: 6px 10px;
+          border: 2px solid rgba(255,45,85,0.95);
           background: linear-gradient(180deg, rgba(255,45,85,0.06), rgba(255,45,85,0.02));
-          box-shadow: 0 4px 18px rgba(255,45,85,0.18), inset 0 0 8px rgba(255,45,85,0.06);
-          padding-left: 10px;
-          padding-right: 10px;
+          box-shadow: 0 6px 18px rgba(255,45,85,0.12), inset 0 0 8px rgba(255,45,85,0.04);
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          min-width:88px;
+        }
+        .badge-error { border-color: rgba(120,120,120,0.7); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .badge-text {
+          color: #fff;
+          font-weight: 800;
+          font-size: 0.92rem;
+          letter-spacing: 0.06em;
+          text-shadow: 0 0 6px rgba(255,45,85,0.6);
+          animation: neonPulse 3s infinite ease-in-out;
         }
 
-        /* compact marquee */
-        .marquee-compact {
-          background: linear-gradient(90deg, rgba(255,45,85,0.04), rgba(255,45,85,0.03));
-          border: 1px solid rgba(255,45,85,0.08);
-          box-shadow: 0 4px 12px rgba(255,45,85,0.06);
+        /* controls compactos */
+        .controls { display:flex; align-items:center; gap:10px; }
+        .btn-play {
+          width:44px; height:44px; border-radius:50%;
+          display:flex; align-items:center; justify-content:center;
+          background: linear-gradient(135deg, #ff2d55 0%, #c41744 100%);
+          border:none; color:white; cursor:pointer;
+          box-shadow: 0 8px 20px rgba(255,45,85,0.22);
         }
-        .marquee-compact-text {
-          display: inline-block;
+        .btn-play:active { transform: scale(.98); }
+        .loader-small {
+          width:13px; height:13px; border:2px solid rgba(255,255,255,0.95);
+          border-top-color: transparent; border-radius:50%; animation: spin 0.7s linear infinite;
+        }
+        .btn-mute { background: transparent; border: none; color: #e6e6e6; display:flex; align-items:center; }
+
+        /* volumen (solo md+) */
+        .volume-box { display:none; align-items:center; gap:8px; }
+        .volume-slider { width:160px; height:3px; background: rgba(255,255,255,0.12); border-radius:999px; -webkit-appearance:none; }
+        .volume-slider::-webkit-slider-thumb { -webkit-appearance:none; width:12px; height:12px; background: linear-gradient(180deg,#ff2d55,#c41744); border-radius:50%; box-shadow:0 4px 10px rgba(196,25,68,0.45); cursor:pointer; }
+        .vol-percent { color: #cfcfcf; font-size: 0.75rem; min-width:36px; text-align:right; }
+
+        /* right area */
+        .player-right { flex:0 0 auto; display:flex; align-items:center; gap:8px; }
+
+        /* MARQUEE (oculto por defecto) */
+        .player-marquee {
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height 260ms ease, opacity 220ms ease, transform 260ms ease;
+          opacity: 0;
+        }
+        .player-marquee-inner {
           white-space: nowrap;
-          padding-left: 100%;
-          color: #ff8fab;
-          font-weight: 600;
-          font-size: 0.95rem;
+          padding: 6px 12px;
+          display:inline-block;
+          color: #ff9fb0;
+          font-weight:600;
           text-shadow: 0 0 6px rgba(255,45,85,0.35);
-          animation: marquee 14s linear infinite;
-          padding: 6px 0;
+          animation: scrollText 14s linear infinite;
         }
 
-        @keyframes marquee {
-          from { transform: translateX(0%); }
+        /* -- show marquee on hover of wrapper -- */
+        .player-wrapper:hover .player-marquee {
+          max-height: 32px;
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        /* responsive: mostrar volumen en md+ */
+        @media (min-width: 768px) {
+          .volume-box { display:flex; }
+        }
+
+        @keyframes neonPulse {
+          0% { text-shadow: 0 0 4px rgba(255,45,85,0.45); }
+          50% { text-shadow: 0 0 10px rgba(255,45,85,0.78); transform: translateY(-1px); }
+          100% { text-shadow: 0 0 6px rgba(255,45,85,0.55); }
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes scrollText {
+          from { transform: translateX(100%); }
           to { transform: translateX(-100%); }
-        }
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-
-        /* small responsiveness fixes */
-        @media (max-width: 640px) {
-          .neon-badge { padding-left: 8px; padding-right: 8px; }
-          .marquee-compact-text { font-size: 0.86rem; }
         }
       `}</style>
     </>
