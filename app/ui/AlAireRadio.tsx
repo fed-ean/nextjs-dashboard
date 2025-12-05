@@ -1,27 +1,27 @@
 'use client';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
 export default function AlAireRadio(): React.ReactElement {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState<number>(70);
-  const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [radioError, setRadioError] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [radioError, setRadioError] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Volumen FIJO: 0.7 (70%)
   useEffect(() => {
     const audio = audioRef.current;
-    if (audio instanceof HTMLAudioElement) {
-      audio.muted = isMuted;
-      audio.volume = isMuted ? 0 : Math.min(Math.max(volume / 100, 0), 1);
+    if (audio) {
+      audio.volume = 0.7;
+      audio.muted = false;
     }
-  }, [volume, isMuted]);
+  }, []);
 
   const togglePlay = async () => {
     const audio = audioRef.current;
     if (!audio) return;
+
     try {
       if (isPlaying) {
         audio.pause();
@@ -33,119 +33,77 @@ export default function AlAireRadio(): React.ReactElement {
         setIsLoading(false);
         setRadioError(false);
       }
-    } catch (error) {
-      console.error('Error al reproducir:', error);
+    } catch (err) {
+      console.error('Error al reproducir:', err);
       setIsLoading(false);
       setRadioError(true);
       setIsPlaying(false);
     }
   };
 
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseInt(e.target.value, 10) || 0;
-    setVolume(newVolume);
-    if (isMuted && newVolume > 0) setIsMuted(false);
+  const handleAudioError = () => {
+    setIsPlaying(false);
+    setIsLoading(false);
+    setRadioError(true);
   };
-
-  const toggleMute = () => setIsMuted((m) => !m);
-  const handleAudioError = () => { setIsPlaying(false); setIsLoading(false); setRadioError(true); };
 
   return (
     <>
-      {/* player-wrapper: hover sobre este contenedor muestra el marquee */}
-      <div className="player-wrapper" >
-        <div
-          className="player-inner"
-          role="region"
-          aria-label="Reproductor Radio Empresarial"
-        >
-          {/* LOGO izquierdo - ocupa lo máximo posible dentro de la franja */}
-          <div className="player-logo">
-            <Image
-              src="/RadioAColor1.png"
-              alt="Radio Empresarial"
-              width={420}      /* ancho "máximo" sugerido, será escalado por CSS */
-              height={80}
-              style={{ objectFit: 'contain' }}
-              priority
-            />
+      <div className="player-wrapper" role="region" aria-label="Reproductor Radio Empresarial">
+        <div className="player-row">
+          {/* LOGO - ocupa el máximo alto disponible sin romper */}
+          <div className="logo-wrap" aria-hidden>
+            <Image src="/RadioAColor1.png" alt="Radio Empresarial" width={420} height={64} style={{ objectFit: 'contain' }} priority />
           </div>
 
-          {/* CENTRO: badge + controles compactos */}
-          <div className="player-center">
-            {/* badge compact */}
-            <div className={`badge ${radioError ? 'badge-error' : ''}`} aria-hidden>
+          {/* CENTRO: badge + separación + play + ecualizador */}
+          <div className="center-wrap">
+            {/* AL AIRE - neón fuerte */}
+            <div className={`badge ${radioError ? 'badge-off' : ''}`} aria-hidden>
               <span className="badge-text">{radioError ? 'NO DISPONIBLE' : 'AL AIRE'}</span>
             </div>
 
-            {/* controles */}
-            <div className="controls">
+            {/* separación visual */}
+            <div className="spacer" />
+
+            {/* Play + Equalizer */}
+            <div className="controls-wrap">
               <button
                 onClick={togglePlay}
-                disabled={isLoading}
+                className={`play-btn ${isPlaying ? 'playing' : ''}`}
                 aria-label={isPlaying ? 'Pausar radio' : 'Reproducir radio'}
-                className="btn-play"
+                disabled={isLoading}
               >
-                {isLoading ? <span className="loader-small" /> :
-                  isPlaying ? (
-                    <svg className="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" /></svg>
-                  ) : (
-                    <svg className="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-                  )
-                }
-              </button>
-
-              {/* mute (oculto en XS) */}
-              <button onClick={toggleMute} className="btn-mute" aria-label="Silenciar">
-                {isMuted || volume === 0 ? (
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M11 5L6 9H2v6h4l5 4V5z" />
-                    <line x1="23" y1="9" x2="17" y2="15" />
-                    <line x1="17" y1="9" x2="23" y2="15" />
-                  </svg>
-                ) : (
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M11 5L6 9H2v6h4l5 4V5z" />
-                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                {isLoading ? <span className="spinner" /> : (
+                  <svg className="play-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    {isPlaying ? <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" /> : <path d="M8 5v14l11-7z" />}
                   </svg>
                 )}
               </button>
 
-              {/* volumen (solo md+) */}
-              <div className="volume-box">
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  value={volume}
-                  onChange={handleVolumeChange}
-                  className="volume-slider"
-                  aria-label="Volumen"
-                />
-                <span className="vol-percent" aria-hidden>{isMuted ? 0 : volume}%</span>
+              {/* small equalizer (animated) */}
+              <div className="eq-wrap" aria-hidden>
+                <span className="bar b1" />
+                <span className="bar b2" />
+                <span className="bar b3" />
+                <span className="bar b4" />
+                <span className="bar b5" />
               </div>
             </div>
           </div>
 
-          {/* ESPACIO DERECHO (iconos pequeños) */}
-          <div className="player-right">
-            <a href="/Login" aria-label="Suscribite" className="icon-subscribe" title="Suscribite">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3 8v13h18V8H3zm9 7.5L6 9h13l-7 6.5zM12 2l5 5h-3v4h-4V7H7l5-5z"/>
-              </svg>
-            </a>
-          </div>
+          {/* RIGHT: vacío (sin íconos) */}
+          <div className="right-empty" />
         </div>
 
-        {/* MARQUEE: oculto por defecto, aparece al hover sobre .player-wrapper */}
-        <div className="player-marquee" aria-hidden>
-          <div className="player-marquee-inner">
+        {/* MARQUEE siempre visible debajo */}
+        <div className="marquee">
+          <div className="marquee-inner">
             🎧 Escuchá la radio en vivo las 24Hs — Radio Empresarial — Música, información y más 🎶
           </div>
         </div>
       </div>
 
-      {/* audio element */}
       <audio
         ref={audioRef}
         src="https://ohradio.cc/8310/stream"
@@ -153,112 +111,187 @@ export default function AlAireRadio(): React.ReactElement {
         onError={handleAudioError}
       />
 
-      {/* estilos locales */}
       <style jsx>{`
-        /* --- wrapper / layout --- */
-        .player-wrapper { width: 100%; }
-        .player-inner {
+        /* CONTAINER */
+        .player-wrapper {
+          width: 100%;
           display: flex;
+          flex-direction: column;
           align-items: center;
-          gap: 18px;
-          height: 64px;                 /* altura compacta y consistente */
-          padding: 6px 14px;
-          border-radius: 10px;
-          background: transparent;      /* transparente para apoyarse en el fondo blanco */
         }
 
-        /* Logo: ocupa lo máximo dentro de la franja, manteniendo proporción */
-        .player-logo { flex: 0 0 auto; display:flex; align-items:center; }
-        .player-logo img { height: 48px; width: auto; }
+        .player-row {
+          width: 100%;
+          max-width: 1200px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 6px 12px;
+          height: 72px; /* compacto */
+        }
 
-        /* centro: badge + controles */
-        .player-center { display:flex; align-items:center; gap:12px; flex:1; justify-content:center; }
+        /* Logo: lo más grande posible sin salir de la franja */
+        .logo-wrap { flex: 0 0 auto; display:flex; align-items:center; }
+        .logo-wrap img { height: 56px; width: auto; }
 
-        /* badge compact */
-        .badge {
-          border-radius: 8px;
-          padding: 6px 10px;
-          border: 2px solid rgba(255,45,85,0.95);
-          background: linear-gradient(180deg, rgba(255,45,85,0.06), rgba(255,45,85,0.02));
-          box-shadow: 0 6px 18px rgba(255,45,85,0.12), inset 0 0 8px rgba(255,45,85,0.04);
+        /* CENTRO */
+        .center-wrap {
           display:flex;
           align-items:center;
           justify-content:center;
-          min-width:88px;
+          gap: 16px;
+          flex: 1 1 auto;
         }
-        .badge-error { border-color: rgba(120,120,120,0.7); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
+        /* BADGE NEON */
+        .badge {
+          min-width: 110px;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          padding: 6px 12px;
+          border-radius: 10px;
+          background: linear-gradient(180deg, rgba(255,45,85,0.06), rgba(255,45,85,0.02));
+          border: 2px solid rgba(255,45,85,0.95);
+          box-shadow: 0 6px 22px rgba(255,45,85,0.12), 0 0 18px rgba(255,45,85,0.12);
+        }
+        .badge-off {
+          border-color: rgba(120,120,120,0.4);
+          box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+          background: rgba(255,255,255,0.02);
+        }
         .badge-text {
           color: #fff;
-          font-weight: 800;
-          font-size: 0.92rem;
+          font-weight: 900;
           letter-spacing: 0.06em;
-          text-shadow: 0 0 6px rgba(255,45,85,0.6);
-          animation: neonPulse 3s infinite ease-in-out;
+          font-size: 0.95rem;
+          text-shadow:
+            0 0 8px rgba(255,45,85,0.9),
+            0 0 20px rgba(255,45,85,0.7),
+            0 0 30px rgba(255,36,85,0.5);
+          animation: neon-flicker 2.6s infinite;
         }
 
-        /* controls compactos */
-        .controls { display:flex; align-items:center; gap:10px; }
-        .btn-play {
-          width:44px; height:44px; border-radius:50%;
-          display:flex; align-items:center; justify-content:center;
-          background: linear-gradient(135deg, #ff2d55 0%, #c41744 100%);
-          border:none; color:white; cursor:pointer;
-          box-shadow: 0 8px 20px rgba(255,45,85,0.22);
-        }
-        .btn-play:active { transform: scale(.98); }
-        .loader-small {
-          width:13px; height:13px; border:2px solid rgba(255,255,255,0.95);
-          border-top-color: transparent; border-radius:50%; animation: spin 0.7s linear infinite;
-        }
-        .btn-mute { background: transparent; border: none; color: #e6e6e6; display:flex; align-items:center; }
+        /* Spacer to separate badge and controls */
+        .spacer { width: 18px; }
 
-        /* volumen (solo md+) */
-        .volume-box { display:none; align-items:center; gap:8px; }
-        .volume-slider { width:160px; height:3px; background: rgba(255,255,255,0.12); border-radius:999px; -webkit-appearance:none; }
-        .volume-slider::-webkit-slider-thumb { -webkit-appearance:none; width:12px; height:12px; background: linear-gradient(180deg,#ff2d55,#c41744); border-radius:50%; box-shadow:0 4px 10px rgba(196,25,68,0.45); cursor:pointer; }
-        .vol-percent { color: #cfcfcf; font-size: 0.75rem; min-width:36px; text-align:right; }
+        /* CONTROLS compactos */
+        .controls-wrap { display:flex; align-items:center; gap:12px; }
 
-        /* right area */
-        .player-right { flex:0 0 auto; display:flex; align-items:center; gap:8px; }
-
-        /* MARQUEE (oculto por defecto) */
-        .player-marquee {
-          max-height: 0;
-          overflow: hidden;
-          transition: max-height 260ms ease, opacity 220ms ease, transform 260ms ease;
-          opacity: 0;
+        /* PLAY BUTTON - neon blinking */
+        .play-btn {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          border: 0;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          cursor:pointer;
+          background: radial-gradient(circle at 30% 30%, #ff496f, #c51745 70%);
+          box-shadow:
+            0 6px 18px rgba(197,23,68,0.28),
+            0 0 12px rgba(255,45,85,0.35);
+          transition: transform .14s ease, box-shadow .14s ease;
         }
-        .player-marquee-inner {
-          white-space: nowrap;
-          padding: 6px 12px;
+        .play-btn:hover { transform: scale(1.06); }
+
+        /* blinking neon while idle */
+        .play-btn.playing {
+          box-shadow:
+            0 8px 22px rgba(197,23,68,0.36),
+            0 0 26px rgba(255,45,85,0.55),
+            0 0 40px rgba(255,45,85,0.30);
+          animation: playPulse 1.6s infinite;
+        }
+        .play-icon { width:20px; height:20px; color:white; }
+
+        .spinner {
+          width:14px; height:14px; border:2px solid rgba(255,255,255,0.95); border-top-color: transparent; border-radius:50%;
+          animation: spin 0.7s linear infinite;
+        }
+
+        /* small equalizer */
+        .eq-wrap, .eq-wrap .bar { display:inline-block; vertical-align:middle; }
+        .eq-wrap {
+          display:flex;
+          gap:4px;
+          align-items:flex-end;
+          height:28px;
+          padding-bottom:2px;
+          width:48px;
+        }
+        .bar {
+          display:block;
+          width:5px;
+          background: linear-gradient(180deg,#ff6b8a,#ff2d55);
+          border-radius: 3px;
+          transform-origin: bottom center;
+          animation: eqAnim 1000ms linear infinite;
+          opacity: 0.95;
+        }
+        .b1 { animation-duration: 900ms; animation-delay: 0ms; }
+        .b2 { animation-duration: 1100ms; animation-delay: 120ms; }
+        .b3 { animation-duration: 800ms; animation-delay: 60ms; }
+        .b4 { animation-duration: 1000ms; animation-delay: 40ms; }
+        .b5 { animation-duration: 1150ms; animation-delay: 160ms; }
+
+        /* right area (empty) */
+        .right-empty { flex:0 0 28px; }
+
+        /* MARQUEE siempre visible */
+        .marquee {
+          width: 100%;
+          max-width: 1200px;
+          margin-top: 8px;
+          overflow:hidden;
+          border-radius: 8px;
+          background: linear-gradient(90deg, rgba(255,45,85,0.03), rgba(255,45,85,0.02));
+          border: 1px solid rgba(255,45,85,0.06);
+        }
+        .marquee-inner {
           display:inline-block;
-          color: #ff9fb0;
+          white-space:nowrap;
+          padding:6px 12px;
+          color:#ff9fb0;
           font-weight:600;
-          text-shadow: 0 0 6px rgba(255,45,85,0.35);
-          animation: scrollText 14s linear infinite;
+          text-shadow: 0 0 8px rgba(255,45,85,0.25);
+          animation: scrollText 16s linear infinite;
         }
 
-        /* -- show marquee on hover of wrapper -- */
-        .player-wrapper:hover .player-marquee {
-          max-height: 32px;
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        /* responsive: mostrar volumen en md+ */
-        @media (min-width: 768px) {
-          .volume-box { display:flex; }
-        }
-
-        @keyframes neonPulse {
-          0% { text-shadow: 0 0 4px rgba(255,45,85,0.45); }
-          50% { text-shadow: 0 0 10px rgba(255,45,85,0.78); transform: translateY(-1px); }
-          100% { text-shadow: 0 0 6px rgba(255,45,85,0.55); }
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        /* keyframes */
         @keyframes scrollText {
           from { transform: translateX(100%); }
-          to { transform: translateX(-100%); }
+          to   { transform: translateX(-100%); }
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes eqAnim {
+          0% { transform: scaleY(0.2); opacity: 0.6; }
+          25% { transform: scaleY(0.9); opacity: 1; }
+          50% { transform: scaleY(0.45); opacity: 0.85; }
+          75% { transform: scaleY(0.85); opacity: 1; }
+          100% { transform: scaleY(0.25); opacity: 0.7; }
+        }
+        @keyframes neon-flicker {
+          0%, 60%, 100% { opacity: 1; filter: drop-shadow(0 0 8px rgba(255,45,85,0.9)); }
+          62% { opacity: 0.5; filter: drop-shadow(0 0 4px rgba(255,45,85,0.5)); }
+          64% { opacity: 1; filter: drop-shadow(0 0 10px rgba(255,45,85,1)); }
+        }
+        @keyframes playPulse {
+          0% { transform: scale(1); box-shadow: 0 8px 22px rgba(197,23,68,0.36), 0 0 20px rgba(255,45,85,0.35); }
+          50% { transform: scale(1.05); box-shadow: 0 10px 30px rgba(197,23,68,0.5), 0 0 36px rgba(255,45,85,0.55); }
+          100% { transform: scale(1); box-shadow: 0 8px 22px rgba(197,23,68,0.36), 0 0 20px rgba(255,45,85,0.35); }
+        }
+
+        /* responsive adjustments */
+        @media (max-width: 1024px) {
+          .logo-wrap img { height: 48px; }
+          .player-row { height: 64px; padding:6px 10px; }
+          .badge { min-width: 92px; }
+        }
+        @media (max-width: 640px) {
+          .logo-wrap { display:none; } /* logo hidden on very small screens to save space */
+          .marquee-inner { font-size: 0.95rem; }
         }
       `}</style>
     </>
