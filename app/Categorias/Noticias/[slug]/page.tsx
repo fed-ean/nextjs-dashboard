@@ -7,7 +7,7 @@ import React from "react";
 import parse from "html-react-parser";
 import SidenavServer from "@/app/ui/Page_Index/SidenavServer";
 import FooterCarousel from "@/app/ui/components/FooterCarousel";
-import SidenavComplement, { type Sponsor, type SocialLink } from "@/app/ui/components/SidenavComplement";
+import SidenavComplement from "@/app/ui/components/SidenavComplement";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale/es";
 import "./styles.css";
@@ -182,59 +182,6 @@ export default async function Page({ params }: PageProps) {
   const post = await getPost(slug);
   const lastPosts = await getLastPosts();
 
-  // --- DATOS PARA SIDENAVCOMPLEMENT (CORREGIDOS) ---
-  const sponsors: Sponsor[] = [
-      { image: "/sponsor/argennova.jpg", href: "#", alt: "Argennova" },
-      { image: "/sponsor/argennova2.jpg", href: "#", alt: "Argennova 2" },
-      { image: "/sponsor/argennovaoficial.jpg", href: "#", alt: "Argennova Oficial" },
-      { image: "/sponsor/berisys.jpg", href: "#", alt: "Berisys" },
-      { image: "/sponsor/berisys2.jpg", href: "#", alt: "Berisys 2" },
-      { image: "/sponsor/bethedrive.jpg", href: "#", alt: "Be The Drive" },
-      { image: "/sponsor/bethedrive2.jpg", href: "#", alt: "Be The Drive 2" },
-      { image: "/sponsor/bisenergia.jpg", href: "#", alt: "Bisenergia" },
-      { image: "/sponsor/bolsasecologicas.jpg", href: "#", alt: "Bolsas Ecologicas" },
-      { image: "/sponsor/bolsasecologicas2.jpg", href: "#", alt: "Bolsas Ecologicas 2" },
-      { image: "/sponsor/dag.jpg", href: "#", alt: "Dag" },
-      { image: "/sponsor/ecoenergia.jpg", href: "#", alt: "Ecoenergia" },
-      { image: "/sponsor/ecotec.jpg", href: "#", alt: "Ecotec" },
-      { image: "/sponsor/fagus.jpg", href: "#", alt: "Fagus" },
-      { image: "/sponsor/gestionparque.jpg", href: "#", alt: "Gestion Parque" },
-      { image: "/sponsor/jlf.jpg", href: "#", alt: "JLF" },
-      { image: "/sponsor/jlf2.jpg", href: "#", alt: "JLF 2" },
-      { image: "/sponsor/mccordones.jpg", href: "#", alt: "MC Cordones" },
-      { image: "/sponsor/metsur.jpg", href: "#", alt: "Metsur" },
-      { image: "/sponsor/nittihermanos.jpg", href: "#", alt: "Nitti Hermanos" },
-      { image: "/sponsor/palletpro.jpg", href: "#", alt: "Pallet Pro" },
-      { image: "/sponsor/palletpro2.jpg", href: "#", alt: "Pallet Pro 2" },
-      { image: "/sponsor/rds.jpg", href: "#", alt: "RDS" },
-      { image: "/sponsor/rds2.jpg", href: "#", alt: "RDS 2" },
-      { image: "/sponsor/rfsoluciones.jpg", href: "#", alt: "RF Soluciones" },
-      { image: "/sponsor/rfsoluciones2.jpg", href: "#", alt: "RF Soluciones 2" },
-      { image: "/sponsor/santacruz.jpg", href: "#", alt: "Santa Cruz" },
-      { image: "/sponsor/santacruz2.jpg", href: "#", alt: "Santa Cruz 2" },
-      { image: "/sponsor/selsa.jpg", href: "#", alt: "Selsa" },
-      { image: "/sponsor/selsa2.jpg", href: "#", alt: "Selsa 2" },
-      { image: "/sponsor/selsaoficial.jpg", href: "#", alt: "Selsa Oficial" },
-      { image: "/sponsor/sergiogerullo.jpg", href: "#", alt: "Sergio Gerullo" },
-      { image: "/sponsor/shekk.jpg", href: "#", alt: "Shekk" },
-      { image: "/sponsor/smartway.jpg", href: "#", alt: "Smartway" },
-      { image: "/sponsor/solari.jpg", href: "#", alt: "Solari" },
-      { image: "/sponsor/solari2.jpg", href: "#", alt: "Solari 2" },
-      { image: "/sponsor/startingpoint.jpg", href: "#", alt: "Starting Point" },
-      { image: "/sponsor/todoslossponsor.jpg", href: "#", alt: "Todos los Sponsor" },
-      { image: "/sponsor/torcel.jpg", href: "#", alt: "Torcel" },
-      { image: "/sponsor/trabajamos.jpg", href: "#", alt: "Trabajamos" },
-      { image: "/sponsor/work.jpg", href: "#", alt: "Work" }
-  ];
-
-  const socialLinks: SocialLink[] = [
-    { type: "facebook", href: "https://www.facebook.com/RadioAColor/", label: "Facebook" },
-    { type: "twitter", href: "https://x.com/radioacolorok", label: "Twitter" },
-    { type: "instagram", href: "https://www.instagram.com/radioacolor/", label: "Instagram" },
-    { type: "email", href: "mailto:info@radioempresarial.com", label: "Email" },
-  ];
-  // ------------------------------------
-
   if (!post) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center text-xl">
@@ -323,31 +270,77 @@ export default async function Page({ params }: PageProps) {
         </div>
       </header>
 
-      {/* MAIN CONTENT */}
+      {/* MAIN */}
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
-          {/* Columna Izquierda: Sidenav Principal */}
-          <aside className="lg:col-span-3">
-            <div className="sticky top-24 space-y-8">
+          {/* SIDENAV */}
+          <aside className="lg:col-span-3 lg:order-first">
+            <div className="sticky top-24">
               <SidenavServer />
             </div>
           </aside>
 
-          {/* Columna Central: Contenido del Artículo */}
+          {/* COMPONENTE NUEVO */}
+          <aside className="lg:col-span-3">
+            <SidenavComplement
+              socialLinks={[
+                { type: "facebook", href: "https://www.facebook.com", label: "Facebook" },
+                { type: "twitter", href: "https://twitter.com", label: "Twitter" },
+                { type: "instagram", href: "https://instagram.com", label: "Instagram" },
+                { type: "email", href: "mailto:info@radioempresarial.com", label: "Email" },
+              ]}
+              sponsors={[
+                { image: "/sponsor/argennova.jpg", alt: "Argennova", href: "#" },
+                { image: "/sponsor/argennova2.jpg", alt: "Argennova2", href: "#" },
+                { image: "/sponsor/argennovaoficial.jpg", alt: "Argennovaoficial", href: "#" },
+                { image: "/sponsor/berisys.jpg", alt: "Berisys", href: "#" },
+                { image: "/sponsor/berisys2.jpg", alt: "Berisys2", href: "#" },
+                { image: "/sponsor/bethedrive.jpg", alt: "Bethedrive", href: "#" },
+                { image: "/sponsor/bethedrive2.jpg", alt: "Bethedrive2", href: "#" },
+                { image: "/sponsor/bisenergia.jpg", alt: "Bisenergia", href: "#" },
+                { image: "/sponsor/bolsasecologicas.jpg", alt: "Bolsasecologicas", href: "#" },
+                { image: "/sponsor/bolsasecologicas2.jpg", alt: "Bolsasecologicas2", href: "#" },
+                { image: "/sponsor/dag.jpg", alt: "Dag", href: "#" },
+                { image: "/sponsor/ecoenergia.jpg", alt: "Ecoenergia", href: "#" },
+                { image: "/sponsor/ecotec.jpg", alt: "Ecotec", href: "#" },
+                { image: "/sponsor/fagus.jpg", alt: "Fagus", href: "#" },
+                { image: "/sponsor/gestionparque.jpg", alt: "Gestionparque", href: "#" },
+                { image: "/sponsor/jlf.jpg", alt: "Jlf", href: "#" },
+                { image: "/sponsor/jlf2.jpg", alt: "Jlf2", href: "#" },
+                { image: "/sponsor/mccordones.jpg", alt: "Mccordones", href: "#" },
+                { image: "/sponsor/metsur.jpg", alt: "Metsur", href: "#" },
+                { image: "/sponsor/nittihermanos.jpg", alt: "Nittihermanos", href: "#" },
+                { image: "/sponsor/palletpro.jpg", alt: "Palletpro", href: "#" },
+                { image: "/sponsor/palletpro2.jpg", alt: "Palletpro2", href: "#" },
+                { image: "/sponsor/rds.jpg", alt: "Rds", href: "#" },
+                { image: "/sponsor/rds2.jpg", alt: "Rds2", href: "#" },
+                { image: "/sponsor/rfsoluciones.jpg", alt: "Rfsoluciones", href: "#" },
+                { image: "/sponsor/rfsoluciones2.jpg", alt: "Rfsoluciones2", href: "#" },
+                { image: "/sponsor/santacruz.jpg", alt: "Santacruz", href: "#" },
+                { image: "/sponsor/santacruz2.jpg", alt: "Santacruz2", href: "#" },
+                { image: "/sponsor/selsa.jpg", alt: "Selsa", href: "#" },
+                { image: "/sponsor/selsa2.jpg", alt: "Selsa2", href: "#" },
+                { image: "/sponsor/selsaoficial.jpg", alt: "Selsaoficial", href: "#" },
+                { image: "/sponsor/sergiogerullo.jpg", alt: "Sergiogerullo", href: "#" },
+                { image: "/sponsor/shekk.jpg", alt: "Shekk", href: "#" },
+                { image: "/sponsor/smartway.jpg", alt: "Smartway", href: "#" },
+                { image: "/sponsor/solari.jpg", alt: "Solari", href: "#" },
+                { image: "/sponsor/solari2.jpg", alt: "Solari2", href: "#" },
+                { image: "/sponsor/startingpoint.jpg", alt: "Startingpoint", href: "#" },
+                { image: "/sponsor/todoslossponsor.jpg", alt: "Todoslossponsor", href: "#" },
+                { image: "/sponsor/torcel.jpg", alt: "Torcel", href: "#" },
+                { image: "/sponsor/trabajamos.jpg", alt: "Trabajamos", href: "#" },
+                { image: "/sponsor/work.jpg", alt: "Work", href: "#" },
+              ]}
+            />
+          </aside>
+
+          {/* ARTÍCULO */}
           <article className="lg:col-span-6">
             <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 prose prose-lg max-w-none text-gray-800">
               <div className="post-content">{parse(post.content || "")}</div>
             </div>
           </article>
-
-          {/* Columna Derecha: Sidenav Complementario (Sponsors y Redes) */}
-          <aside className="lg:col-span-3">
-            <div className="sticky top-24 space-y-8">
-              <SidenavComplement sponsors={sponsors} socialLinks={socialLinks} />
-            </div>
-          </aside>
-          
         </div>
       </main>
 
