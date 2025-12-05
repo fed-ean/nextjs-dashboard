@@ -79,14 +79,18 @@ export default function SidenavComplement({
             <div className="marquee-vertical will-change-transform" aria-hidden>
               {items.map((s, idx) => (
                 <a
-                  key={`${s.image}-${idx}`}
-                  href={s.href || "#"}
-                  className="flex-shrink-0 w-full h-40 flex items-center justify-center bg-white shadow-md py-2"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <img src={s.image} alt={s.alt || "sponsor"} className="object-contain h-full" />
-                </a>
+                key={`${s.image}-${idx}`}
+                href={s.href || "#"}
+                className="flex-shrink-0 w-50 h-50 rounded-full overflow-hidden flex items-center justify-center bg-white shadow-lg"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <img
+                  src={s.image}
+                  alt={s.alt || "sponsor"}
+                  className="object-contain w-full h-full p-6"
+                />
+              </a>              
               ))}
             </div>
           ) : (
