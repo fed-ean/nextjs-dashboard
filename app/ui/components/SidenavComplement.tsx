@@ -81,7 +81,7 @@ export default function SidenavComplement({
                 <a
                 key={`${s.image}-${idx}`}
                 href={s.href || "#"}
-                className="flex-shrink-0 w-50 h-50 rounded-full overflow-hidden flex items-center justify-center bg-white shadow-lg"
+                className="flex-shrink-0 w-40 h-40 rounded-full overflow-hidden flex items-center justify-center bg-white shadow-lg"
                 target="_blank"
                 rel="noreferrer"
               >
