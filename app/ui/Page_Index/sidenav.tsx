@@ -10,7 +10,7 @@ interface SidenavProps {
 
 export default function SideNav({ categories, latestPosts }: SidenavProps) {
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col">
 
       {/* --- ÚLTIMAS NOTICIAS --- */}
       {latestPosts?.length > 0 && (

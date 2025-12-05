@@ -282,8 +282,22 @@ export default async function Page({ params }: PageProps) {
 
           {/* COMPONENTE NUEVO */}
           <aside className="lg:col-span-3">
-            <SidenavComplement />
-          </aside>
+  <SidenavComplement
+    socialLinks={{
+      facebook: "https://www.facebook.com",
+      twitter: "https://twitter.com",
+      instagram: "https://instagram.com",
+      email: "mailto:info@radioempresarial.com",
+    }}
+    sponsors={[
+      { src: "/sponsor/argennova.jpg", alt: "Sponsor 1" },
+      { src: "/sponsors/s2.png", alt: "Sponsor 2" },
+      { src: "/sponsors/s3.png", alt: "Sponsor 3" },
+      { src: "/sponsors/s4.png", alt: "Sponsor 4" },
+    ]}
+  />
+</aside>
+
 
           {/* ARTÍCULO */}
           <article className="lg:col-span-6">
