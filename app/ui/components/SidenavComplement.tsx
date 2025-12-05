@@ -26,7 +26,7 @@ export default function SidenavComplement({
   socialLinks?: SocialLink[];
   className?: string;
 }) {
-  // duplicate sponsors to create a seamless horizontal marquee
+  // duplicate sponsors to create a seamless horizontal marquee-vertical
   const items = sponsors.length ? [...sponsors, ...sponsors] : [];
 
   // automatic animation duration based on number of logos (keeps speed reasonable)
@@ -92,7 +92,7 @@ export default function SidenavComplement({
       {/* styles */}
       <style>{`
         .marquee {
-          display: flex;
+          display: flex; flex-direction: column;
           gap: 1rem;
           padding-bottom: 0.5rem;
           align-items: center;
@@ -112,9 +112,11 @@ export default function SidenavComplement({
           display: block;
         }
 
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+        @keyframes marquee-vertical {
+          0% { trtranslateYranslateY(0); }
+          100% { transform: translateY(-50%); }
+        }
+          100% { transform: translateY(-50%); }
         }
 
         /* Small responsive tweaks */
