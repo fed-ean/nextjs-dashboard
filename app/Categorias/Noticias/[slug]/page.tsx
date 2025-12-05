@@ -272,7 +272,7 @@ export default async function Page({ params }: PageProps) {
 
       {/* MAIN */}
       <main className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-[1600px]">
-  <div className="grid grid-cols-1 lg:grid-cols-[220px_300px_1fr] gap-8 w-full">
+  <div className="grid grid-cols-1 lg:grid-cols-[220px_300px_1fr] w-full">
     
     {/* SIDENAV */}
     <aside className="lg:col-span-1">
