@@ -7,7 +7,7 @@ import React from "react";
 import parse from "html-react-parser";
 import SidenavServer from "@/app/ui/Page_Index/SidenavServer";
 import FooterCarousel from "@/app/ui/components/FooterCarousel";
-import SidenavComplement from "@/app/ui/components/SidenavComplement";
+import SidenavComplement, { type Sponsor, type SocialLink } from "@/app/ui/components/SidenavComplement";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale/es";
 import "./styles.css";
@@ -183,7 +183,7 @@ export default async function Page({ params }: PageProps) {
   const lastPosts = await getLastPosts();
 
   // --- DATOS PARA SIDENAVCOMPLEMENT (CORREGIDOS) ---
-  const sponsors = [
+  const sponsors: Sponsor[] = [
       { image: "/sponsor/argennova.jpg", href: "#", alt: "Argennova" },
       { image: "/sponsor/argennova2.jpg", href: "#", alt: "Argennova 2" },
       { image: "/sponsor/argennovaoficial.jpg", href: "#", alt: "Argennova Oficial" },
@@ -227,11 +227,11 @@ export default async function Page({ params }: PageProps) {
       { image: "/sponsor/work.jpg", href: "#", alt: "Work" }
   ];
 
-  const socialLinks = [
+  const socialLinks: SocialLink[] = [
     { type: "facebook", href: "https://www.facebook.com/RadioAColor/", label: "Facebook" },
     { type: "twitter", href: "https://x.com/radioacolorok", label: "Twitter" },
     { type: "instagram", href: "https://www.instagram.com/radioacolor/", label: "Instagram" },
-    { type: "youtube", href: "https://www.youtube.com/c/RadioaColor", label: "YouTube" },
+    { type: "email", href: "mailto:info@radioempresarial.com", label: "Email" },
   ];
   // ------------------------------------
 
