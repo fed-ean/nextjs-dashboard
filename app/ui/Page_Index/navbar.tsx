@@ -25,12 +25,11 @@ export default function NavBar({ newsComponent }: { newsComponent?: ReactNode })
 
   return (
     <>
-      {/* Contenedor principal del Navbar con estilos base */}
+      {/* Contenedor principal con texto oscuro por defecto */}
       <nav className="fixed top-14 lg:top-0 left-0 right-0 z-50 text-gray-800 border-b border-gray-200 shadow-md">
         
-        {/* --- VISTA MÓVIL --- */}
-        {/* Se aplica el fondo de SVG y el patrón de hexágonos */}
-        <div className="lg:hidden grid grid-cols-3 items-center p-4 bg-fondo-svg bg-hexagon-pattern">
+        {/* --- VISTA MÓVIL (Fondo blanco) --- */}
+        <div className="lg:hidden grid grid-cols-3 items-center p-4 bg-white">
           <div className="flex justify-start">
             <button
               className="text-gray-800 rounded-sm transition duration-300 ease-in-out hover:bg-gray-200 focus:outline-none"
@@ -77,8 +76,8 @@ export default function NavBar({ newsComponent }: { newsComponent?: ReactNode })
                 </Link>
               </div>
           </div>
-          {/* --- Parte inferior (Ahora también con el fondo de rombos) --- */}
-          <div className="border-t border-gray-200 bg-fondo-svg bg-hexagon-pattern">
+          {/* --- Parte inferior (Vuelve a ser azul con texto blanco) --- */}
+          <div className="border-t border-blue-800 bg-blue-900 text-white">
             <div className="px-6 py-1">
               <div className="flex justify-center items-center gap-4">
                 <LinksNav />
@@ -92,7 +91,6 @@ export default function NavBar({ newsComponent }: { newsComponent?: ReactNode })
       </nav>
 
       {/* --- MENÚ LATERAL (Offcanvas) --- */}
-      {/* Se mantiene el fondo oscuro para el menú desplegable por contraste */}
       <div
         id="offcanvas-menu"
         className={`fixed top-14 left-0 h-[calc(100vh-3.5rem)] lg:hidden w-[90%] sm:w-[70%] md:w-[50%] bg-blue-900 shadow-xl transform transition-transform duration-300 ease-in-out text-white ${
