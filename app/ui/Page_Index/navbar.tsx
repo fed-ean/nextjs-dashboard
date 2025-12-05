@@ -25,13 +25,15 @@ export default function NavBar({ newsComponent }: { newsComponent?: ReactNode })
 
   return (
     <>
-      <nav className="fixed top-14 lg:top-0 left-0 right-0 z-50 bg-hexagon-pattern text-white border-b border-gray-200 shadow-md">
+      {/* Contenedor principal del Navbar con estilos base */}
+      <nav className="fixed top-14 lg:top-0 left-0 right-0 z-50 text-gray-800 border-b border-gray-200 shadow-md">
         
         {/* --- VISTA MÓVIL --- */}
-        <div className="lg:hidden grid grid-cols-3 items-center p-4">
+        {/* Se aplica el fondo de SVG y el patrón de hexágonos */}
+        <div className="lg:hidden grid grid-cols-3 items-center p-4 bg-fondo-svg bg-hexagon-pattern">
           <div className="flex justify-start">
             <button
-              className="text-white rounded-sm transition duration-300 ease-in-out hover:bg-gray-100 focus:outline-none"
+              className="text-gray-800 rounded-sm transition duration-300 ease-in-out hover:bg-gray-200 focus:outline-none"
               onClick={toggleMenu}
               aria-controls="offcanvas-menu"
               aria-expanded={isMenuOpen}
@@ -52,32 +54,31 @@ export default function NavBar({ newsComponent }: { newsComponent?: ReactNode })
             </Link>
           </div>
           <div className="flex justify-end items-center">
-            <Link href="/Login" className="flex items-center gap-2 text-white">
-              <HiOutlineMail className="h-8 w-8 text-white" />
+            <Link href="/Login" className="flex items-center gap-2 text-gray-800">
+              <HiOutlineMail className="h-8 w-8" />
             </Link>
           </div>
         </div>
 
         {/* --- VISTA ESCRITORIO --- */}
         <div className="hidden lg:block">
-          {/* --- Parte superior (Ahora blanca) --- */}
-          <div className="flex items-center justify-between md:px-6">
+          {/* --- Parte superior (Con fondo de rombos) --- */}
+          <div className="flex items-center justify-between md:px-6 bg-fondo-svg bg-hexagon-pattern">
               <div className='w-1/4'></div>
               <div className="flex justify-center">
                   <AlAireRadio />
               </div>
               <div className="flex justify-end w-1/4">
-                <Link href="/Login" className="flex items-center gap-2 text-white transition-transform duration-300 ease-in-out hover:scale-105">
-                  <HiOutlineMail className="h-8 w-8 text-white" />
+                <Link href="/Login" className="flex items-center gap-2 text-gray-800 transition-transform duration-300 ease-in-out hover:scale-105">
+                  <HiOutlineMail className="h-8 w-8" />
                   <span className="text-lg font-semibold bg-gradient-to-r from-orange-400 to-rose-500 text-transparent bg-clip-text">
                     Suscribite
                   </span>
                 </Link>
               </div>
           </div>
-          {/* --- Parte inferior (Se mantiene azul y ahora más delgada) --- */}
-          <div className="border-t border-blue-800 bg-blue-900">
-            {/* MODIFICADO: Padding vertical reducido de 'py-3' a 'py-1' para achicar la barra */}
+          {/* --- Parte inferior (Ahora también con el fondo de rombos) --- */}
+          <div className="border-t border-gray-200 bg-fondo-svg bg-hexagon-pattern">
             <div className="px-6 py-1">
               <div className="flex justify-center items-center gap-4">
                 <LinksNav />
@@ -91,6 +92,7 @@ export default function NavBar({ newsComponent }: { newsComponent?: ReactNode })
       </nav>
 
       {/* --- MENÚ LATERAL (Offcanvas) --- */}
+      {/* Se mantiene el fondo oscuro para el menú desplegable por contraste */}
       <div
         id="offcanvas-menu"
         className={`fixed top-14 left-0 h-[calc(100vh-3.5rem)] lg:hidden w-[90%] sm:w-[70%] md:w-[50%] bg-blue-900 shadow-xl transform transition-transform duration-300 ease-in-out text-white ${
