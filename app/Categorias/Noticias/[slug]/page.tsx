@@ -337,10 +337,11 @@ export default async function Page({ params }: PageProps) {
           </aside>
 
           <article className="w-full">
-            <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 prose prose-lg max-w-none text-gray-800">
-              <div className="post-content">{parse(post.content || "")}</div>
-            </div>
-          </article>
+  <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 prose prose-lg max-w-none text-gray-800">
+    <div className="post-content">{parse(post.content || "")}</div>
+  </div>
+</article>
+
         </div>
       </main>
 
