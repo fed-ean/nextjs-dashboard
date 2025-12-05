@@ -36,7 +36,7 @@ export default function SidenavComplement({
   const durationSeconds = Math.max(8, Math.round((sponsorsToUse.length || 4) * 2.5));
 
   // altura visible del carrusel — cambiala si querés más/menos ítems visibles
-  const visibleHeight = "1200px"; // aumentado para mostrar más sponsors // default: 240px (aprox 3-4 logos)
+  const visibleHeight = "2150px"; // aumentado para mostrar más sponsors // default: 240px (aprox 3-4 logos)
 
   const marqueeStyle: React.CSSProperties = {
     ["--marquee-duration" as any]: `${durationSeconds}s`,
