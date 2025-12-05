@@ -271,8 +271,8 @@ export default async function Page({ params }: PageProps) {
       </header>
 
       {/* MAIN */}
-      <main className="container">
-      <div className="grid grid-cols-1 lg:grid-cols-[240px_340px_1fr] gap-8">
+      <main className="container w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-[240px_340px_1fr]">
     {/* SIDENAV (ancho fijo 240px en lg) */}
     <aside className="lg:col-span-1">
       <div className="sticky top-24">
