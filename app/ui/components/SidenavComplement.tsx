@@ -72,7 +72,7 @@ export default function SidenavComplement({
       <div className="text-center text-xs tracking-wider text-gray-600 mb-3">SPONSORS</div>
 
       {/* VISTA del carrusel con altura fija para evitar que crezca demasiado */}
-      <div className="relative" style={marqueeStyle}>
+      <div className="relative flex justify-center" style={marqueeStyle}>
         <div className="marquee-viewport" style={{ height: visibleHeight, overflow: "hidden" }}>
           {/* Renderizamos solo si hay items */}
           {items.length > 0 ? (
