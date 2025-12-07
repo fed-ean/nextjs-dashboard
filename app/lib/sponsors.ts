@@ -1,5 +1,5 @@
 // app/lib/sponsors.ts
-const sponsors = [
+const sponsorsList = [
     { id: 1, name: 'Argennova', image: '/sponsor/argennova.jpg', url: '#' },
     { id: 2, name: 'Argennova 2', image: '/sponsor/argennova2.jpg', url: '#' },
     { id: 3, name: 'Argennova Oficial', image: '/sponsor/argennovaoficial.jpg', url: '#' },
@@ -43,5 +43,5 @@ const sponsors = [
     { id: 41, name: 'Work', image: '/sponsor/work.jpg', url: '#' },
   ];
   
-  export default sponsors;
+  export default sponsorsList;
   
