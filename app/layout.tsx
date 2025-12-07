@@ -5,13 +5,11 @@ import "./global.css";
 
 import sponsorsList from "@/app/lib/sponsors";
 
-import MobileRadioPlayer from "@/app/ui/MobileRadioPlayer";
 import NavBar from "@/app/ui/Page_Index/navbar";
 import EnVivoLayout from "@/app/ui/EnVivoLayout";
 import Footer from "@/app/ui/Page_Index/footer";
 
 import SponsorsBottomCarousel from "@/app/ui/SponsorsBottomCarousel";
-import SponsorsDrawer from "@/app/ui/SponsorsDrawer"; // opcional: pestaña/drawer
 
 const alegreyaSans = Alegreya_Sans({
   subsets: ["latin"],
