@@ -2,18 +2,17 @@
 import type { Metadata } from "next";
 import { Alegreya_Sans } from "next/font/google";
 import "./global.css";
-import dynamic from "next/dynamic";
 import sponsorsList from "@/app/lib/sponsors";
 import NavBar from "@/app/ui/Page_Index/navbar";
 import EnVivoLayout from "@/app/ui/EnVivoLayout";
-import Footer from "@/app/ui/Page_Index/footer";
 
+import Footer from "@/app/ui/Page_Index/footer";
+import SponsorsDrawer from "@/app/ui/SponsorsDrawer"; // OK: Server component puede renderizar client components
 const alegreyaSans = Alegreya_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "700", "800", "900"],
   variable: "--font-alegreya-sans",
 });
-const SponsorsDrawer = dynamic(() => import("./ui/SponsorsDrawer"), { ssr: false });
 
 export const metadata: Metadata = {
   title: "Radio Empresarial",
