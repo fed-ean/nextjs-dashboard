@@ -59,13 +59,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                - pointer-events-auto permite interacción
            ------------------------- */}
         <div className="fixed bottom-0 left-0 w-full z-50 block lg:hidden pointer-events-auto">
-          <SponsorsBottomCarousel
-            sponsors={sponsorsList}
-            visibleCount={4}
-            autoSlideMs={3000}
-            circleSize={80}
-          />
-        </div>
+  <SponsorsBottomCarousel
+    sponsors={sponsorsList}
+    autoSlideMs={3000}
+    size={90}
+  />
+</div>
+
       </body>
     </html>
   );

@@ -1,138 +1,103 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { useEffect, useState } from "react";
 
-type SponsorInput = {
-  id?: string | number;
-  name?: string;
-  src?: string;    // ruta (ej. '/sponsor/argennova.jpg')
-  image?: string;  // alias
+interface Sponsor {
+  name: string;
+  image: string;
   url?: string;
-  href?: string;
-};
+}
 
 export default function SponsorsBottomCarousel({
-  sponsors = [],
-  visibleCount = 4,     // cuántos logos mostrar visualmente (ajustable)
+  sponsors,
   autoSlideMs = 3000,
-  circleSize = 80,      // tamaño de los círculos en px (ajustá si querés)
+  size = 90,
 }: {
-  sponsors?: SponsorInput[];
-  visibleCount?: number;
+  sponsors: Sponsor[];
   autoSlideMs?: number;
-  circleSize?: number;
+  size?: number;
 }) {
-  // normalizar
-  const items = (sponsors || []).map((s, i) => ({
-    id: s.id ?? i,
-    name: s.name ?? `Sponsor ${i + 1}`,
-    src: (s as any).src ?? (s as any).image ?? "",
-    url: (s as any).url ?? (s as any).href ?? "#",
-  }));
-
-  const containerRef = useRef<HTMLDivElement | null>(null);
   const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [open, setOpen] = useState(true); // 🔥 Por defecto visible
 
-  // Auto slide (solo si hay más de visibleCount)
+  // --- AutoSlide ---
   useEffect(() => {
-    if (items.length <= 1) return;
-    if (paused) return;
-
-    const iv = window.setInterval(() => {
-      setIndex((prev) => (prev + 1) % items.length);
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 2) % sponsors.length);
     }, autoSlideMs);
 
-    return () => window.clearInterval(iv);
-  }, [items.length, paused, autoSlideMs]);
+    return () => clearInterval(interval);
+  }, [sponsors.length, autoSlideMs]);
 
-  // Scroll to current item (center it)
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    const children = Array.from(container.children) as HTMLElement[];
-    const target = children[index];
-    if (!target) return;
-
-    const left = target.offsetLeft - (container.clientWidth - target.clientWidth) / 2;
-    container.scrollTo({ left, behavior: "smooth" });
-  }, [index]);
-
-  // touch to pause + swipe
-  const touchStartX = useRef<number | null>(null);
-  const onTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    setPaused(true);
-  };
-  const onTouchEnd = (e: React.TouchEvent) => {
-    const start = touchStartX.current;
-    if (start == null) {
-      setPaused(false);
-      return;
-    }
-    const end = e.changedTouches[0].clientX;
-    const diff = start - end;
-    if (Math.abs(diff) > 30) {
-      if (diff > 0) setIndex((p) => (p + 1) % items.length);
-      else setIndex((p) => (p - 1 + items.length) % items.length);
-    }
-    touchStartX.current = null;
-    setTimeout(() => setPaused(false), 500);
-  };
+  // --- 2 sponsors visibles ---
+  const visibleSponsors = [
+    sponsors[index],
+    sponsors[(index + 1) % sponsors.length],
+  ];
 
   return (
-    // outer wrapper should be fixed in layout; here just the carousel inner
-    <div
-      className="block lg:hidden w-full bg-black/95 text-white"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-    >
-      <div className="w-full overflow-hidden py-3">
-        <div
-          ref={containerRef}
-          className="flex gap-4 px-4 overflow-x-auto scroll-smooth"
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
-          style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
+    <div className="w-full fixed bottom-0 left-0 z-50 lg:hidden">
+      
+      {/* 🔥 BOTÓN PARA MOSTRAR CUANDO ESTÁ OCULTO */}
+      {!open && (
+        <button
+          onClick={() => setOpen(true)}
+          className="
+            absolute 
+            -top-10 
+            left-1/2 
+            -translate-x-1/2 
+            bg-white 
+            shadow-lg 
+            rounded-full 
+            px-4 py-1 
+            text-sm 
+            font-semibold
+          "
         >
-          {items.map((it) => (
+          ▲ Sponsors
+        </button>
+      )}
+
+      {/* 🔥 CONTENEDOR DEL CARRUSEL */}
+      <div
+        className={`
+          w-full bg-white shadow-2xl border-t border-gray-200 px-4 py-2
+          transition-transform duration-500
+          ${open ? "translate-y-0" : "translate-y-full"}
+        `}
+      >
+        {/* FLECHA PARA OCULTAR */}
+        <div className="w-full flex justify-center">
+          <button
+            onClick={() => setOpen(false)}
+            className="text-gray-700 text-sm mb-1"
+          >
+            ▼ Ocultar
+          </button>
+        </div>
+
+        {/* SPONSORS */}
+        <div className="flex justify-center items-center gap-4">
+          {visibleSponsors.map((sp, i) => (
             <a
-              key={it.id}
-              href={it.url}
+              key={i}
+              href={sp.url || "#"}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-shrink-0 flex flex-col items-center justify-center"
-              style={{
-                width: `${100 / visibleCount}%`,
-                scrollSnapAlign: "center",
-              }}
-              onClick={() => {
-                // track click si querés
-              }}
+              className="flex-shrink-0"
             >
-              <div
-                className="rounded-full overflow-hidden bg-white flex items-center justify-center shadow-md"
+              <img
+                src={sp.image}
+                alt={sp.name}
                 style={{
-                  width: circleSize,
-                  height: circleSize,
+                  width: size,
+                  height: size,
+                  objectFit: "cover",
+                  borderRadius: "10px",
                 }}
-              >
-                {it.src ? (
-                  <Image
-                    src={it.src}
-                    alt={it.name}
-                    width={300}     // fuente 300x300, Next optimizará
-                    height={300}
-                    className="object-contain"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="text-xs px-2">{it.name}</div>
-                )}
-              </div>
-
-              <div className="text-[10px] text-center mt-2 text-gray-200">{it.name}</div>
+                className="shadow-md"
+              />
             </a>
           ))}
         </div>
