@@ -1,3 +1,4 @@
+//app/ui/SponsorsDrawer.tsx
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -12,7 +13,8 @@ type InputSponsor = {
   href?: string;
 };
 
-export default function SponsorsFullWidthCarousel({
+export default function SponsorsDrawer({
+
   sponsors = [],
   height = 140,            // altura en px del carrusel (ajustala)
   autoSlideMs = 3000,      // autoplay interval
