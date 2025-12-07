@@ -272,17 +272,33 @@ export default async function Page({ params }: PageProps) {
 
       {/* MAIN */}
       <main className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-[1600px]">
-  <div className="grid grid-cols-1 lg:grid-cols-[220px_300px_1fr] w-full">
+      <div
+  className="
+    grid 
+    grid-cols-1 
+    gap-8 
+    w-full
+
+    /* Desktop layout */
+    lg:grid-cols-[220px_300px_1fr]
+  "
+>
     
-    {/* SIDENAV */}
-    <aside className="lg:col-span-1">
-      <div className="sticky top-24">
-        <SidenavServer />
-      </div>
-    </aside>
+    {/* ARTÍCULO — EN CELULAR VA PRIMERO */}
+  <article className="order-1 lg:order-3 w-full min-w-0">
+    <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 prose prose-lg max-w-none text-gray-800">
+      <div className="post-content">{parse(post.content || "")}</div>
+    </div>
+  </article>
+   {/* SIDENAV — EN CELULAR DESPUÉS DEL ARTÍCULO */}
+   <aside className="order-2 lg:order-1">
+    <div className="sticky top-24">
+      <SidenavServer />
+    </div>
+  </aside>
 
           {/* COMPONENTE NUEVO */}
-          <aside className="hidden md:block lg:col-span-1 my-1">
+          <aside className="hidden lg:block order-2 lg:order-2">
             <SidenavComplement
             className="hidden md:block"
               socialLinks={[
@@ -336,12 +352,7 @@ export default async function Page({ params }: PageProps) {
               ]}
             />
           </aside>
-{/* ARTÍCULO */}
-<article className="w-full min-w-0">
-      <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 prose prose-lg max-w-none text-gray-800">
-        <div className="post-content">{parse(post.content || "")}</div>
-      </div>
-    </article>
+
 
   </div>
 </main>
