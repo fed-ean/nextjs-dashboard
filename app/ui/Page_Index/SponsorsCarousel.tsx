@@ -1,4 +1,4 @@
-
+//app/ui/Page_Index
 import React from 'react';
 import Image from 'next/image';
 import './SponsorsCarousel.css';

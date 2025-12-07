@@ -2,7 +2,8 @@
 import type { Metadata } from "next";
 import { Alegreya_Sans } from "next/font/google";
 import "./global.css";
-
+import dynamic from "next/dynamic";
+import sponsorsList from "@/app/lib/sponsors";
 import NavBar from "@/app/ui/Page_Index/navbar";
 import EnVivoLayout from "@/app/ui/EnVivoLayout";
 import Footer from "@/app/ui/Page_Index/footer";
@@ -12,6 +13,7 @@ const alegreyaSans = Alegreya_Sans({
   weight: ["400", "500", "700", "800", "900"],
   variable: "--font-alegreya-sans",
 });
+const SponsorsDrawer = dynamic(() => import("@/app/ui/SponsorsDrawer"), { ssr: false });
 
 export const metadata: Metadata = {
   title: "Radio Empresarial",
@@ -39,6 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </main>
 
         <Footer />
+        <SponsorsDrawer sponsors={sponsorsList} autoSlideMs={3500} />
       </body>
     </html>
   );

@@ -298,9 +298,9 @@ export default async function Page({ params }: PageProps) {
   </aside>
 
           {/* COMPONENTE NUEVO */}
-          <aside className="flex gap-4 overflow-x-auto snap-x snap-mandatory">
+          <aside className="hidden md:block lg:col-span-1 my-1">
             <SidenavComplement
-            className="min-w-full md:min-w-[200px] md:max-w-[200px] snap-center"
+            className="hidden md:block"
               socialLinks={[
                 { type: "facebook", href: "https://www.facebook.com", label: "Facebook" },
                 { type: "twitter", href: "https://twitter.com", label: "Twitter" },

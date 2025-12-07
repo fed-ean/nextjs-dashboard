@@ -52,7 +52,9 @@ export default function Page() {
         <Suspense fallback={<SeccionNoticiasVariasSkeleton />}>
           <SeccionNoticiasVarias />
         </Suspense>
+        <div className="hidden lg:block">
         <SponsorsCarousel />
+        </div>
       </main>
 
       {/* --- NO HAY SIDENAV AQUÍ --- */}
