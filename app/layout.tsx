@@ -62,7 +62,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   <SponsorsBottomCarousel
     sponsors={sponsorsList}
     autoSlideMs={3000}
-    size={90}
   />
 </div>
 
