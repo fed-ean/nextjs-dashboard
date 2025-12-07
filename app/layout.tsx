@@ -13,7 +13,7 @@ const alegreyaSans = Alegreya_Sans({
   weight: ["400", "500", "700", "800", "900"],
   variable: "--font-alegreya-sans",
 });
-const SponsorsDrawer = dynamic(() => import("@/app/ui/SponsorsDrawer"), { ssr: false });
+const SponsorsDrawer = dynamic(() => import("./ui/SponsorsDrawer"), { ssr: false });
 
 export const metadata: Metadata = {
   title: "Radio Empresarial",
