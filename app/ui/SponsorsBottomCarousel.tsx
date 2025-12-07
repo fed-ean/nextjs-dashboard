@@ -13,38 +13,38 @@ type Sponsor = {
 export default function SponsorsBottomCarousel({
   sponsors = [],
   autoSlideMs = 3000,
-  squareSize = 300, // tamaño fuente (las imágenes son 300x300)
+  itemHeight = 110, // alto visible en px de cada imagen
 }: {
   sponsors?: Sponsor[];
   autoSlideMs?: number;
-  squareSize?: number;
+  itemHeight?: number;
 }) {
   const [index, setIndex] = useState(0);
   const [open, setOpen] = useState(true);
   const [paused, setPaused] = useState(false);
   const touchStartX = useRef<number | null>(null);
 
-  // Si hay menos de 2 sponsors, evitar errores
   const count = sponsors.length || 0;
+
+  // AutoSlide (avanza de 2 en 2 para mostrar parejas)
   useEffect(() => {
     if (count <= 1) return;
     if (!open) return;
     if (paused) return;
 
     const iv = window.setInterval(() => {
-      // Avanzamos de 2 en 2 para mostrar parejas no solapadas
-      setIndex((prev) => (prev + 2) % count);
+      setIndex((p) => (p + 2) % count);
     }, autoSlideMs);
 
     return () => clearInterval(iv);
   }, [count, autoSlideMs, open, paused]);
 
-  // Visible: dos a la vez
+  // Visible: dos a la vez (si solo hay 1, muestra 1)
   const left = sponsors[(index) % (count || 1)];
   const right = sponsors[(index + 1) % (count || 1)];
   const visible = count === 0 ? [] : count === 1 ? [left] : [left, right];
 
-  // Touch handlers (pausa + swipe)
+  // touch handlers (pausa + swipe)
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
     setPaused(true);
@@ -58,23 +58,17 @@ export default function SponsorsBottomCarousel({
     const end = e.changedTouches[0].clientX;
     const diff = start - end;
     if (Math.abs(diff) > 30) {
-      if (diff > 0) {
-        // swipe left -> next pair
-        setIndex((p) => (p + 2) % (count || 1));
-      } else {
-        // swipe right -> prev pair
-        setIndex((p) => (p - 2 + (count || 1)) % (count || 1));
-      }
+      if (diff > 0) setIndex((p) => (p + 2) % (count || 1));
+      else setIndex((p) => (p - 2 + (count || 1)) % (count || 1));
     }
     touchStartX.current = null;
     setTimeout(() => setPaused(false), 400);
   };
 
-  // hide/show animation uses translateY
   return (
-    <div className="md:hidden"> {/* wrapper visible solo en mobile */}
+    <div className="md:hidden">
       <div className="fixed bottom-0 left-0 w-full z-50 pointer-events-auto">
-        {/* Tab / botón sobresaliente */}
+        {/* Tab sobresaliente cuando está oculto */}
         {!open && (
           <button
             onClick={() => setOpen(true)}
@@ -88,8 +82,8 @@ export default function SponsorsBottomCarousel({
           </button>
         )}
 
+        {/* Container que se desplaza para ocultar/mostrar */}
         <div
-          // container that slides down to hide
           className={`w-full bg-white shadow-2xl border-t border-gray-200 transition-transform duration-400 ease-in-out ${
             open ? "translate-y-0" : "translate-y-full"
           }`}
@@ -98,7 +92,7 @@ export default function SponsorsBottomCarousel({
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
         >
-          {/* header con botón para ocultar */}
+          {/* Header con botón ocultar */}
           <div className="w-full flex justify-center pt-2">
             <button
               onClick={() => setOpen(false)}
@@ -112,7 +106,7 @@ export default function SponsorsBottomCarousel({
             </button>
           </div>
 
-          {/* content: two items each taking 50% width */}
+          {/* Dos items ocupando 50% cada uno */}
           <div className="w-full">
             <div className="flex w-full">
               {visible.length === 0 ? (
@@ -125,23 +119,21 @@ export default function SponsorsBottomCarousel({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-1/2 flex items-center justify-center p-2"
-                    onClick={() => {
-                      /* event tracking punto de extensión */
-                    }}
+                    onClick={() => { /* tracking point */ }}
                   >
+                    {/* wrapper con altura fija para que next/image tenga referencia */}
                     <div
-                      className="w-full h-full flex items-center justify-center overflow-hidden"
-                      style={{ maxWidth: "100%", maxHeight: 96 }}
+                      className="relative w-full"
+                      style={{ height: `${itemHeight}px`, maxWidth: "100%" }}
                     >
-                      {/* usamos next/image para que optimice; width/height fuente 300 */}
                       {sp?.src ? (
                         <Image
                           src={sp.src}
                           alt={sp.name ?? ""}
-                          width={squareSize}
-                          height={squareSize}
+                          fill
                           style={{ objectFit: "cover" }}
-                          className="block"
+                          sizes="50vw"
+                          priority={false}
                         />
                       ) : (
                         <div className="w-full h-full bg-gray-100 flex items-center justify-center text-xs text-gray-600">
@@ -155,7 +147,7 @@ export default function SponsorsBottomCarousel({
             </div>
           </div>
 
-          {/* optional small pager dots */}
+          {/* Dots (grupos) */}
           <div className="w-full flex justify-center items-center py-2">
             <div className="flex gap-2">
               {Array.from({ length: Math.ceil(count / 2) }).map((_, i) => (
