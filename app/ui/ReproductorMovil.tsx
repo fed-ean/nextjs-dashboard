@@ -24,11 +24,11 @@ export default function MobileRadioPlayer() {
       {/* AUDIO */}
       <audio
         ref={audioRef}
-        src="https://radio.streaming/source" // <-- tu URL real
+        src="https://radio.streaming/source"
       ></audio>
 
       {/* PLAYER MOBILE */}
-      <div className="w-full fixed bottom-0 left-0 bg-black text-white py-3 px-4 shadow-xl z-50 md:hidden">
+      <div className="w-full fixed bottom-[120px] left-0 bg-black text-white py-3 px-4 shadow-xl z-40 md:hidden">
 
         <div className="flex items-center justify-between gap-3">
 
@@ -45,7 +45,7 @@ export default function MobileRadioPlayer() {
             )}
           </button>
 
-          {/* CARTEL NEÓN CENTRO */}
+          {/* CARTEL NEÓN */}
           <div className="flex-1 text-center">
             <p className="text-xs font-bold leading-tight tracking-wide text-red-400 
                           drop-shadow-[0_0_5px_#ff1a1a]">
@@ -55,7 +55,7 @@ export default function MobileRadioPlayer() {
             </p>
           </div>
 
-          {/* “AL AIRE” DERECHA */}
+          {/* AL AIRE */}
           <div className="text-right">
             <span className="px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-md 
                              shadow-[0_0_10px_#ff1a1a] animate-pulse">
