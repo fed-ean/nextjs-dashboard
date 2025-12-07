@@ -1,69 +1,85 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
 import { PlayIcon, PauseIcon } from "@heroicons/react/24/solid";
 
-export default function MobileRadioPlayer() {
+export default function MobileRadioPlayer({
+  streamUrl = "https://radio.streaming/source",
+}: {
+  streamUrl?: string;
+}) {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     if (!audioRef.current) return;
-
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
+    try {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        await audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    } catch (e) {
+      console.error("Audio play error:", e);
     }
-
-    setIsPlaying(!isPlaying);
   };
 
   return (
     <>
-      {/* AUDIO */}
-      <audio
-        ref={audioRef}
-        src="https://radio.streaming/source"
-      ></audio>
+      <audio ref={audioRef} src={streamUrl} preload="none" />
 
-      {/* PLAYER MOBILE */}
-      <div className="w-full fixed bottom-[120px] left-0 bg-black text-white py-3 px-4 shadow-xl z-40 md:hidden">
-
-        <div className="flex items-center justify-between gap-3">
-
-          {/* PLAY BUTTON */}
+      {/* PLAYER - aparece en MOBILE (oculto en MD+) */}
+      <div className="md:hidden w-full bg-black text-white py-3 px-4 shadow-md">
+        <div className="flex items-center gap-3">
+          {/* Play button */}
           <button
             onClick={togglePlay}
-            className="w-16 h-16 rounded-full bg-black text-white flex items-center justify-center
-                       border-2 border-red-500 neon-red"
+            aria-pressed={isPlaying}
+            aria-label={isPlaying ? "Pausar radio" : "Reproducir radio"}
+            className="flex-shrink-0 w-14 h-14 rounded-full bg-black border-2 border-red-500 flex items-center justify-center neon-red"
           >
             {isPlaying ? (
-              <PauseIcon className="w-8 h-8 text-red-400" />
+              <PauseIcon className="w-7 h-7 text-red-400" />
             ) : (
-              <PlayIcon className="w-8 h-8 text-red-400 pl-1" />
+              <PlayIcon className="w-7 h-7 text-red-400" />
             )}
           </button>
 
-          {/* CARTEL NEÓN */}
+          {/* Texto central */}
           <div className="flex-1 text-center">
-            <p className="text-xs font-bold leading-tight tracking-wide text-red-400 
-                          drop-shadow-[0_0_5px_#ff1a1a]">
-              🎧 Escuchá la radio en vivo las 24Hs <br />
-              — Radio Empresarial — <br />
-              Música, información y más 🎶
+            <p className="text-xs font-bold leading-tight tracking-wide text-red-400 drop-shadow-[0_0_5px_#ff1a1a]">
+              🎧 Escuchá la radio en vivo las 24Hs — Radio Empresarial — Música,
+              información y más 🎶
             </p>
           </div>
 
           {/* AL AIRE */}
-          <div className="text-right">
-            <span className="px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-md 
-                             shadow-[0_0_10px_#ff1a1a] animate-pulse">
+          <div className="flex-shrink-0 text-right">
+            <span className="px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-md shadow-[0_0_8px_#ff1a1a]">
               🔴 AL AIRE
             </span>
           </div>
         </div>
       </div>
+
+      {/* small inline styles for neon (keeps self-contained) */}
+      <style jsx>{`
+        @keyframes neonPulseRed {
+          0% {
+            box-shadow: 0 0 4px #ff1a1a, 0 0 8px #ff1a1a;
+          }
+          50% {
+            box-shadow: 0 0 10px #ff4d4d, 0 0 22px #ff4d4d;
+          }
+          100% {
+            box-shadow: 0 0 4px #ff1a1a, 0 0 8px #ff1a1a;
+          }
+        }
+        .neon-red {
+          animation: neonPulseRed 1.6s ease-in-out infinite;
+        }
+      `}</style>
     </>
   );
 }

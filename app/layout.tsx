@@ -5,12 +5,13 @@ import "./global.css";
 
 import sponsorsList from "@/app/lib/sponsors";
 
+import MobileRadioPlayer from "@/app/ui/MobileRadioPlayer";
 import NavBar from "@/app/ui/Page_Index/navbar";
 import EnVivoLayout from "@/app/ui/EnVivoLayout";
 import Footer from "@/app/ui/Page_Index/footer";
 
-import SponsorsDrawer from "@/app/ui/SponsorsDrawer";
-import SponsorsFullWidthCarousel from "@/app/ui/SponsorsFullWidthCarousel";
+import SponsorsBottomCarousel from "@/app/ui/SponsorsBottomCarousel";
+import SponsorsDrawer from "@/app/ui/SponsorsDrawer"; // opcional: pestaña/drawer
 
 const alegreyaSans = Alegreya_Sans({
   subsets: ["latin"],
@@ -27,39 +28,44 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es">
       <body className={`${alegreyaSans.variable} font-sans antialiased`}>
-
-        {/* REPRODUCTOR EN VIVO ARRIBA */}
         <EnVivoLayout />
 
-        {/* NAVBAR */}
+        {/* -------------------------
+            3) Navbar
+           ------------------------- */}
         <NavBar />
 
-        {/* 
-          PADDING BOTTOM SOLO PARA MOBILE
-          Así el carrusel de sponsors no tapa nada.
-        */}
-        <main className="
-          pt-[var(--navbar-height-mobile)] 
-          lg:pt-[var(--navbar-height-desktop)]
-          pb-[150px] lg:pb-0   /* SOLO mobile tiene espacio abajo */
-        ">
+        {/* -------------------------
+            4) Main content
+            - Añadimos padding-bottom SOLO en mobile para que el fixed bottom
+              sponsor carousel no tape el contenido.
+           ------------------------- */}
+        <main
+          className="
+            pt-[var(--navbar-height-mobile)]
+            lg:pt-[var(--navbar-height-desktop)]
+            pb-[140px] lg:pb-0
+          "
+        >
           {children}
         </main>
 
-        {/* FOOTER */}
+        {/* -------------------------
+            5) Footer
+           ------------------------- */}
         <Footer />
 
-        {/* 
-          CARRUSEL DE SPONSORS FIJO SOLO EN MOBILE 
-          hidden lg:block  → eso era para desktop
-          Ahora hacemos AL REVÉS:
-          block lg:hidden → SOLO mobile
-        */}
-        <div className="fixed bottom-0 left-0 w-full z-50 bg-white shadow-xl block lg:hidden">
-          <SponsorsFullWidthCarousel
+        {/* -------------------------
+            6) Sponsors carousel FIJO ABAJO — SOLO MOBILE
+               - block lg:hidden => visible solo en pantallas pequeñas
+               - pointer-events-auto permite interacción
+           ------------------------- */}
+        <div className="fixed bottom-0 left-0 w-full z-50 block lg:hidden pointer-events-auto">
+          <SponsorsBottomCarousel
             sponsors={sponsorsList}
-            height={110}
+            visibleCount={4}
             autoSlideMs={3000}
+            circleSize={80}
           />
         </div>
       </body>
