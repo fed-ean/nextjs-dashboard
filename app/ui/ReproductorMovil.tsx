@@ -38,13 +38,13 @@ export default function ReproductorMovil({
 
       {/* fixed bar on top for mobile only */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50">
-        <div className="envivo-bar-mobile flex items-center justify-between gap-3 px-3 py-2 h-16">
-          {/* PLAY (left) - tamaño aumentado a 84px */}
+        <div className="envivo-bar-mobile flex items-center justify-between gap-3 px-3 py-2 h-14">
+          {/* PLAY (left) - ahora MUY pequeño */}
           <button
             onClick={togglePlay}
             aria-pressed={isPlaying}
             aria-label={isPlaying ? "Pausar radio" : "Reproducir radio"}
-            className="play-btn"
+            className="play-btn-sm"
             title={isPlaying ? "Pausar" : "Reproducir"}
           >
             {isPlaying ? (
@@ -92,61 +92,60 @@ export default function ReproductorMovil({
           backdrop-filter: blur(6px);
         }
 
-        /* ===== PLAY BUTTON: ahora 84x84, súper redondo ===== */
-        .play-btn {
-          width: 84px;
-          height: 84px;
+        /* ===== PLAY BUTTON SMALL: 40x40 (mucho más pequeño) ===== */
+        .play-btn-sm {
+          width: 40px;
+          height: 40px;
           border-radius: 9999px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          background: radial-gradient(circle at 35% 30%, rgba(255, 120, 120, 0.22), rgba(255, 30, 30, 0.98) 28%),
+          background: radial-gradient(circle at 35% 30%, rgba(255, 120, 120, 0.18), rgba(255, 30, 30, 0.95) 30%),
                       linear-gradient(180deg, #ff3b3b 0%, #c81010 100%);
-          border: 1px solid rgba(255, 60, 60, 0.8);
+          border: 1px solid rgba(255, 60, 60, 0.75);
           cursor: pointer;
           transition: transform 120ms ease;
           box-shadow:
-            0 0 18px rgba(255, 30, 30, 0.98),
-            0 0 46px rgba(255, 30, 30, 0.78),
-            0 0 110px rgba(255, 60, 60, 0.45),
-            inset 0 0 18px rgba(255, 180, 180, 0.2);
-          animation: neon-blink-very-strong 0.9s linear infinite, neon-glow 1.6s ease-in-out infinite;
+            0 0 10px rgba(255, 30, 30, 0.9),
+            0 0 20px rgba(255, 30, 30, 0.6),
+            inset 0 0 6px rgba(255, 150, 150, 0.12);
+          animation: neon-blink-small 0.9s linear infinite, neon-glow-small 1.6s ease-in-out infinite;
           flex-shrink: 0;
         }
-        .play-btn:active { transform: scale(0.98); }
+        .play-btn-sm:active { transform: scale(0.96); }
 
-        .play-btn .icon { width: 40px; height: 40px; color: white; } /* ícono aumentado */
+        .play-btn-sm .icon { width: 18px; height: 18px; color: white; } /* iconito pequeño */
 
-        @keyframes neon-blink-very-strong {
+        @keyframes neon-blink-small {
           0% {
             box-shadow:
-              0 0 14px rgba(255,30,30,0.75),
-              0 0 32px rgba(255,25,25,0.55);
+              0 0 6px rgba(255,30,30,0.6),
+              0 0 14px rgba(255,25,25,0.45);
             transform: translateY(0);
           }
-          30% {
+          40% {
             box-shadow:
-              0 0 56px rgba(255,90,90,1),
-              0 0 120px rgba(255,40,40,0.95);
-            transform: translateY(-2.8px);
+              0 0 26px rgba(255,80,80,0.95),
+              0 0 56px rgba(255,40,40,0.8);
+            transform: translateY(-1px);
           }
-          60% {
+          80% {
             box-shadow:
-              0 0 108px rgba(255,120,120,1),
-              0 0 260px rgba(255,60,60,0.98);
-            transform: translateY(-5px);
+              0 0 36px rgba(255,100,100,1),
+              0 0 86px rgba(255,60,60,0.9);
+            transform: translateY(-2px);
           }
           100% {
             box-shadow:
-              0 0 14px rgba(255,30,30,0.75),
-              0 0 32px rgba(255,25,25,0.55);
+              0 0 6px rgba(255,30,30,0.6),
+              0 0 14px rgba(255,25,25,0.45);
             transform: translateY(0);
           }
         }
-        @keyframes neon-glow {
-          0% { filter: drop-shadow(0 0 10px rgba(255,30,30,0.75)); }
-          50% { filter: drop-shadow(0 0 56px rgba(255,30,30,0.98)); }
-          100% { filter: drop-shadow(0 0 10px rgba(255,30,30,0.75)); }
+        @keyframes neon-glow-small {
+          0% { filter: drop-shadow(0 0 4px rgba(255,30,30,0.6)); }
+          50% { filter: drop-shadow(0 0 24px rgba(255,30,30,0.95)); }
+          100% { filter: drop-shadow(0 0 4px rgba(255,30,30,0.6)); }
         }
 
         /* ===== MARQUEE (texto que se mueve) ===== */
@@ -230,12 +229,12 @@ export default function ReproductorMovil({
           }
         }
 
-        /* responsive tweaks */
-        @media (max-width: 420px) {
-          .play-btn { width: 76px; height: 76px; }
-          .play-btn .icon { width: 36px; height: 36px; }
-          .marquee-item { font-size: 0.68rem; gap: 1rem; padding: 4px 8px; }
-          .alaire-badge { padding: 5px 10px; font-size: 0.7rem; }
+        /* responsive tweaks (aún más pequeño en pantallas muy chicas) */
+        @media (max-width: 380px) {
+          .play-btn-sm { width: 34px; height: 34px; }
+          .play-btn-sm .icon { width: 14px; height: 14px; }
+          .marquee-item { font-size: 0.66rem; gap: 1rem; padding: 4px 8px; }
+          .alaire-badge { padding: 5px 8px; font-size: 0.66rem; }
         }
       `}</style>
     </>
