@@ -24,7 +24,6 @@ export default function ReproductorMovil({
     }
   };
 
-  // ensure audio pauses when component unmounts
   useEffect(() => {
     return () => {
       if (audioRef.current) {
@@ -45,7 +44,7 @@ export default function ReproductorMovil({
             onClick={togglePlay}
             aria-pressed={isPlaying}
             aria-label={isPlaying ? "Pausar radio" : "Reproducir radio"}
-            className={`play-btn`}
+            className="play-btn"
             title={isPlaying ? "Pausar" : "Reproducir"}
           >
             {isPlaying ? (
@@ -86,7 +85,6 @@ export default function ReproductorMovil({
       </div>
 
       <style jsx>{`
-        /* container */
         .envivo-bar-mobile {
           background: linear-gradient(180deg, rgba(6,6,6,0.92), rgba(10,10,10,0.86));
           color: white;
@@ -94,7 +92,7 @@ export default function ReproductorMovil({
           backdrop-filter: blur(6px);
         }
 
-        /* ===== PLAY BUTTON: rojo neón intenso y parpadeo fuerte ===== */
+        /* ===== PLAY BUTTON: rojo neón como fondo (NO NEGRO) ===== */
         .play-btn {
           width: 56px;
           height: 56px;
@@ -102,15 +100,17 @@ export default function ReproductorMovil({
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          background: radial-gradient(circle at 35% 30%, rgba(255, 77, 109, 0.20), rgba(0,0,0,0.0) 40%), #0b0b0b;
-          border: 1px solid rgba(255, 20, 60, 0.35);
+          /* Red neon background */
+          background: radial-gradient(circle at 35% 30%, rgba(255, 120, 120, 0.25), rgba(255, 30, 30, 0.95) 30%),
+                      linear-gradient(180deg, #ff3b3b 0%, #c81010 100%);
+          border: 1px solid rgba(255, 60, 60, 0.65);
           cursor: pointer;
           transition: transform 120ms ease;
           box-shadow:
-            0 0 8px rgba(255, 20, 60, 0.45),
-            0 0 20px rgba(255, 20, 60, 0.28),
-            0 0 40px rgba(255, 30, 70, 0.18),
-            inset 0 0 8px rgba(255, 77, 109, 0.12);
+            0 0 10px rgba(255, 30, 30, 0.9),
+            0 0 28px rgba(255, 30, 30, 0.6),
+            0 0 60px rgba(255, 60, 60, 0.35),
+            inset 0 0 12px rgba(255, 150, 150, 0.18);
           animation: neon-blink-very-strong 0.9s linear infinite, neon-glow 1.6s ease-in-out infinite;
         }
         .play-btn:active { transform: scale(0.96); }
@@ -120,33 +120,33 @@ export default function ReproductorMovil({
         @keyframes neon-blink-very-strong {
           0% {
             box-shadow:
-              0 0 6px rgba(255,20,60,0.5),
-              0 0 18px rgba(255,20,60,0.36);
+              0 0 10px rgba(255,30,30,0.6),
+              0 0 24px rgba(255,25,25,0.45);
             transform: translateY(0);
           }
           30% {
             box-shadow:
-              0 0 30px rgba(255,60,90,1),
-              0 0 60px rgba(255,30,70,0.8);
+              0 0 34px rgba(255,80,80,1),
+              0 0 70px rgba(255,40,40,0.9);
             transform: translateY(-1.8px);
           }
           60% {
             box-shadow:
-              0 0 44px rgba(255,80,110,1),
-              0 0 110px rgba(255,40,80,0.95);
+              0 0 56px rgba(255,100,100,1),
+              0 0 140px rgba(255,60,60,0.98);
             transform: translateY(-3px);
           }
           100% {
             box-shadow:
-              0 0 6px rgba(255,20,60,0.5),
-              0 0 18px rgba(255,20,60,0.36);
+              0 0 10px rgba(255,30,30,0.6),
+              0 0 24px rgba(255,25,25,0.45);
             transform: translateY(0);
           }
         }
         @keyframes neon-glow {
-          0% { filter: drop-shadow(0 0 4px rgba(255,20,60,0.4)); }
-          50% { filter: drop-shadow(0 0 28px rgba(255,20,60,0.9)); }
-          100% { filter: drop-shadow(0 0 4px rgba(255,20,60,0.4)); }
+          0% { filter: drop-shadow(0 0 6px rgba(255,30,30,0.6)); }
+          50% { filter: drop-shadow(0 0 32px rgba(255,30,30,0.95)); }
+          100% { filter: drop-shadow(0 0 6px rgba(255,30,30,0.6)); }
         }
 
         /* ===== MARQUEE (texto que se mueve) ===== */
@@ -156,7 +156,7 @@ export default function ReproductorMovil({
           align-items: center;
           justify-content: center;
           overflow: hidden;
-          min-width: 0; /* important for truncation in flex */
+          min-width: 0;
         }
         .marquee { width: 100%; overflow: hidden; }
         .marquee-track {
@@ -187,7 +187,7 @@ export default function ReproductorMovil({
 
         @keyframes marquee-scroll {
           0% { transform: translateX(0%); }
-          100% { transform: translateX(-50%); } /* duplicated content scroll */
+          100% { transform: translateX(-50%); }
         }
 
         /* ===== 'AL AIRE' badge (derecha) ===== */
