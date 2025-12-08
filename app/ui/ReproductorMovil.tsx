@@ -38,7 +38,7 @@ export default function ReproductorMovil({
 
       {/* fixed bar on top for mobile only */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50">
-        <div className="envivo-bar-mobile flex items-center justify-between gap-3 px-3 py-2 h-14">
+        <div className="envivo-bar-mobile flex items-center justify-between gap-3 px-3 py-2 h-16">
           {/* PLAY (left) */}
           <button
             onClick={togglePlay}
@@ -92,61 +92,61 @@ export default function ReproductorMovil({
           backdrop-filter: blur(6px);
         }
 
-        /* ===== PLAY BUTTON: rojo neón como fondo (NO NEGRO) ===== */
+        /* ===== PLAY BUTTON: más grande y súper redondo ===== */
         .play-btn {
-          width: 56px;
-          height: 56px;
-          border-radius: 50%;
+          width: 72px;                /* tamaño aumentado */
+          height: 72px;
+          border-radius: 9999px;      /* completamente redondo */
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          /* Red neon background */
           background: radial-gradient(circle at 35% 30%, rgba(255, 120, 120, 0.25), rgba(255, 30, 30, 0.95) 30%),
                       linear-gradient(180deg, #ff3b3b 0%, #c81010 100%);
-          border: 1px solid rgba(255, 60, 60, 0.65);
+          border: 1px solid rgba(255, 60, 60, 0.75);
           cursor: pointer;
           transition: transform 120ms ease;
           box-shadow:
-            0 0 10px rgba(255, 30, 30, 0.9),
-            0 0 28px rgba(255, 30, 30, 0.6),
-            0 0 60px rgba(255, 60, 60, 0.35),
-            inset 0 0 12px rgba(255, 150, 150, 0.18);
+            0 0 14px rgba(255, 30, 30, 0.95),
+            0 0 36px rgba(255, 30, 30, 0.7),
+            0 0 80px rgba(255, 60, 60, 0.45),
+            inset 0 0 14px rgba(255, 180, 180, 0.18);
           animation: neon-blink-very-strong 0.9s linear infinite, neon-glow 1.6s ease-in-out infinite;
+          flex-shrink: 0;
         }
-        .play-btn:active { transform: scale(0.96); }
+        .play-btn:active { transform: scale(0.98); }
 
-        .play-btn .icon { width: 28px; height: 28px; color: white; }
+        .play-btn .icon { width: 34px; height: 34px; color: white; } /* ícono más grande */
 
         @keyframes neon-blink-very-strong {
           0% {
             box-shadow:
-              0 0 10px rgba(255,30,30,0.6),
-              0 0 24px rgba(255,25,25,0.45);
+              0 0 12px rgba(255,30,30,0.7),
+              0 0 28px rgba(255,25,25,0.55);
             transform: translateY(0);
           }
           30% {
             box-shadow:
-              0 0 34px rgba(255,80,80,1),
-              0 0 70px rgba(255,40,40,0.9);
-            transform: translateY(-1.8px);
+              0 0 46px rgba(255,80,80,1),
+              0 0 96px rgba(255,40,40,0.9);
+            transform: translateY(-2.2px);
           }
           60% {
             box-shadow:
-              0 0 56px rgba(255,100,100,1),
-              0 0 140px rgba(255,60,60,0.98);
-            transform: translateY(-3px);
+              0 0 86px rgba(255,100,100,1),
+              0 0 200px rgba(255,60,60,0.98);
+            transform: translateY(-4px);
           }
           100% {
             box-shadow:
-              0 0 10px rgba(255,30,30,0.6),
-              0 0 24px rgba(255,25,25,0.45);
+              0 0 12px rgba(255,30,30,0.7),
+              0 0 28px rgba(255,25,25,0.55);
             transform: translateY(0);
           }
         }
         @keyframes neon-glow {
-          0% { filter: drop-shadow(0 0 6px rgba(255,30,30,0.6)); }
-          50% { filter: drop-shadow(0 0 32px rgba(255,30,30,0.95)); }
-          100% { filter: drop-shadow(0 0 6px rgba(255,30,30,0.6)); }
+          0% { filter: drop-shadow(0 0 8px rgba(255,30,30,0.7)); }
+          50% { filter: drop-shadow(0 0 44px rgba(255,30,30,0.98)); }
+          100% { filter: drop-shadow(0 0 8px rgba(255,30,30,0.7)); }
         }
 
         /* ===== MARQUEE (texto que se mueve) ===== */
@@ -231,9 +231,10 @@ export default function ReproductorMovil({
         }
 
         /* responsive tweaks */
-        @media (max-width: 380px) {
-          .play-btn { width: 48px; height: 48px; }
-          .marquee-item { font-size: 0.64rem; gap: 1rem; padding: 4px 8px; }
+        @media (max-width: 420px) {
+          .play-btn { width: 64px; height: 64px; }
+          .play-btn .icon { width: 30px; height: 30px; }
+          .marquee-item { font-size: 0.68rem; gap: 1rem; padding: 4px 8px; }
           .alaire-badge { padding: 5px 10px; font-size: 0.7rem; }
         }
       `}</style>
