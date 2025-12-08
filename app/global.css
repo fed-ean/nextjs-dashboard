@@ -39,3 +39,72 @@
 .neon-red {
   animation: neonPulseRed 1.8s ease-in-out infinite;
 }
+/* ——————————————— */
+/* 🔥 EFECTOS NEÓN ROJO */
+/* ——————————————— */
+
+.neon-red {
+  box-shadow:
+    0 0 5px rgba(255, 0, 0, 0.9),
+    0 0 15px rgba(255, 0, 0, 1),
+    0 0 30px rgba(255, 0, 0, 1),
+    0 0 45px rgba(255, 0, 0, 1);
+}
+
+@keyframes neon-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 10px rgba(255, 0, 0, 0.8),
+      0 0 25px rgba(255, 0, 0, 1),
+      0 0 35px rgba(255, 0, 0, 1);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(255, 70, 70, 1),
+      0 0 40px rgba(255, 0, 0, 1),
+      0 0 70px rgba(255, 0, 0, 1);
+  }
+}
+
+.neon-pulse {
+  animation: neon-pulse 1.2s infinite ease-in-out;
+}
+
+/* ————————————————— */
+/* 🔥 TEXTO LED DESPLAZÁNDOSE */
+/* ————————————————— */
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+.marquee {
+  white-space: nowrap;
+  overflow: hidden;
+  display: block;
+}
+.marquee-inner {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee 12s linear infinite;
+}
+
+/* ——————————————— */
+/* 🔥 CARTEL "AL AIRE" NEÓN */
+/* ——————————————— */
+
+.neon-al-aire {
+  background: rgba(255, 0, 0, 0.22);
+  border: 2px solid rgba(255, 80, 80, 1);
+  color: #ff4d4d;
+  font-weight: bold;
+  padding: 6px 14px;
+  border-radius: 10px;
+  text-shadow:
+    0 0 8px #ff0000,
+    0 0 15px #ff2d2d,
+    0 0 25px #ff0000;
+  box-shadow:
+    0 0 10px rgba(255, 0, 0, 1),
+    0 0 25px rgba(255, 0, 0, 1),
+    0 0 45px rgba(255, 0, 0, 1);
+}
