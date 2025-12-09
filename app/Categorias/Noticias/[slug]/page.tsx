@@ -284,21 +284,21 @@ export default async function Page({ params }: PageProps) {
   "
 >
     
-    {/* ARTÍCULO — EN CELULAR VA PRIMERO */}
+    {/* ARTÍCULO — Derecha */}
   <article className="order-1 lg:order-3 w-full min-w-0">
     <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 prose prose-lg max-w-none text-gray-800">
       <div className="post-content">{parse(post.content || "")}</div>
     </div>
   </article>
-   {/* SIDENAV — EN CELULAR DESPUÉS DEL ARTÍCULO */}
-   <aside className="order-2 lg:order-1">
+   {/* SIDENAV — Izquierda */}
+  <aside className="order-2 lg:order-1">
     <div className="sticky top-24">
       <SidenavServer />
     </div>
   </aside>
 
           {/* COMPONENTE NUEVO */}
-          <aside className="hidden md:block lg:col-span-1 my-1">
+           <aside className="order-3 lg:order-2 hidden md:block lg:col-span-1 my-1">
             <SidenavComplement
             className="hidden md:block"
               socialLinks={[
