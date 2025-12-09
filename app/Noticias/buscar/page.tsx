@@ -2,10 +2,11 @@
 import { Suspense } from "react";
 import Card from "../../components/card";
 import type { AsyncSearchParams } from "@/types/next-async";
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
-
-const GQL_ENDPOINT = "/graphql";
+const GQL_ENDPOINT =
+  process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ??
+  "https://radioempresaria.com.ar/graphql";
 
 const SEARCH_POSTS_QUERY = `
   query SearchPosts($search: String!) {
@@ -24,6 +25,10 @@ const SEARCH_POSTS_QUERY = `
 `;
 
 async function fetchSearchResults(searchTerm: string) {
+  if (!searchTerm || !searchTerm.trim()) {
+    return { posts: [], error: null };
+  }
+
   try {
     const response = await fetch(GQL_ENDPOINT, {
       method: "POST",
@@ -36,9 +41,20 @@ async function fetchSearchResults(searchTerm: string) {
     });
 
     const json = await response.json();
+
+    // Si GraphQL devolvió errores, devuelvo el primer mensaje para depuración
+    if (!response.ok || json?.errors?.length) {
+      const errMsg =
+        json?.errors?.[0]?.message ??
+        `GraphQL error (status ${response.status})`;
+      console.error("GraphQL error:", json?.errors ?? json);
+      return { posts: [], error: `Error al buscar: ${errMsg}` };
+    }
+
     return { posts: json.data?.posts?.nodes || [], error: null };
-  } catch {
-    return { posts: [], error: "Error al buscar" };
+  } catch (err: any) {
+    console.error("Fetch search error:", err);
+    return { posts: [], error: "Error al buscar (network)." };
   }
 }
 
@@ -72,9 +88,13 @@ export default async function SearchPage({
         Resultados para: <span className="font-light">{searchTerm}</span>
       </h1>
 
-      <Suspense fallback={<div>Cargando...</div>}>
-        <SearchResults searchTerm={searchTerm} />
-      </Suspense>
+      { !searchTerm.trim() ? (
+        <div className="text-center text-gray-600">Escribe algo para buscar</div>
+      ) : (
+        <Suspense fallback={<div>Cargando...</div>}>
+          <SearchResults searchTerm={searchTerm} />
+        </Suspense>
+      )}
     </div>
   );
 }
