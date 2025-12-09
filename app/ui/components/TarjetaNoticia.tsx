@@ -1,4 +1,3 @@
-
 import Link from 'next/link';
 import Image from 'next/image';
 import React from 'react';
@@ -14,12 +13,32 @@ export default function TarjetaNoticia({ post }: { post: Noticia }) {
   const { title, slug, categories } = post;
   const urlNoticia = `/Categorias/Noticias/${slug}`;
 
-  // SOLUCIÓN DEFINITIVA: Se unifica la lógica para encontrar la imagen.
-  // Se busca primero en la estructura anidada (común en las noticias principales)
-  // y si no se encuentra, se busca en la propiedad `sourceUrl` (común en otras llamadas).
-  // El `(post as any)` es necesario para que TypeScript acepte la propiedad `sourceUrl` que no está en la definición estricta.
-  const imageUrl = post.featuredImage?.node?.sourceUrl || (post as any).sourceUrl;
-  const category = categories?.nodes?.[0];
+  // Imagen segura
+  const imageUrl =
+    post.featuredImage?.node?.sourceUrl || (post as any).sourceUrl;
+
+  // Categorías seguras
+  const categoryNodes = categories?.nodes ?? [];
+
+  const getColorForName = (name: string) => {
+    const colors = [
+      "bg-indigo-600",
+      "bg-blue-600",
+      "bg-emerald-600",
+      "bg-rose-600",
+      "bg-purple-600",
+      "bg-orange-500",
+      "bg-yellow-400 text-black",
+      "bg-teal-600",
+      "bg-pink-500",
+      "bg-red-600",
+    ];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+  };
 
   return (
     <article className="group flex flex-col h-full bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
@@ -32,7 +51,9 @@ export default function TarjetaNoticia({ post }: { post: Noticia }) {
                 src={imageUrl}
                 alt={title || 'Imagen de la noticia'}
                 fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                sizes="(max-width: 768px) 100vw,
+                       (max-width: 1200px) 50vw,
+                       33vw"
                 className="object-cover"
               />
             ) : (
@@ -42,11 +63,19 @@ export default function TarjetaNoticia({ post }: { post: Noticia }) {
             )}
           </div>
 
-          {category?.name && (
-            <div className="absolute bottom-3 left-3">
-              <span className="text-white text-xs font-semibold px-3 py-1 rounded-md shadow-sm bg-indigo-600 bg-opacity-90">
-                {category.name}
-              </span>
+          {/* Todas las categorías — seguro, no rompe SSR */}
+          {categoryNodes.length > 0 && (
+            <div className="absolute bottom-3 left-3 flex flex-wrap gap-2 max-w-[85%]">
+              {categoryNodes.map((c: any) => (
+                <span
+                  key={c?.databaseId ?? c?.slug ?? c?.name}
+                  className={`text-white text-xs font-semibold px-2 py-1 rounded-md shadow-sm ${getColorForName(
+                    c?.name ?? "categoria"
+                  )}`}
+                >
+                  {c?.name}
+                </span>
+              ))}
             </div>
           )}
         </div>
@@ -55,10 +84,11 @@ export default function TarjetaNoticia({ post }: { post: Noticia }) {
           <h2 className="text-xl font-semibold text-gray-900 mb-3 leading-snug group-hover:text-blue-700 transition-colors flex-grow">
             {title}
           </h2>
+
           <div className="mt-auto flex justify-between items-center text-xs text-gray-500 pt-3 border-t border-gray-100">
             <span>by RadioEmpresarial</span>
             <span className="font-semibold tracking-wider text-gray-600 group-hover:text-indigo-600 transition-colors duration-300">
-              LEER MÁS &rarr;
+              LEER MÁS →
             </span>
           </div>
         </div>
