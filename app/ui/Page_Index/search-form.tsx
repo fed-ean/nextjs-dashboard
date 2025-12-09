@@ -11,19 +11,17 @@ export default function SearchFormInner({ placeholder = 'Buscar...' }: { placeho
   const pathname = usePathname();
   const router = useRouter();
 
-  // valor controlado para que el input siempre muestre lo que se escribe
   const [term, setTerm] = useState<string>(() => searchParams?.get('q') ?? '');
 
-  // Si cambian los search params externamente (ej: back/forward), sincronizamos
   useEffect(() => {
     const q = searchParams?.get('q') ?? '';
     setTerm(q);
   }, [searchParams]);
 
-  // Debounce: armamos la función que va a navegar con replace()
-  const handleSearch = useDebouncedCallback((value: string) => {
-    // clonamos los params actuales para preservar otros parámetros
-    const params = new URLSearchParams(searchParams as unknown as URLSearchParams);
+  // Debounced callback: devuelve una función, la llamamos directamente
+  const debouncedSearch = useDebouncedCallback((value: string) => {
+    // Creamos params a partir de los entries para evitar problemas de tipos
+    const params = new URLSearchParams(Array.from(searchParams?.entries() ?? []));
 
     if (value && value.trim()) {
       params.set('q', value.trim());
@@ -35,6 +33,7 @@ export default function SearchFormInner({ placeholder = 'Buscar...' }: { placeho
     const base = pathname ?? '/Noticias/buscar';
     const url = queryString ? `${base}?${queryString}` : base;
 
+    // replace para no generar historial por cada tecla
     router.replace(url);
   }, 300);
 
@@ -49,8 +48,8 @@ export default function SearchFormInner({ placeholder = 'Buscar...' }: { placeho
         value={term}
         onChange={(e) => {
           setTerm(e.target.value);
-          handleSearch.callback?.(e.target.value); // .callback es tipado por use-debounce, pero funciona como función
-          // Si tu versión de use-debounce devuelve la función directamente, usa: handleSearch(e.target.value)
+          // Llamamos la función debounced directamente
+          debouncedSearch(e.target.value);
         }}
         placeholder={placeholder}
         className="
