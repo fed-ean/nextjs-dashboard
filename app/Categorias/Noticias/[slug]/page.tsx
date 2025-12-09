@@ -10,6 +10,7 @@ import FooterCarousel from "@/app/ui/components/FooterCarousel";
 import SidenavComplement from "@/app/ui/components/SidenavComplement";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale/es";
+import DOMPurify from "isomorphic-dompurify";
 import "./styles.css";
 
 export const dynamic = "force-dynamic";
@@ -169,7 +170,9 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPost(slug);
-  return { title: post?.title ?? "Post no encontrado" };
+  // Sanitize title to prevent XSS in tab
+  const cleanTitle = DOMPurify.sanitize(post?.title ?? "");
+  return { title: cleanTitle || "Post no encontrado" };
 }
 
 /* =============================
@@ -190,6 +193,10 @@ export default async function Page({ params }: PageProps) {
     );
   }
 
+  // Sanitize content to prevent XSS
+  const cleanContent = DOMPurify.sanitize(post.content || "");
+  const cleanTitle = DOMPurify.sanitize(post.title || "");
+
   const featuredUrl = post.featuredImage?.node?.sourceUrl;
   const authorName = post.author?.node?.name ?? "RadioEmpresarial";
 
@@ -197,7 +204,7 @@ export default async function Page({ params }: PageProps) {
     ? format(parseISO(post.date), "d 'de' MMMM, yyyy", { locale: es })
     : "";
 
-  const readingTime = estimateReadingTime(post.content || "");
+  const readingTime = estimateReadingTime(cleanContent);
 
   const categorias = post.categories?.nodes ?? [];
   const primaryCategory = categorias[0] ?? null;
@@ -245,7 +252,7 @@ export default async function Page({ params }: PageProps) {
             {/* TITULO */}
             <h1
               className="text-white text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight drop-shadow-lg"
-              dangerouslySetInnerHTML={{ __html: post.title }}
+              dangerouslySetInnerHTML={{ __html: cleanTitle }}
             />
 
             {/* AUTOR */}
@@ -271,36 +278,27 @@ export default async function Page({ params }: PageProps) {
       </header>
 
       {/* MAIN */}
-      <main className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-[1600px]">
-      <div
-  className="
-    grid 
-    grid-cols-1 
-    gap-8 
-    w-full
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          {/* Columna Izquierda: Sidenav Principal */}
+          <aside className="lg:col-span-3 order-2 lg:order-1">
+            <div className="sticky top-24 space-y-8">
+              <SidenavServer />
+            </div>
+          </aside>
 
-    /* Desktop layout */
-    lg:grid-cols-[220px_300px_1fr]
-  "
->
-    
-    {/* ARTÍCULO — EN CELULAR VA PRIMERO */}
-  <article className="order-1 lg:order-3 w-full min-w-0">
-    <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 prose prose-lg max-w-none text-gray-800">
-      <div className="post-content">{parse(post.content || "")}</div>
-    </div>
-  </article>
-   {/* SIDENAV — EN CELULAR DESPUÉS DEL ARTÍCULO */}
-   <aside className="order-2 lg:order-1">
-    <div className="sticky top-24">
-      <SidenavServer />
-    </div>
-  </aside>
+          {/* Columna Central: Contenido del Artículo */}
+          <article className="lg:col-span-6 order-1 lg:order-2">
+            <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 prose prose-lg max-w-none text-gray-800">
+              <div className="post-content">{parse(cleanContent)}</div>
+            </div>
+          </article>
 
-          {/* COMPONENTE NUEVO */}
-          <aside className="hidden md:block lg:col-span-1 my-1">
+          {/* Columna Derecha: Sidenav Complementario (Sponsors y Redes) */}
+          <aside className="lg:col-span-3 order-3 lg:order-3">
+            <div className="sticky top-24 space-y-8">
             <SidenavComplement
-            className="hidden md:block"
               socialLinks={[
                 { type: "facebook", href: "https://www.facebook.com", label: "Facebook" },
                 { type: "twitter", href: "https://twitter.com", label: "Twitter" },
@@ -351,11 +349,11 @@ export default async function Page({ params }: PageProps) {
                 { image: "/sponsor/work.jpg", alt: "Work", href: "#" },
               ]}
             />
+            </div>
           </aside>
-
-
-  </div>
-</main>
+          
+        </div>
+      </main>
 
       {/* FOOTER (CARRUSEL DE NOTICIAS) */}
       <FooterCarousel posts={lastPosts} />
