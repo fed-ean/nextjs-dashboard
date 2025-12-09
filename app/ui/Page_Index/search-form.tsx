@@ -1,44 +1,70 @@
-// app/ui/Page_index/search-form.tsx
+// app/ui/Page_Index/search-form.tsx
 'use client';
 
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { useSearchParams, usePathname, useRouter } from 'next/navigation';
-import { useDebouncedCallback } from 'use-debounce';
-import { useEffect, useState } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
 export default function SearchFormInner({ placeholder = 'Buscar...' }: { placeholder?: string }) {
   const searchParams = useSearchParams();
-  const pathname = usePathname();
   const router = useRouter();
 
+  // valor controlado
   const [term, setTerm] = useState<string>(() => searchParams?.get('q') ?? '');
 
+  // sincronizar si cambian los params por back/forward u otra navegación
   useEffect(() => {
     const q = searchParams?.get('q') ?? '';
     setTerm(q);
   }, [searchParams]);
 
-  // Debounced callback: devuelve una función, la llamamos directamente
-  const debouncedSearch = useDebouncedCallback((value: string) => {
-    // Creamos params a partir de los entries para evitar problemas de tipos
-    const params = new URLSearchParams(Array.from(searchParams?.entries() ?? []));
+  // debounce simple con setTimeout
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const DEBOUNCE_MS = 300;
+
+  const navigateWithParams = (value: string) => {
+    // siempre vamos a /Noticias/buscar (no usamos pathname para evitar confusiones)
+    const params = new URLSearchParams();
 
     if (value && value.trim()) {
       params.set('q', value.trim());
-    } else {
-      params.delete('q');
     }
+    const qs = params.toString();
+    const url = qs ? `/Noticias/buscar?${qs}` : `/Noticias/buscar`;
 
-    const queryString = params.toString();
-    const base = pathname ?? '/Noticias/buscar';
-    const url = queryString ? `${base}?${queryString}` : base;
-
-    // replace para no generar historial por cada tecla
+    // Usamos replace para no llenar el historial con cada tecla
     router.replace(url);
-  }, 300);
+  };
+
+  const scheduleNavigate = (value: string) => {
+    // limpiar si hay timeout pendiente
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+    debounceRef.current = setTimeout(() => {
+      navigateWithParams(value);
+      debounceRef.current = null;
+    }, DEBOUNCE_MS);
+  };
+
+  // llamada inmediata (por ejemplo al presionar Enter)
+  const navigateNow = (value: string) => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+      debounceRef.current = null;
+    }
+    navigateWithParams(value);
+  };
 
   return (
-    <div className="relative flex flex-1 flex-shrink-0">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        navigateNow(term);
+      }}
+      className="relative flex flex-1 flex-shrink-0 w-full max-w-md"
+      role="search"
+    >
       <label htmlFor="search" className="sr-only">Buscar</label>
 
       <input
@@ -48,12 +74,11 @@ export default function SearchFormInner({ placeholder = 'Buscar...' }: { placeho
         value={term}
         onChange={(e) => {
           setTerm(e.target.value);
-          // Llamamos la función debounced directamente
-          debouncedSearch(e.target.value);
+          scheduleNavigate(e.target.value);
         }}
         placeholder={placeholder}
         className="
-          peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 pr-3 text-sm 
+          peer block w-full rounded-md border border-gray-200 py-2 pl-10 pr-3 text-sm 
           text-black bg-white placeholder:text-gray-500
           focus:outline-none focus:ring-2 focus:ring-blue-500
         "
@@ -61,10 +86,16 @@ export default function SearchFormInner({ placeholder = 'Buscar...' }: { placeho
         aria-label="Buscar noticias"
       />
 
-      <MagnifyingGlassIcon
-        aria-hidden="true"
-        className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 pointer-events-none peer-focus:text-gray-900"
-      />
-    </div>
+      <button
+        type="submit"
+        aria-label="Buscar"
+        className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded-md"
+      >
+        <MagnifyingGlassIcon
+          aria-hidden="true"
+          className="h-5 w-5 text-gray-600"
+        />
+      </button>
+    </form>
   );
 }
