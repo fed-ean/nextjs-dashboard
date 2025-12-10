@@ -1,3 +1,4 @@
+//app/Contacto/page.tsx
 import Image from "next/image";
 
 export default function Contacto() {
@@ -135,8 +136,8 @@ export default function Contacto() {
 
 // Sponsors configurables
 const SPONSORS = [
-  { src: "/sponsors/fagua-audax.png", alt: "Fagua Audax", href: "https://www.tiendafagua.com.ar/" },
-  { src: "/sponsors/lober.png", alt: "Lober Logística", href: "#" },
-  { src: "/sponsors/jlf.jpg", alt: "JLF Materiales Eléctricos", href: "http://www.electrojf.com.ar/" },
-  { src: "/sponsors/encadenar.png", alt: "Encadenar", href: "https://www.encadenar.com.ar/" },
+  { src: "/sponsor/fagua-audax.png", alt: "Fagua Audax", href: "https://www.tiendafagua.com.ar/" },
+  { src: "/sponsor/lober.png", alt: "Lober Logística", href: "#" },
+  { src: "/sponsor/jlf.jpg", alt: "JLF Materiales Eléctricos", href: "http://www.electrojf.com.ar/" },
+  { src: "/sponsor/encadenar.png", alt: "Encadenar", href: "https://www.encadenar.com.ar/" },
 ];
