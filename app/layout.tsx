@@ -1,6 +1,7 @@
 // app/layout.tsx
 import type { Metadata } from "next";
 import { Alegreya_Sans } from "next/font/google";
+import React, { Suspense } from "react";
 import "./global.css";
 
 import sponsorsList from "@/app/lib/sponsors";
@@ -26,10 +27,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es">
       <body className={`${alegreyaSans.variable} font-sans antialiased`}>
-        <header>
         <EnVivoLayout />
+        <Suspense fallback={<div />}>
+          <NavBar />
+        </Suspense>
         <NavBar />
-        </header>
 
         {/* -------------------------
             4) Main content
