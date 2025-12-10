@@ -26,12 +26,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es">
       <body className={`${alegreyaSans.variable} font-sans antialiased`}>
+        <header>
         <EnVivoLayout />
-
-        {/* -------------------------
-            3) Navbar
-           ------------------------- */}
         <NavBar />
+        </header>
 
         {/* -------------------------
             4) Main content
