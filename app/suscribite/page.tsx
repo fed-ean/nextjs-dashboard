@@ -1,13 +1,25 @@
+// app/suscribite/page.tsx
+// Next.js (App Router) + TypeScript
+// Página intermedia (interstitial) para redirigir al Newsletter (Substack).
+// Incluye:
+//  - dos tonos de texto: "Institucional" y "Periodístico"
+//  - animación / loader visual
+//  - integración estética pensada para "Radio Empresarial"
+//  - fallback "Ir ahora" y contador con barra de progreso
+// Cómo usar:
+//  - Copiar este archivo a /app/suscribite/page.tsx
+//  - Cambiar SUBSTACK_URL si corresponde
+//  - Ajustar DELAY_SECONDS si querés 10 / 20 s por defecto
 
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 
-const SUBSTACK_URL = 'https://substack.com/@fundacionprobuenosaires?utm_source=global-search'; // <- cambia esto
+const SUBSTACK_URL = 'https://tusubstack.substack.com'; // <- cambia esto
 const DELAY_SECONDS = 15; // <- puedes cambiar a 10 o 20
 
-export default function SuscribitePage(): JSX.Element {
+export default function SuscribitePage(): React.ReactElement {
   const [secondsLeft, setSecondsLeft] = useState<number>(DELAY_SECONDS);
   const [tone, setTone] = useState<'institucional' | 'periodistico'>('institucional');
   const [isRedirecting, setIsRedirecting] = useState<boolean>(false);
