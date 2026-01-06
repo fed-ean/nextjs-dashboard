@@ -41,7 +41,6 @@ export default async function CategoriaFirstPage({ params }: Props) {
       className="
         grid
         grid-cols-1
-        gap-8
         w-full
         lg:grid-cols-[350px_240px_1fr]
       "
