@@ -36,14 +36,14 @@ export default async function CategoriaFirstPage({ params }: Props) {
   }
 
   return (
-  <div className="w-full mx-auto max-w-[1600px] px-0 py-8">
+  <div className="w-full max-w-[1600px] px-1 py-8">
     <div
       className="
         grid
         grid-cols-1
         gap-8
         w-full
-        lg:grid-cols-[360px_300px_1fr]
+        lg:grid-cols-[350px_240px_1fr]
       "
     >
       {/* SIDENAV — IZQUIERDA */}
