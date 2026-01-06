@@ -67,7 +67,6 @@ useEffect(() => {
   };
 }, []);
 
-  // When mobile menu opens: show mobile tooltip (auto) and hide after 5s
   useEffect(() => {
   if (typeof window === 'undefined') return;
   if (!isMenuOpen) return;
@@ -198,7 +197,7 @@ useEffect(() => {
 
             {/* DERECHA: Suscribite */}
             <div className="flex justify-end w-1/4">
-              <Link href="/Login" className="flex items-center gap-2 text-gray-800 transition-transform duration-300 ease-in-out hover:scale-105">
+              <Link href="/suscribite" className="flex items-center gap-2 text-gray-800 transition-transform duration-300 ease-in-out hover:scale-105">
                 <HiOutlineMail className="h-8 w-8" />
                 <span className="text-lg font-semibold bg-gradient-to-r from-orange-400 to-rose-500 text-transparent bg-clip-text">
                   Suscribite
