@@ -204,7 +204,7 @@ export default async function Page({ params }: PageProps) {
   const otherCategories = categorias.slice(1);
 
   return (
-    <div className="w-full">
+    <div className="flex flex-col gap-6 w-full">
       {/* HERO */}
       <header
         className="hero-bleed"
@@ -274,15 +274,14 @@ export default async function Page({ params }: PageProps) {
       <main className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-[1600px]">
       <div
   className="
-    grid 
-    grid-cols-1 
-    gap-8 
+    grid
+    grid-cols-1
+    gap-8
     w-full
-
-    /* Desktop layout */
-    lg:grid-cols-[220px_300px_1fr]
+    lg:grid-cols-[360px_300px_1fr]
   "
 >
+
     
     {/* ARTÍCULO — Derecha */}
   <article className="order-1 lg:order-3 w-full min-w-0">
@@ -291,11 +290,12 @@ export default async function Page({ params }: PageProps) {
     </div>
   </article>
    {/* SIDENAV — Izquierda */}
-  <aside className="order-2 lg:order-1 lg:col-span-4">
-    <div className="sticky top-24">
-      <SidenavServer />
-    </div>
-  </aside>
+<aside className="order-2 lg:order-1">
+  <div className="sticky top-24">
+    <SidenavServer />
+  </div>
+</aside>
+
 
           {/* COMPONENTE NUEVO */}
            <aside className="order-3 lg:order-2 hidden md:block lg:col-span-1 my-1">
