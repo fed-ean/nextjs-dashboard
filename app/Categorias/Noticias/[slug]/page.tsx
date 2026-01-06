@@ -291,7 +291,7 @@ export default async function Page({ params }: PageProps) {
     </div>
   </article>
    {/* SIDENAV — Izquierda */}
-  <aside className="order-2 lg:order-1">
+  <aside className="order-2 lg:order-1 lg:col-span-4">
     <div className="sticky top-24">
       <SidenavServer />
     </div>
