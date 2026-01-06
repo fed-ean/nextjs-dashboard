@@ -42,7 +42,7 @@ export default async function CategoriaFirstPage({ params }: Props) {
         grid
         grid-cols-1
         w-full
-        lg:grid-cols-[330px_220px_1fr]
+        lg:grid-cols-[320px_210px_1fr]
       "
     >
       {/* SIDENAV — IZQUIERDA */}
