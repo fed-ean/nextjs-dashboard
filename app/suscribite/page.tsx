@@ -4,22 +4,24 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 
-const SUBSTACK_URL = 'https://substack.com/@fundacionprobuenosaires?utm_source=global-search'; // <- reemplazá por tu URL real
-const DELAY_SECONDS = 15; // <- ajustar a 10 o 20 si querés
+const SUBSTACK_URL = 'https://substack.com/@fundacionprobuenosaires?utm_source=global-search'; // <- reemplaza
+const DELAY_SECONDS = 15; // <- ajustar si querés 10/20
 
 export default function SuscribitePage(): React.ReactElement {
   const [secondsLeft, setSecondsLeft] = useState<number>(DELAY_SECONDS);
   const [tone, setTone] = useState<'institucional' | 'periodistico'>('institucional');
-  const [isRedirecting, setIsRedirecting] = useState<boolean>(false);
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // Inicia el contador
+    // Bloqueo scroll del body mientras está el overlay
+    const prevOverflow = document.body.style.overflow || '';
+    document.body.style.overflow = 'hidden';
+
+    // Inicia contador
     timerRef.current = window.setInterval(() => {
       setSecondsLeft((s) => {
         if (s <= 1) {
           if (timerRef.current) window.clearInterval(timerRef.current);
-          setIsRedirecting(true);
           window.location.href = SUBSTACK_URL;
           return 0;
         }
@@ -27,23 +29,20 @@ export default function SuscribitePage(): React.ReactElement {
       });
     }, 1000);
 
-    // Evento para analytics (opcional)
-    if ((window as any).dataLayer) {
-      (window as any).dataLayer.push({ event: 'newsletter_interstitial_shown' });
-    }
+    // evento analytics opcional
+    if ((window as any).dataLayer) (window as any).dataLayer.push({ event: 'newsletter_interstitial_shown' });
 
     return () => {
       if (timerRef.current) window.clearInterval(timerRef.current);
+      // restaura scroll
+      document.body.style.overflow = prevOverflow;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const goNow = () => {
     if (timerRef.current) window.clearInterval(timerRef.current);
-    setIsRedirecting(true);
-    if ((window as any).dataLayer) {
-      (window as any).dataLayer.push({ event: 'newsletter_interstitial_click_now' });
-    }
+    if ((window as any).dataLayer) (window as any).dataLayer.push({ event: 'newsletter_interstitial_click_now' });
     window.location.href = SUBSTACK_URL;
   };
 
@@ -65,28 +64,36 @@ export default function SuscribitePage(): React.ReactElement {
   } as const;
 
   return (
-    <main
-      className="suscribite-page-root"
+    // OVERLAY FIJO que cubre TODO el viewport
+    <div
+      role="dialog"
+      aria-modal="true"
       style={{
-        width: '100%',
-        maxWidth: 1100,
-        boxSizing: 'border-box',
-        padding: 20,
+        position: 'fixed',
+        inset: 0,
+        zIndex: 999999, // muy por encima de la navbar/footer
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(180deg, rgba(2,6,23,0.95), rgba(4,8,20,0.92))',
+        padding: 24,
       }}
     >
+      {/* Contenedor centrado (card) */}
       <div
         style={{
           width: '100%',
+          maxWidth: 1100,
           borderRadius: 16,
           padding: 22,
           boxSizing: 'border-box',
           background: 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))',
           border: '1px solid rgba(255,255,255,0.04)',
           color: '#f8fafc',
-          boxShadow: '0 8px 30px rgba(2,6,23,0.6)',
+          boxShadow: '0 12px 40px rgba(2,6,23,0.7)',
         }}
       >
-        {/* header pequeño */}
+        {/* CABECERA */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
           <div
             style={{
@@ -118,14 +125,12 @@ export default function SuscribitePage(): React.ReactElement {
           </div>
         </div>
 
-        {/* cuerpo */}
+        {/* BODY: texto + loader */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 24, alignItems: 'center' }}>
-          {/* left: texto y controles */}
+          {/* Izquierda: texto y controles */}
           <div>
             <h1 style={{ margin: 0, fontSize: 24, lineHeight: 1.12, fontWeight: 800 }}>{texts[tone].title}</h1>
-            <p style={{ marginTop: 12, marginBottom: 12, color: 'rgba(248,250,252,0.9)', lineHeight: 1.6 }}>
-              {texts[tone].lead}
-            </p>
+            <p style={{ marginTop: 12, marginBottom: 12, color: 'rgba(248,250,252,0.9)', lineHeight: 1.6 }}>{texts[tone].lead}</p>
             <p style={{ marginTop: 8, marginBottom: 4, color: 'rgba(248,250,252,0.72)' }}>{texts[tone].cta}</p>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 18 }}>
@@ -140,7 +145,6 @@ export default function SuscribitePage(): React.ReactElement {
                   border: 'none',
                   cursor: 'pointer',
                 }}
-                aria-label="Ir ahora al newsletter"
               >
                 Ir ahora
               </button>
@@ -163,14 +167,7 @@ export default function SuscribitePage(): React.ReactElement {
               <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ fontSize: 14, minWidth: 36, textAlign: 'right' }}>{secondsLeft}s</div>
                 <div style={{ width: 160, height: 10, background: 'rgba(255,255,255,0.06)', borderRadius: 999, overflow: 'hidden' }}>
-                  <div
-                    style={{
-                      width: `${progress}%`,
-                      height: '100%',
-                      transition: 'width 220ms linear',
-                      background: 'linear-gradient(90deg,#ef4444,#f59e0b)',
-                    }}
-                  />
+                  <div style={{ width: `${progress}%`, height: '100%', transition: 'width 220ms linear', background: 'linear-gradient(90deg,#ef4444,#f59e0b)' }} />
                 </div>
               </div>
             </div>
@@ -192,40 +189,10 @@ export default function SuscribitePage(): React.ReactElement {
             </div>
           </div>
 
-          {/* right: animación / loader */}
+          {/* Derecha: animación/loader */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div
-              style={{
-                width: 300,
-                height: 300,
-                borderRadius: 18,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative',
-                background: 'radial-gradient(closest-side, rgba(239,68,68,0.06), rgba(0,0,0,0.18))',
-                border: '1px solid rgba(255,255,255,0.03)',
-              }}
-            >
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 18,
-                  left: 18,
-                  width: 52,
-                  height: 52,
-                  borderRadius: 999,
-                  background: '#ef4444',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontWeight: 800,
-                  fontSize: 20,
-                }}
-              >
-                ▶
-              </div>
+            <div style={{ width: 300, height: 300, borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', background: 'radial-gradient(closest-side, rgba(239,68,68,0.06), rgba(0,0,0,0.18))', border: '1px solid rgba(255,255,255,0.03)' }}>
+              <div style={{ position: 'absolute', top: 18, left: 18, width: 52, height: 52, borderRadius: 999, background: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: 20 }}>▶</div>
 
               <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.92)' }}>
                 <div style={{ fontSize: 14, fontWeight: 800 }}>Radio Empresarial</div>
@@ -233,7 +200,6 @@ export default function SuscribitePage(): React.ReactElement {
                 <div style={{ marginTop: 36, fontSize: 22, opacity: 0.85, fontWeight: 800 }}>RE</div>
               </div>
 
-              {/* Equalizer - animado con keyframes (ver style al final) */}
               <svg viewBox="0 0 120 40" style={{ position: 'absolute', bottom: 18, left: 18, right: 18, height: 40 }} preserveAspectRatio="none" aria-hidden>
                 <g strokeWidth={3} strokeLinecap="round">
                   <line x1="10" y1="25" x2="10" y2="15" stroke="url(#g)" style={{ transformOrigin: 'center bottom', animation: 'eq 1.2s ease-in-out infinite' }} />
@@ -251,13 +217,11 @@ export default function SuscribitePage(): React.ReactElement {
               </svg>
             </div>
 
-            <div style={{ marginTop: 12, fontSize: 14, color: 'rgba(255,255,255,0.85)' }}>
-              Redirigiendo en <strong>{secondsLeft}s</strong>…
-            </div>
+            <div style={{ marginTop: 12, fontSize: 14, color: 'rgba(255,255,255,0.85)' }}>Redirigiendo en <strong>{secondsLeft}s</strong>…</div>
           </div>
         </div>
 
-        {/* footer pequeño */}
+        {/* footer chico en la card */}
         <div style={{ marginTop: 18, display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>
           <div>Apoyá a la fundación — Gracias por ser parte.</div>
           <div>
@@ -268,7 +232,6 @@ export default function SuscribitePage(): React.ReactElement {
         </div>
       </div>
 
-      {/* Keyframes locales para el equalizer */}
       <style jsx>{`
         @keyframes eq {
           0% { transform: scaleY(0.35); }
@@ -276,6 +239,6 @@ export default function SuscribitePage(): React.ReactElement {
           100% { transform: scaleY(0.35); }
         }
       `}</style>
-    </main>
+    </div>
   );
 }
