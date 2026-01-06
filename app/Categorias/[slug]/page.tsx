@@ -36,10 +36,18 @@ export default async function CategoriaFirstPage({ params }: Props) {
   }
 
   return (
-    // Nota: eliminé el padding horizontal del container (px-0) para poder pegar los extremos.
-    <div className="container mx-auto px-0 py-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
-      {/* COLUMNA IZQUIERDA - MENU (sticky) */}
-      <aside className="lg:col-span-3 space-y-8 pl-0">
+  <div className="w-full mx-auto max-w-[1600px] px-0 py-8">
+    <div
+      className="
+        grid
+        grid-cols-1
+        gap-8
+        w-full
+        lg:grid-cols-[360px_300px_1fr]
+      "
+    >
+      {/* SIDENAV — IZQUIERDA */}
+      <aside className="order-2 lg:order-1">
         <div className="sticky top-24">
           <Suspense fallback={<div className="p-4 text-sm text-gray-500">Cargando menú…</div>}>
             <SidenavServer />
@@ -47,14 +55,10 @@ export default async function CategoriaFirstPage({ params }: Props) {
         </div>
       </aside>
 
-      {/* COLUMNA CENTRAL - CARRUSEL DE SPONSORS */}
-      <div className="hidden md:block lg:col-span-4 flex justify-center items-start px-4">
-        {/* 
-          Pasa la lista de sponsors como prop (puedes usar tu array completo).
-          Si ya tienes un array compartido, importa y pásalo; acá incluyo un ejemplo reducido.
-        */}
+      {/* COLUMNA CENTRAL — SPONSORS */}
+      <aside className="order-3 lg:order-2 hidden md:block">
         <SidenavComplement
-          className="w-full max-w-[360px] p-0"
+          className="w-full"
           socialLinks={[
             { type: "facebook", href: "https://www.facebook.com", label: "Facebook" },
             { type: "twitter", href: "https://twitter.com", label: "Twitter" },
@@ -105,22 +109,29 @@ export default async function CategoriaFirstPage({ params }: Props) {
                 { image: "/sponsor/work.jpg", alt: "Work", href: "#" },
           ]}
         />
-      </div>
+      </aside>
 
-      {/* COLUMNA DERECHA - NOTICIAS (sin padding-right) */}
-      <main className="lg:col-span-5 pr-0">
-        <h1 className="text-3xl font-bold mb-6 pl-4 lg:pl-0">{category?.name ?? slug}</h1>
-        {/* Aseguro que CategoryGrid no agregue padding a la derecha: envuelto en un div p-0 */}
+      {/* NOTICIAS — DERECHA */}
+      <main className="order-1 lg:order-3 w-full min-w-0 pr-0">
+        <h1 className="text-3xl font-bold mb-6 px-4 lg:px-0">
+          {category?.name ?? slug}
+        </h1>
+
         <div className="p-0">
           <CategoryGrid posts={posts} currentSectionSlug={slug} />
         </div>
 
         <div className="mt-8">
           <Suspense fallback={<div className="text-sm text-gray-500">Cargando paginación…</div>}>
-            <CategoryPagination basePath={`/Categorias/${slug}`} current={page} totalPages={totalPages} />
+            <CategoryPagination
+              basePath={`/Categorias/${slug}`}
+              current={page}
+              totalPages={totalPages}
+            />
           </Suspense>
         </div>
       </main>
     </div>
-  );
+  </div>
+);
 }
