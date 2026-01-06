@@ -154,7 +154,7 @@ useEffect(() => {
             </Link>
           </div>
           <div className="flex justify-end items-center">
-            <Link href="/Login" className="flex items-center gap-2 text-gray-800">
+            <Link href="/suscribite" className="flex items-center gap-2 text-gray-800">
               <HiOutlineMail className="h-8 w-8" />
             </Link>
           </div>
