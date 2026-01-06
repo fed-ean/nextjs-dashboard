@@ -79,17 +79,17 @@ export default function EquipoPage() {
             {
               name: "Facundo Galdós",
               role: "Dir Contenido PYME",
-              image: "/equipo/facundo.jpg",
+              image: "/Equipo/facundo.jpg",
             },
             {
               name: "Claudio Blanco",
               role: "Director Periodístico",
-              image: "/equipo/claudio.jpg",
+              image: "/Equipo/claudio.jpg",
             },
             {
               name: "Practicantes de la EEST N°4",
               role: "Diseño & Web Master",
-              image: "/equipo/practicantes.jpg",
+              image: "/Equipo/practicantes.jpg",
             },
           ]}
         />
@@ -102,12 +102,12 @@ export default function EquipoPage() {
             {
               name: "Esteban Díaz Romero",
               role: "Locutor Nacional",
-              image: "/equipo/esteban.jpg",
+              image: "/Equipo/esteban.jpg",
             },
             {
               name: "Laura Farías",
               role: "Locutora Nacional",
-              image: "/equipo/laura.jpg",
+              image: "/Equipo/laura.jpg",
             },
           ]}
         />
@@ -120,17 +120,17 @@ export default function EquipoPage() {
             {
               name: "Rober Páez",
               role: "Operador Técnico",
-              image: "/equipo/rober.jpg",
+              image: "/Equipo/rober.jpg",
             },
             {
               name: "Eliana Herrera",
               role: "Operadora Técnica",
-              image: "/equipo/eliana.jpg",
+              image: "/Equipo/eliana.jpg",
             },
             {
               name: "Nahuel Cravero",
               role: "Operador Técnico",
-              image: "/equipo/nahuel.jpg",
+              image: "/Equipo/nahuel.jpg",
             },
           ]}
         />
@@ -143,12 +143,12 @@ export default function EquipoPage() {
             {
               name: "Claudio Blanco",
               role: "Director Periodístico",
-              image: "/equipo/claudio.jpg",
+              image: "/Equipo/claudio.jpg",
             },
             {
               name: "Juan Larroza",
               role: "Periodista y productor",
-              image: "/equipo/juan-larroza.jpg",
+              image: "/Equipo/juan-larroza.jpg",
             },
           ]}
         />
