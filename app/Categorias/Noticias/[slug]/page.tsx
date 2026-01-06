@@ -7,7 +7,7 @@ import React from "react";
 import parse from "html-react-parser";
 import SidenavServer from "@/app/ui/Page_Index/SidenavServer";
 import FooterCarousel from "@/app/ui/components/FooterCarousel";
-import SidenavComplement from "@/app/ui/components/SidenavComplement";
+import SidenavComplement from "../../../ui/components/SidenavComplement";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale/es";
 import "./styles.css";
