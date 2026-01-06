@@ -16,7 +16,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 
-const SUBSTACK_URL = 'https://tusubstack.substack.com'; // <- cambia esto
+const SUBSTACK_URL = 'https://substack.com/@fundacionprobuenosaires?utm_source=global-search'; // <- cambia esto
 const DELAY_SECONDS = 15; // <- puedes cambiar a 10 o 20
 
 export default function SuscribitePage(): React.ReactElement {
@@ -26,6 +26,23 @@ export default function SuscribitePage(): React.ReactElement {
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
+    // Hide common site headers/navbars to make this page truly full-screen.
+    // We'll attempt several common selectors and restore the original display on cleanup.
+    const selectors = ['#navbar', 'header', '.site-header', '.main-nav', '.topbar', '.navbar', '.Header', '.header', '#topnav'];
+    const prevStyles: Array<{ el: HTMLElement; display: string | null; overflow: string | null }> = [];
+
+    selectors.forEach((sel) => {
+      document.querySelectorAll(sel).forEach((node) => {
+        const el = node as HTMLElement;
+        prevStyles.push({ el, display: el.style.display || null, overflow: el.style.overflow || null });
+        el.style.display = 'none';
+      });
+    });
+
+    // Also prevent body scrolling while interstitial is active
+    const prevBodyOverflow = document.body.style.overflow || '';
+    document.body.style.overflow = 'hidden';
+
     // Start countdown
     timerRef.current = window.setInterval(() => {
       setSecondsLeft((s) => {
@@ -48,6 +65,12 @@ export default function SuscribitePage(): React.ReactElement {
 
     return () => {
       if (timerRef.current) window.clearInterval(timerRef.current);
+      // restore previously hidden elements
+      prevStyles.forEach(({ el, display, overflow }) => {
+        el.style.display = display ?? '';
+        if (overflow != null) el.style.overflow = overflow;
+      });
+      document.body.style.overflow = prevBodyOverflow;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
