@@ -154,9 +154,9 @@ useEffect(() => {
             </Link>
           </div>
           <div className="flex justify-end items-center">
-            <Link href="/suscribite" className="flex items-center gap-2 text-gray-800">
+            <a href="https://substack.com/@fundacionprobuenosaires?utm_source=global-search" className="flex items-center gap-2 text-gray-800">
               <HiOutlineMail className="h-8 w-8" />
-            </Link>
+            </a>
           </div>
         </div>
 
@@ -197,12 +197,12 @@ useEffect(() => {
 
             {/* DERECHA: Suscribite */}
             <div className="flex justify-end w-1/4">
-              <Link href="/suscribite" className="flex items-center gap-2 text-gray-800 transition-transform duration-300 ease-in-out hover:scale-105">
+              <a href="https://substack.com/@fundacionprobuenosaires?utm_source=global-search" className="flex items-center gap-2 text-gray-800 transition-transform duration-300 ease-in-out hover:scale-105">
                 <HiOutlineMail className="h-8 w-8" />
                 <span className="text-lg font-semibold bg-gradient-to-r from-orange-400 to-rose-500 text-transparent bg-clip-text">
                   Suscribite
                 </span>
-              </Link>
+              </a>
             </div>
 
             {/* TOOLTIP (desktop) - centered on screen, arrow positioned to point to Contact button */}
