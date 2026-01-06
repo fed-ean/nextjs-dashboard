@@ -271,7 +271,7 @@ export default async function Page({ params }: PageProps) {
       </header>
 
       {/* MAIN */}
-      <main className="w-full p">
+      <main className="w-full px-1">
       <div
   className="
     grid
