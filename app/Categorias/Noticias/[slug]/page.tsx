@@ -271,14 +271,13 @@ export default async function Page({ params }: PageProps) {
       </header>
 
       {/* MAIN */}
-      <main className="w-full">
+      <main className="w-full p">
       <div
   className="
     grid
     grid-cols-1
-    gap-8
     w-full
-    lg:grid-cols-[360px_300px_1fr]
+    lg:grid-cols-[360px_250px_1fr]
   "
 >
 
