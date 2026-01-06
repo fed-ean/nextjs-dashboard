@@ -4,7 +4,7 @@ import { getCachedPostsPage } from "../../../../lib/data-fetcher";
 import CategoryGridServer from "../../../../ui/categorias/CategoryGridServer";
 import CategoryPagination from "../../../../ui/categorias/CategoryPagination";
 import SidenavServer from "@/app/ui/Page_Index/SidenavServer";
-import SidenavComplement from "@/app/ui/components/SidenavComplement"; // ajusta ruta si la tienes en otro lugar
+import SidenavComplement from "../../../../ui/components/SidenavComplement"; // ajusta ruta si la tienes en otro lugar
 
 const PER_PAGE = 10;
 
