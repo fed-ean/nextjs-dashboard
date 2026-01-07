@@ -6,7 +6,7 @@ export default function CategoryGridServer({ posts }: { posts: any[] }) {
   }
 
   return (
-    <section className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="container mx-auto px-1 sm:px-6 lg:px-1">
       <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
         {posts.map((p: any) => (
           <TarjetaNoticia
