@@ -54,7 +54,6 @@ export default async function CategoriaPaged({ params }: Props) {
       className="
         grid
         grid-cols-1
-        gap-8
         w-full
         lg:grid-cols-[320px_210px_1fr]
       "
