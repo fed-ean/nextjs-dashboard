@@ -48,11 +48,19 @@ export default async function CategoriaPaged({ params }: Props) {
     );
   }
 
-  return (
-    // Quitar padding horizontal del container para que quede pegado a los bordes
-    <div className="container mx-auto px-0 py-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
-      {/* COLUMNA IZQUIERDA - MENU (sticky) */}
-      <aside className="lg:col-span-3 space-y-8 pl-0">
+ return (
+  <div className="w-full max-w-[1600px] px-1 py-8">
+    <div
+      className="
+        grid
+        grid-cols-1
+        gap-8
+        w-full
+        lg:grid-cols-[320px_210px_1fr]
+      "
+    >
+      {/* SIDENAV — IZQUIERDA */}
+      <aside className="order-2 lg:order-1">
         <div className="sticky top-24">
           <Suspense fallback={<div className="p-4 text-sm text-gray-500">Cargando menú…</div>}>
             <SidenavServer />
@@ -60,10 +68,10 @@ export default async function CategoriaPaged({ params }: Props) {
         </div>
       </aside>
 
-      {/* COLUMNA CENTRAL - CARRUSEL DE SPONSORS */}
-      <div className="hidden md:block lg:col-span-4 flex justify-center items-start px-4">
+      {/* COLUMNA CENTRAL — SPONSORS */}
+      <aside className="order-3 lg:order-2 hidden md:block">
         <SidenavComplement
-          className="w-full max-w-[360px] p-0"
+          className="w-full"
           socialLinks={[
             { type: "facebook", href: "https://www.facebook.com", label: "Facebook" },
             { type: "twitter", href: "https://twitter.com", label: "Twitter" },
@@ -114,23 +122,29 @@ export default async function CategoriaPaged({ params }: Props) {
                 { image: "/sponsor/work.jpg", alt: "Work", href: "#" },
           ]}
         />
-      </div>
+      </aside>
 
-      {/* COLUMNA DERECHA - NOTICIAS (sin padding-right) */}
-      <main className="lg:col-span-5 pr-0">
-        <h1 className="text-3xl font-bold mb-6 pl-4 lg:pl-0">{title}</h1>
+      {/* NOTICIAS — DERECHA */}
+      <main className="order-1 lg:order-3 w-full min-w-0 pr-0">
+        <h1 className="text-3xl font-bold mb-6 px-4 lg:px-0">
+          {title}
+        </h1>
 
-        {/* Envuelvo CategoryGridServer en un contenedor sin padding para evitar márgenes extra */}
         <div className="p-0">
           <CategoryGridServer posts={posts} />
         </div>
 
         <div className="mt-8">
           <Suspense fallback={<div className="text-sm text-gray-500">Cargando paginación…</div>}>
-            <CategoryPagination basePath={`/Categorias/${slug}`} current={pageNum} totalPages={totalPages} />
+            <CategoryPagination
+              basePath={`/Categorias/${slug}`}
+              current={pageNum}
+              totalPages={totalPages}
+            />
           </Suspense>
         </div>
       </main>
     </div>
-  );
+  </div>
+);
 }
