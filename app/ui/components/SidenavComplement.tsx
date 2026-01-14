@@ -26,7 +26,7 @@ export const SidenavComplement: React.FC<{
   // Limit a 16 items como en tu versión original
   const sponsorsToUse = (sponsors || []).slice(0, 39);
   const items = sponsorsToUse.length ? [...sponsorsToUse, ...sponsorsToUse] : [];
-  const durationSeconds = Math.max(8, Math.round((sponsorsToUse.length || 4) * 2.5));
+  const durationSeconds = Math.max(8, Math.round((sponsorsToUse.length || 4) * 4));
   const visibleHeight = '2150px'; // mantené o ajustá según quieras
   const marqueeStyle: React.CSSProperties = {
     ['--marquee-duration' as any]: `${durationSeconds}s`,
