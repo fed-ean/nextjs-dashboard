@@ -77,3 +77,56 @@
     font-size: 1rem;
   }
 }
+@media (min-width: 1024px) {
+  .post-content iframe {
+    max-width: 800px;
+  }
+}
+
+
+/* ================================
+   CONTENIDO DE POST - RESPONSIVE
+   ================================ */
+
+.post-content {
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+/* --- Iframes (YouTube, Facebook, etc.) --- */
+.post-content iframe {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  display: block;
+  margin: 1.5rem auto;
+}
+
+/* --- Videos HTML5 --- */
+.post-content video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.5rem auto;
+}
+
+/* --- Imágenes --- */
+.post-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.5rem auto;
+}
+
+/* --- Embeds de WordPress (figure + iframe) --- */
+.post-content figure {
+  max-width: 100%;
+  margin: 1.5rem auto;
+}
+
+/* --- Evita desbordes raros --- */
+.post-content * {
+  box-sizing: border-box;
+}
