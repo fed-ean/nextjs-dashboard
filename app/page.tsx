@@ -20,6 +20,7 @@ import SeccionNoticiasVarias from './ui/Page_Index/SeccionNoticiasVarias';
 import SponsorsCarousel from './ui/Page_Index/SponsorsCarousel';
 
 import './fonts.css';
+import AdSlot from './ui/components/AdSlot';
 import AdPlaceholder from './ui/components/AdPlaceholder';
 
 export default function Page() {
@@ -35,15 +36,12 @@ export default function Page() {
               phrases={["DIFUSIÓN y ANÁLISIS DE LAS PYMES", "SOMOS LA VOZ DEL SECTOR PRODUCTIVO"]}
             />
           </h1>
-           {/* <-- PLACEHOLDER PEQUEÑO PARA GOOGLE ADS (debajo de la máquina de escribir) */}
-          <div className="mt-4 flex justify-center">
-            <AdPlaceholder
-              id="ad-top-small"
-              slot="top-small"
-              size="small"          // tamaño pequeño (no muy grande)
-              label="Espacio publicitario — placeholder (Google Ads)"
-            />
-          </div>
+           <AdSlot
+            id="ad-top-leaderboard"
+            slot="top-leaderboard"
+            variant="leaderboard"
+            label="Espacio publicitario — placeholder (Google Ads)"
+          />
         </header>
         <h2 className="titullium-web-semibold uppercase text-xl">Noticias Principales</h2>
         
