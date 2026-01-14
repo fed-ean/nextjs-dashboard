@@ -1,6 +1,7 @@
+// app/ui/components/SidenavComplement.tsx
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 
 export type Sponsor = {
   id?: string;
@@ -22,66 +23,11 @@ export const SidenavComplement: React.FC<{
   socialLinks?: SocialLink[];
   className?: string;
 }> = ({ sponsors = [], socialLinks = [], className = '' }) => {
-  // límite aumentado a 39 (como pediste)
+  // Limit a 16 items como en tu versión original
   const sponsorsToUse = (sponsors || []).slice(0, 39);
   const items = sponsorsToUse.length ? [...sponsorsToUse, ...sponsorsToUse] : [];
-
-  // refs para medir alturas reales
-  const marqueeVerticalRef = useRef<HTMLDivElement | null>(null);
-  const marqueeViewportRef = useRef<HTMLDivElement | null>(null);
-
-  // duración (segundos) que se inyectará en CSS var --marquee-duration
-  const [durationSeconds, setDurationSeconds] = useState<number>(
-    Math.max(12, Math.round((sponsorsToUse.length || 4) * 4))
-  );
-
-  // altura visible del viewport (ajustalo si querés)
-  const visibleHeight = '560px';
-
-  // velocidad objetivo en píxeles por segundo (ajustala: 10 = muy lento, 40 = rápido)
-  const desiredPxPerSec = 18; // <-- pon esto más bajo para más lento
-
-  useEffect(() => {
-    function computeDuration() {
-      const vertical = marqueeVerticalRef.current;
-      const viewport = marqueeViewportRef.current;
-      if (!vertical || !viewport) return;
-
-      // altura total del contenedor de items (incluye duplicado)
-      const totalHeight = vertical.scrollHeight; // px
-      // la animación actual mueve -50% (por eso distance = totalHeight / 2)
-      const distance = totalHeight / 2;
-
-      // calcular duración en segundos para lograr desiredPxPerSec
-      const seconds = Math.max(8, Math.ceil(distance / desiredPxPerSec));
-      setDurationSeconds(seconds);
-    }
-
-    // calcular inicialmente y al cargar imágenes/recursos esperar un poco
-    computeDuration();
-
-    // recalcular tras un timeout por si hay imágenes que cargan después
-    const t = window.setTimeout(computeDuration, 500);
-    const t2 = window.setTimeout(computeDuration, 1500);
-
-    // recalcular al cambiar tamaño de ventana
-    const onResize = () => {
-      // pequeña debounce
-      window.clearTimeout(t);
-      window.clearTimeout(t2);
-      window.setTimeout(computeDuration, 150);
-    };
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      window.clearTimeout(t);
-      window.clearTimeout(t2);
-      window.removeEventListener('resize', onResize);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sponsorsToUse.length, desiredPxPerSec]);
-
-  // CSS variables inline para que la regla CSS use el valor calculado
+  const durationSeconds = Math.max(12, Math.round((sponsorsToUse.length || 4) * 4));
+  const visibleHeight = '2150px'; // mantené o ajustá según quieras
   const marqueeStyle: React.CSSProperties = {
     ['--marquee-duration' as any]: `${durationSeconds}s`,
     ['--marquee-visible-height' as any]: visibleHeight,
@@ -113,13 +59,9 @@ export const SidenavComplement: React.FC<{
       <div className="text-center text-xs tracking-wider text-gray-600 mb-3">SPONSORS</div>
 
       <div className="relative flex justify-center" style={marqueeStyle}>
-        <div
-          ref={marqueeViewportRef}
-          className="marquee-viewport"
-          style={{ height: visibleHeight, overflow: 'hidden' }}
-        >
+        <div className="marquee-viewport" style={{ height: visibleHeight, overflow: 'hidden' }}>
           {items.length > 0 ? (
-            <div ref={marqueeVerticalRef} className="marquee-vertical will-change-transform" aria-hidden>
+            <div className="marquee-vertical will-change-transform" aria-hidden>
               {items.map((s, idx) => (
                 <a
                   key={`${s.image}-${idx}`}
